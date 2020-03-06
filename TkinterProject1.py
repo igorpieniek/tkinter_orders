@@ -2,6 +2,7 @@ from tkinter import *
 
 from windowManager import windowManager
 
+
 root = Tk()
 root.geometry('400x400')
 
@@ -9,11 +10,15 @@ global manager
 manager = windowManager(0)
 
 from startModule import startModule
+startwin = startModule(root)
 
-if manager.getStatus == 0:
-    startwin = startModule(root)
-    #START WINDOW
-#elif manager.getStatus() == 1:
+if manager.getStatus() == 'START':
+      #START WINDOW
+    if startwin.Process() != -1:  
+        manager.setStatus(manager.options[startwin.Process()])
+  
+elif manager.getStatus() == 'NEW ORDER':
+    pass
     #NEW ORDER
 #elif manager.getStatus() == 2:
     #HISTORY
