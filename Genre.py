@@ -3,4 +3,7 @@ class Genre():
     stands = ['90', '45','Ślimak']
     color = ['styropian', 'czarny', 'bialy', 'ecru', 'czerwony']
 
-
+    def __init__(self):
+        # read from database (future)
+        pass
+  

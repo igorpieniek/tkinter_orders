@@ -1,6 +1,7 @@
 from tkinter import *
 
 from windowManager import windowManager
+from Order import Order
 
 
 root = Tk()
@@ -12,13 +13,16 @@ manager = windowManager(0)
 from startModule import startModule
 startwin = startModule(root)
 
+order = Order(root)
+
 if manager.getStatus() == 'START':
       #START WINDOW
-    if startwin.Process() != -1:  
-        manager.setStatus(manager.options[startwin.Process()])
+    status = startwin.process()
+    if status != -1:  
+        manager.setStatus(manager.options[status])
   
-elif manager.getStatus() == 'NEW ORDER':
-    pass
+elif manager.getStatus() == 'NEW_ORDER':
+    order.process()
     #NEW ORDER
 #elif manager.getStatus() == 2:
     #HISTORY

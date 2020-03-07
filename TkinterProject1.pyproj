@@ -21,6 +21,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Genre.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Order.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="windowManager.py">
       <SubType>Code</SubType>
     </Compile>
