@@ -13,7 +13,7 @@ class Order():
 
     def addInputFrame(self):
         self.inputFrame.append( LabelFrame(self.root, padx = 5, pady=5) )
-        self.inputFrame[self.inputFrameNum].grid(row = 1+self.inputFrameNum ,column = 1, stick = N+W)
+        self.inputFrame[-1].grid(row = len(self.inputFrame) ,column = 1, stick = N+W)
         self.inputFrameNum += 1
 
 
@@ -22,9 +22,8 @@ class Order():
         self.addElementsFrame = LabelFrame(self.root, padx = 5, pady=5)
         self.addElementsFrame.grid(row = 0,column = 1, stick = W+N+E)
 
-
         self.controlFrame = LabelFrame(self.root, padx = 5, pady=5)
-        self.controlFrame.grid(rowspan = 2,column = 0, stick = W+N+S)
+        self.controlFrame.grid(row= 0, rowspan = 2,column = 0, stick = W+N+S)
  
         self.orderListFrame = LabelFrame(self.root, padx = 5, pady=5)
         self.orderListFrame.grid(row = 2,column = 1)
@@ -32,19 +31,24 @@ class Order():
 
 
     def addDummyClick(self):
-        self.addInputFrame()
-        self.Dummys.append(DummyLine( self.inputFrame[self.inputFrameNum - 1]))
-
         counter = 0
         while counter < len(self.Dummys):
             if len(self.Dummys) != 0 and self.Dummys[counter].toDelate == True:
                 self.Dummys.pop(counter)
+                self.inputFrame[counter].destroy()
                 self.inputFrame.pop(counter)
-                self.inputFrameNum -= 1
+#                if counter != len(self.inputframe)-1:
+ #                   for i in range(counter,len(self.inputframe)):
+  #                      self.inputframe[i].grid(row = counter ,column = 1, stick = n+w)
+
             else : counter += 1
-        
-        for i in range( len(self.Dummys)):
-            self.Dummys[i].dummyUpdate(self.inputFrame[i])
+        for i in range(len(self.inputFrame)):
+            self.inputFrame[i].grid(row = 1+i ,column = 1, stick = N+W)
+       # for i in range( len(self.Dummys)):
+        #    self.Dummys[i].dummyUpdate(self.inputFrame[i])
+
+        self.addInputFrame()
+        self.Dummys.append(DummyLine( self.inputFrame[len(self.inputFrame) - 1]))
 
     def addStateClick(self):
         pass
@@ -162,5 +166,3 @@ class DummyLine():
             self.toDelate = True
             self.root.destroy()
         
-    def dummyUpdate(self, newRoot):
-       self.root = newRoot
