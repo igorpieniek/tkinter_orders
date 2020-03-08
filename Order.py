@@ -13,7 +13,7 @@ class Order():
 
     def addInputFrame(self):
         self.inputFrame.append( LabelFrame(self.root, padx = 5, pady=5) )
-        self.inputFrame[self.inputFrameNum].grid(row = 1+self.inputFrameNum ,column = 1, stick = W+N)
+        self.inputFrame[self.inputFrameNum].grid(row = 1+self.inputFrameNum ,column = 1, stick = N+W)
         self.inputFrameNum += 1
 
 
@@ -35,6 +35,16 @@ class Order():
         self.addInputFrame()
         self.Dummys.append(DummyLine( self.inputFrame[self.inputFrameNum - 1]))
 
+        counter = 0
+        while counter < len(self.Dummys):
+            if len(self.Dummys) != 0 and self.Dummys[counter].toDelate == True:
+                self.Dummys.pop(counter)
+                self.inputFrame.pop(counter)
+                self.inputFrameNum -= 1
+            else : counter += 1
+        
+        for i in range( len(self.Dummys)):
+            self.Dummys[i].dummyUpdate(self.inputFrame[i])
 
     def addStateClick(self):
         pass
@@ -98,26 +108,27 @@ class DummyLine():
         self.genre = Genre()
         self._colorNum = 0
 
+        self.toDelate = False
 
         self.addDummyClick()
 
-    def addDummyClick(self):
-
-        self.model.append(StringVar())
-        self.model[ len(self.model)-1 ].set(self.genre.dummys[0])
-        self.modelopt.append( OptionMenu(self.root,  self.model[ len(self.model)-1 ],*self.genre.dummys) )
-        self.modelopt[ len(self.modelopt)-1 ].configure(width = 5)
-        self.modelopt[ len(self.modelopt)-1 ].grid(padx=20, pady=0, row=0, column=0)
-
+    def addDummyClick(self):     
+        self._addModel()
         self._addDummyColor()
-
         self._addNumberEntry()
-        
+    
         self._genreButtons.append( Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) )
         self._genreButtons[len(self._genreButtons)-1].grid( row =1, column = 0)
 
         self._delateButtons.append( Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) )
         self._delateButtons[len(self._delateButtons)-1].grid( row = 0, column = 3)
+
+    def _addModel(self):
+        self.model.append(StringVar())
+        self.model[ len(self.model)-1 ].set(self.genre.dummys[0])
+        self.modelopt.append( OptionMenu(self.root,  self.model[ len(self.model)-1 ],*self.genre.dummys) )
+        self.modelopt[ len(self.modelopt)-1 ].configure(width = 5)
+        self.modelopt[ len(self.modelopt)-1 ].grid(padx=20, pady=0, row=0, column=0)
 
     def _addDummyColor(self):
         self.color.append(StringVar())
@@ -132,18 +143,24 @@ class DummyLine():
         self.number[len(self.number)-1].grid( row= self._colorNum , column=2)
 
     def _addInputLine(self):
-        if   self._colorNum < len(self.genre.color):
+        if   self._colorNum < len(self.genre.color) -1:
             self._colorNum += 1
             self._addDummyColor()
             self._addNumberEntry()
+        
     
     def _delThisInputFrame(self):
         if len(self.color)>1:
             self.color.pop(-1)
             self.coloropt[-1].destroy()
+            self.coloropt.pop(-1)
 
             self.number[-1].destroy()
+            self.number.pop(-1)
             self._colorNum -= 1
         else:
+            self.toDelate = True
             self.root.destroy()
         
+    def dummyUpdate(self, newRoot):
+       self.root = newRoot
