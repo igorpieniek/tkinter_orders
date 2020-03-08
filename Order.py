@@ -83,6 +83,7 @@ class Order():
         self.addOptionLists()
 
 
+####################################################################################################################
 class DummyLine():
 
     def __init__(self,root):
@@ -137,4 +138,12 @@ class DummyLine():
             self._addNumberEntry()
     
     def _delThisInputFrame(self):
-        pass
+        if len(self.color)>1:
+            self.color.pop(-1)
+            self.coloropt[-1].destroy()
+
+            self.number[-1].destroy()
+            self._colorNum -= 1
+        else:
+            self.root.destroy()
+        
