@@ -14,15 +14,17 @@ class Order():
 
 
     def addInputFrame(self):
-        self.inputFrame.append( LabelFrame(self.root, padx = 5, pady=5) )
-        self.inputFrame[-1].grid(row = len(self.inputFrame) ,column = 1, stick = N+W)
-
+        self.inputFrame.append( LabelFrame(self.allInputsFrame, padx = 5, pady=5) )
+        self.inputFrame[-1].grid(row = len(self.inputFrame)-1 ,column = 0, stick = N+W)
 
 
 
     def addFrames(self):
         self.addElementsFrame = LabelFrame(self.root, padx = 5, pady=5,width =300, background = "blue")
         self.addElementsFrame.grid(row = 0,column = 1, stick = W+N+E)
+
+        self.allInputsFrame = LabelFrame(self.root, padx = 5, pady=5)
+        self.allInputsFrame.grid(row= 1,column = 1, stick = W+N+S)
 
         self.controlFrame = LabelFrame(self.root, padx = 5, pady=5)
         self.controlFrame.grid(row= 0, rowspan = 2,column = 0, stick = W+N+S)
@@ -35,7 +37,14 @@ class Order():
 
         self.addInputFrame()
         self.Dummys.append(DummyLine( self.inputFrame[len(self.inputFrame) - 1] , len(self.inputFrame) - 1) )
-  
+
+    def addStateClick(self):
+        self._updateDummysObj()
+        self._updateStandsObj()
+        self._updateInputFrames()
+
+        self.addInputFrame()
+        self.Stands.append(StandsLine( self.inputFrame[len(self.inputFrame) - 1], len(self.inputFrame) - 1) )
     def _updateInputFrames(self):
         dumNum = []
         standNum = []
@@ -45,11 +54,16 @@ class Order():
         for k in range(len(self.Stands)):
             standNum.append(self.Stands[k].lineNum)
 
-        allNum = dumNum + standNum 
-        self.inputFrame[self._lineNumToDel].destroy()
-        del  self.inputFrame[self._lineNumToDel]
+        allNum = dumNum + standNum
+        print(allNum)
+        for i in self._lineNumToDel:
+            self.inputFrame[i].destroy()
 
-        self.inputFrame[allNum].grid(row = 1+allNum ,column = 1, stick = N+W)
+
+        if self._lineNumToDel : self.inputFrame[self._lineNumToDel] = []
+
+        for i in allNum:
+            self.inputFrame[i].grid(row = allNum[i] ,column = 0, stick = N+W)
 
     def _updateDummysObj(self):
         counter = 0
@@ -57,18 +71,14 @@ class Order():
             if len(self.Dummys) != 0 and self.Dummys[counter].toDelate == True:
                 self._lineNumToDel.append( self.Dummys[counter].lineNum)
                 self.Dummys.pop(counter)
-                while counter < len(self.Dummys):
-                    self.Dummys[counter].lineNum -= 1
+                k = counter
+                while k < len(self.Dummys):
+                    self.Dummys[k].lineNum -= 1
+                    k +=1
 
             else : counter += 1
 
-    def addStateClick(self):
-        self._updateDummysObj()
-        self._updateStandsObj()
-        self._updateInputFrames()
 
-        self.addInputFrame()
-        self.Stands.append(StandsLine( self.inputFrame[len(self.inputFrame) - 1], len(self.inputFrame) - 1) )
 
 
     def _updateStandsObj(self): # could be merged with updateDummys by reference
@@ -77,10 +87,11 @@ class Order():
             if len(self.Stands) != 0 and self.Stands[counter].toDelate == True:
                 self._lineNumToDel.append( self.Stands[counter].lineNum)
                 self.Stands.pop(counter)
-                while counter < len(self.Stands):
-                    self.Stands[counter].lineNum -= 1
-                #self.inputFrame[counter].destroy()
-                #self.inputFrame.pop(counter)
+
+                k = counter
+                while k < len(self.Stands):
+                    self.Stands[k].lineNum -= 1
+                    k +=1
 
             else : counter += 1
 
