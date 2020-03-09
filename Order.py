@@ -10,6 +10,7 @@ class Order():
         self.inputFrame = []
         self.Dummys = []
         self.Stands = []
+        self.allProducts = []
         self._lineNumToDel = []
 
 
@@ -30,70 +31,47 @@ class Order():
         self.controlFrame.grid(row= 0, rowspan = 2,column = 0, stick = W+N+S)
 
     def addDummyClick(self):
-        if self.Dummys : 
-            self._updateDummysObj()
-            self._updateStandsObj()
-            self._updateInputFrames()
-
+        self._inputUpdate()
         self.addInputFrame()
-        self.Dummys.append(DummyLine( self.inputFrame[len(self.inputFrame) - 1] , len(self.inputFrame) - 1) )
+        self.allProducts.append(DummyLine( self.inputFrame[len(self.inputFrame) - 1] , len(self.inputFrame) - 1) )
 
     def addStateClick(self):
-        self._updateDummysObj()
-        self._updateStandsObj()
-        self._updateInputFrames()
-
+        self._inputUpdate()
         self.addInputFrame()
-        self.Stands.append(StandsLine( self.inputFrame[len(self.inputFrame) - 1], len(self.inputFrame) - 1) )
+        self.allProducts.append(StandsLine( self.inputFrame[len(self.inputFrame) - 1], len(self.inputFrame) - 1) )
+
+    def _inputUpdate(self):
+        if self.allProducts : 
+            self._updateProductsObj()
+            self._updateInputFrames()
+            self._lineNumToDel = []
+
     def _updateInputFrames(self):
-        dumNum = []
-        standNum = []
-        allNum = []
-        for k in range(len(self.Dummys)):
-            dumNum.append(self.Dummys[k].lineNum)
-        for k in range(len(self.Stands)):
-            standNum.append(self.Stands[k].lineNum)
+        if self._lineNumToDel:
+            counter = self._lineNumToDel[0]
+            dynCounter = 0
+            for counter in self._lineNumToDel:             
+                self.inputFrame.pop(counter - dynCounter)
+               
+                k = counter - dynCounter
+                dynCounter += 1 
+                while k < len(self.inputFrame):
+                    self.inputFrame[k].grid_configure(row = k ,column = 0, stick = N+W)
+                    k+=1
 
-        allNum = dumNum + standNum
-        print(allNum)
-        for i in self._lineNumToDel:
-            self.inputFrame[i].destroy()
 
-
-        if self._lineNumToDel : self.inputFrame[self._lineNumToDel] = []
-
-        for i in allNum:
-            self.inputFrame[i].grid(row = allNum[i] ,column = 0, stick = N+W)
-
-    def _updateDummysObj(self):
+    def _updateProductsObj(self):
         counter = 0
-        while counter < len(self.Dummys):
-            if len(self.Dummys) != 0 and self.Dummys[counter].toDelate == True:
-                self._lineNumToDel.append( self.Dummys[counter].lineNum)
-                self.Dummys.pop(counter)
+        while counter < len(self.allProducts):
+            if len(self.allProducts) != 0 and self.allProducts[counter].toDelate == True:
+                self._lineNumToDel.append( self.allProducts[counter].lineNum)
+                self.allProducts.pop(counter)
                 k = counter
-                while k < len(self.Dummys):
-                    self.Dummys[k].lineNum -= 1
+                while k < len(self.allProducts):
+                    self.allProducts[k].lineNum -= 1
                     k +=1
 
-            else : counter += 1
-
-
-
-
-    def _updateStandsObj(self): # could be merged with updateDummys by reference
-        counter = 0
-        while counter < len(self.Stands):
-            if len(self.Stands) != 0 and self.Stands[counter].toDelate == True:
-                self._lineNumToDel.append( self.Stands[counter].lineNum)
-                self.Stands.pop(counter)
-
-                k = counter
-                while k < len(self.Stands):
-                    self.Stands[k].lineNum -= 1
-                    k +=1
-
-            else : counter += 1
+            else: counter +=1
 
 
     def backClick():
