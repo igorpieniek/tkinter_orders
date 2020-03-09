@@ -13,7 +13,11 @@ manager = windowManager(0)
 from startModule import startModule
 startwin = startModule(root)
 
-order = Order(root)
+orderFrame = LabelFrame(root, padx = 10, pady=10,width=500)
+orderFrame.grid(row = 0, column  =0)
+
+
+order = Order(orderFrame)
 
 if manager.getStatus() == 'START':
       #START WINDOW
