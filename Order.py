@@ -10,6 +10,7 @@ class Order():
         self.inputFrame = []
         self.Dummys = []
         self.Stands = []
+        self._lineNumToDel = []
 
 
     def addInputFrame(self):
@@ -27,26 +28,37 @@ class Order():
         self.controlFrame.grid(row= 0, rowspan = 2,column = 0, stick = W+N+S)
 
     def addDummyClick(self):
-        self._updateDummysObj()
-        self._updateStandsObj()
-        self._updateInputFrames()
+        if self.Dummys : 
+            self._updateDummysObj()
+            self._updateStandsObj()
+            self._updateInputFrames()
 
         self.addInputFrame()
-        self.Dummys.append(DummyLine( self.inputFrame[len(self.inputFrame) - 1]))
+        self.Dummys.append(DummyLine( self.inputFrame[len(self.inputFrame) - 1] , len(self.inputFrame) - 1) )
   
     def _updateInputFrames(self):
-        print("Ilosc ramek " +str(len(self.inputFrame)))
-        for i in range(len(self.inputFrame)):
-            print("Licznik " + str(i))
-            self.inputFrame[i].grid(row = 1+i ,column = 1, stick = N+W)
+        dumNum = []
+        standNum = []
+        allNum = []
+        for k in range(len(self.Dummys)):
+            dumNum.append(self.Dummys[k].lineNum)
+        for k in range(len(self.Stands)):
+            standNum.append(self.Stands[k].lineNum)
+
+        allNum = dumNum + standNum 
+        self.inputFrame[self._lineNumToDel].destroy()
+        del  self.inputFrame[self._lineNumToDel]
+
+        self.inputFrame[allNum].grid(row = 1+allNum ,column = 1, stick = N+W)
 
     def _updateDummysObj(self):
         counter = 0
         while counter < len(self.Dummys):
             if len(self.Dummys) != 0 and self.Dummys[counter].toDelate == True:
+                self._lineNumToDel.append( self.Dummys[counter].lineNum)
                 self.Dummys.pop(counter)
-                self.inputFrame[counter].destroy()
-                self.inputFrame.pop(counter)
+                while counter < len(self.Dummys):
+                    self.Dummys[counter].lineNum -= 1
 
             else : counter += 1
 
@@ -56,16 +68,19 @@ class Order():
         self._updateInputFrames()
 
         self.addInputFrame()
-        self.Stands.append(StandsLine( self.inputFrame[len(self.inputFrame) - 1]))
+        self.Stands.append(StandsLine( self.inputFrame[len(self.inputFrame) - 1], len(self.inputFrame) - 1) )
 
 
     def _updateStandsObj(self): # could be merged with updateDummys by reference
         counter = 0
         while counter < len(self.Stands):
             if len(self.Stands) != 0 and self.Stands[counter].toDelate == True:
+                self._lineNumToDel.append( self.Stands[counter].lineNum)
                 self.Stands.pop(counter)
-                self.inputFrame[counter].destroy()
-                self.inputFrame.pop(counter)
+                while counter < len(self.Stands):
+                    self.Stands[counter].lineNum -= 1
+                #self.inputFrame[counter].destroy()
+                #self.inputFrame.pop(counter)
 
             else : counter += 1
 
@@ -114,8 +129,10 @@ class Order():
 ####################################################################################################################
 class DummyLine():
 
-    def __init__(self,root):
+    def __init__(self,root ,lineNum):
         self.root = root
+        self.lineNum = lineNum
+
         self.model = []
         self.modelopt = []
         self.color = []
@@ -182,8 +199,10 @@ class DummyLine():
         
 #############################################################################################
 class StandsLine():
-    def __init__(self,root):
+    def __init__(self,root, lineNum):
          self.root = root
+         self.lineNum = lineNum
+
          self.genre = Genre()
          self.toDelate = False
 
