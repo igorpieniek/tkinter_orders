@@ -6,7 +6,6 @@ class Order():
         self.genre = Genre()
         self.root = root
 
-
         self.inputFrame = []
         self.Dummys = []
         self.Stands = []
@@ -41,7 +40,7 @@ class Order():
         self.allProducts.append(StandsLine( self.inputFrame[len(self.inputFrame) - 1], len(self.inputFrame) - 1) )
 
     def _inputUpdate(self):
-        if self.allProducts : 
+        if self.allProducts and self.inputFrame: 
             self._updateProductsObj()
             self._updateInputFrames()
             self._lineNumToDel = []
@@ -51,13 +50,10 @@ class Order():
             counter = self._lineNumToDel[0]
             dynCounter = 0
             for counter in self._lineNumToDel:             
-                self.inputFrame.pop(counter - dynCounter)
-               
-                k = counter - dynCounter
-                dynCounter += 1 
-                while k < len(self.inputFrame):
-                    self.inputFrame[k].grid_configure(row = k ,column = 0, stick = N+W)
-                    k+=1
+                self.inputFrame.pop(counter - dynCounter)              
+
+            for i in range(len(self.inputFrame)):
+                self.inputFrame[i].grid(row = self.allProducts[i].lineNum ,column = 0)
 
 
     def _updateProductsObj(self):
