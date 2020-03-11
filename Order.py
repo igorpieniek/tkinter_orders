@@ -1,9 +1,11 @@
 from tkinter import *
 from Genre import Genre
+from PDFgen import *
 
 class Order():
     def __init__(self,root):
         self.genre = Genre()
+        self.pdf = PDFgen()
         self.root = root
 
         self.inputFrame = []
@@ -76,8 +78,18 @@ class Order():
     def saveClick():
         pass
    
-    def generatePDFClick():
-        pass
+    def generatePDFClick(self):
+        self.pdf.process(self.allProducts)
+        for i in range(len(self.allProducts)):   
+            if isinstance(self.allProducts[i],DummyLine ):
+                for k in range(len(self.allProducts[i].color)):
+                    print(str(self.allProducts[i].model[0].get()) + " "+
+                          str(self.allProducts[i].color[k].get()) + " "+
+                          str(self.allProducts[i].number[k].get()))
+            if isinstance(self.allProducts[i],StandsLine ): 
+                for k in range(len(self.allProducts[i].value)):
+                    print(str(self.allProducts[i].model[0].get()) + " "+
+                          str(self.allProducts[i].value[k]))
 
     def addMainButtons(self):
         self.buttons = []
@@ -190,6 +202,7 @@ class StandsLine():
 
          self.genre = Genre()
          self.toDelate = False
+         self.value = []
 
          self._addStand()
 
@@ -198,12 +211,13 @@ class StandsLine():
         self._addNumberEntry()
 
         self._delateButton = Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) 
-        self._delateButton.grid( row = 0, column = 3)
+        self._delateButton.grid( row = 0, column = 3, stick = N+E)
 
 
     def _addNumberEntry(self):
         self.number = Entry(self.root, width=4) 
         self.number.grid( row= 0 , column=2)
+        self.value.append(self.number.get())
     
     def _addModel(self):
         self.model = StringVar()

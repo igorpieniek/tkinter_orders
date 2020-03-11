@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="PDFgen.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Genre.py">
       <SubType>Code</SubType>
     </Compile>
