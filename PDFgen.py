@@ -44,20 +44,25 @@ class PDFgen():
 
         # Update of colour and number
         for i in range(len(self._dummys)):
+            dummyLineToDel = []
             for k in range(len(self._dummys[i].color)):
                 if not self._dummys[i].number[k].get(): 
-                    newDummy_col.append( self._dummys[i].color[k].get())
-                    newDummy_num.append( self._dummys[i].number[k].get())
-            if len( newDummy_col) != 0:
-                self._dummys[i].color = newDummy_col
-                self._dummys[i].numer = newDummy_num
-            else:
+                    dummyLineToDel.append(k)    
+            if len( dummyLineToDel) > 0 and len( dummyLineToDel) < len(self._dummys[i].color)  :
+                counter = 0
+                while counter < len(dummyLineToDel):
+                    self._dummys[i].color.pop(dummyLineToDel[counter]-counter)
+                    self._dummys[i].number.pop(dummyLineToDel[counter]-counter)
+                    counter +=1
+            elif len( dummyLineToDel) == len(self._dummys[i].color):
                 dummyObjtoDel.append(i)
+
         # Update dummy obj in case all is empty
         if dummyObjtoDel:
             counter = 0
             while counter < len(dummyObjtoDel):
                 self._dummys.pop(dummyObjtoDel[counter]-counter)
+                counter +=1
         # Update stands obj incase its empty
         for i in range(len(self._stands)):
             if self._stands[i].number.get(): standsObjtoDel.append(i)
@@ -65,6 +70,7 @@ class PDFgen():
             counter = 0
             while counter < len(standsObjtoDel):
                 self._stands.pop(standsObjtoDel[counter]-counter)
+                counter +=1
         
 
 
