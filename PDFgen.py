@@ -19,13 +19,16 @@ class PDFgen():
     def process(self, prodList):
         self._copyProducts(prodList)
         self._sortProducts()
+        self._delEmptyLines()
         self._addToExcel()
         self._generatePDF()
     
     def _copyProducts(self,prodList):
+        self._productsList = []
         self._productsList = prodList
 
     def _sortProducts(self):
+
         from Order import DummyLine, StandsLine
         for i in range(len(self._productsList)):   
              if isinstance(self._productsList[i],DummyLine ):
@@ -33,13 +36,46 @@ class PDFgen():
              elif isinstance(self._productsList[i],StandsLine ):
                  self._stands.append(self._productsList[i])
 
+    def _delEmptyLines(self):
+        newDummy_col = []
+        newDummy_num = []
+        dummyObjtoDel = []
+        standsObjtoDel = []
+
+        # Update of colour and number
+        for i in range(len(self._dummys)):
+            for k in range(len(self._dummys[i].color)):
+                if not self._dummys[i].number[k].get(): 
+                    newDummy_col.append( self._dummys[i].color[k].get())
+                    newDummy_num.append( self._dummys[i].number[k].get())
+            if len( newDummy_col) != 0:
+                self._dummys[i].color = newDummy_col
+                self._dummys[i].numer = newDummy_num
+            else:
+                dummyObjtoDel.append(i)
+        # Update dummy obj in case all is empty
+        if dummyObjtoDel:
+            counter = 0
+            while counter < len(dummyObjtoDel):
+                self._dummys.pop(dummyObjtoDel[counter]-counter)
+        # Update stands obj incase its empty
+        for i in range(len(self._stands)):
+            if self._stands[i].number.get(): standsObjtoDel.append(i)
+        if standsObjtoDel:
+            counter = 0
+            while counter < len(standsObjtoDel):
+                self._stands.pop(standsObjtoDel[counter]-counter)
+        
+
+
+
+
     def _addToExcel(self):
         lastRow = 3
         for i in range(len(self._dummys)):
             self.er['A'+ str(lastRow)] = str(self._dummys[i].model[0].get())
             k =0
             while k < len(self._dummys[i].color):
-                #if len( self._dummys[i].number[k].get()) !=0
                 self.er['B'+ str(k+lastRow)] = self._dummys[i].color[k].get()
                 self.er['C'+ str(k+lastRow)] = self._dummys[i].number[k].get()
                 k+=1
