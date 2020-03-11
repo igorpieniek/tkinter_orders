@@ -87,9 +87,8 @@ class Order():
                           str(self.allProducts[i].color[k].get()) + " "+
                           str(self.allProducts[i].number[k].get()))
             if isinstance(self.allProducts[i],StandsLine ): 
-                for k in range(len(self.allProducts[i].value)):
-                    print(str(self.allProducts[i].model[0].get()) + " "+
-                          str(self.allProducts[i].value[k]))
+                print(str(self.allProducts[i].model.get()) + " "+
+                          str(self.allProducts[i].number.get()))
 
     def addMainButtons(self):
         self.buttons = []
@@ -202,7 +201,7 @@ class StandsLine():
 
          self.genre = Genre()
          self.toDelate = False
-         self.value = []
+         
 
          self._addStand()
 
@@ -217,7 +216,7 @@ class StandsLine():
     def _addNumberEntry(self):
         self.number = Entry(self.root, width=4) 
         self.number.grid( row= 0 , column=2)
-        self.value.append(self.number.get())
+        #self.value.append(self.number.get())
     
     def _addModel(self):
         self.model = StringVar()

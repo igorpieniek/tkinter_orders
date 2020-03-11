@@ -31,18 +31,25 @@ class PDFgen():
              if isinstance(self._productsList[i],DummyLine ):
                  self._dummys.append(self._productsList[i])
              elif isinstance(self._productsList[i],StandsLine ):
-                 self._dummys.append(self._productsList[i])
+                 self._stands.append(self._productsList[i])
 
     def _addToExcel(self):
         lastRow = 3
         for i in range(len(self._dummys)):
-            self.er['A'+ str(i+lastRow)] = self._dummys[i].model[0].get()
+            self.er['A'+ str(lastRow)] = str(self._dummys[i].model[0].get())
             k =0
             while k < len(self._dummys[i].color):
-                self.er['B'+ str(i+k+lastRow)] = self._dummys[i].color[k].get()
-                self.er['C'+ str(i+k+lastRow)] = self._dummys[i].number[k].get()
+                #if len( self._dummys[i].number[k].get()) !=0
+                self.er['B'+ str(k+lastRow)] = self._dummys[i].color[k].get()
+                self.er['C'+ str(k+lastRow)] = self._dummys[i].number[k].get()
                 k+=1
-            lastRow += len(self._dummys[i].color)-1
+            lastRow += len(self._dummys[i].color)
+
+        for q in range(len(self._stands)):
+            self.er['A'+ str(q+lastRow)] = self._stands[q].model.get()
+            self.er['C'+ str(q+lastRow)] = self._stands[q].number.get()
+          
+       
         
         self.ex.save('tkinter_test.xlsx')
 
