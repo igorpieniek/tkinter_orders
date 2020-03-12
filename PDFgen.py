@@ -1,20 +1,21 @@
 from openpyxl import Workbook
-
-
+from openpyxl.styles import NamedStyle, Border, Side
 
 class PDFgen():
     def __init__(self):
          self.ex = Workbook()
     
          self.er = self.ex.active
-         self.er['A2'] = 'model'
-         self.er['B2'] = 'rodzaj'
-         self.er['C2'] = 'ilość'
+
+         bd = Side(style='thin', color="000000")
+         self.border = Border(left=bd, top=bd, right=bd, bottom=bd)
+
 
 
 
     def process(self, prodList):
         self._clearExcelSheet()
+        self._addDefaultCells()
         self._copyProducts(prodList)
         self._sortProducts()
         self._delEmptyLines()
@@ -25,8 +26,14 @@ class PDFgen():
         for row in self.er['A1':'G37']:
             for cell in row:
                 cell.value = None
-        self.ex.save('tkinter_test.xlsx')
+
         
+    def _addDefaultCells(self):
+        #self.er['A'].width = 15
+        self.er['A2'] = 'model'
+        self.er['B2'] = 'rodzaj'
+        self.er['C2'] = 'ilość'
+
     def _copyProducts(self,prodList):
         self._productsList = []
         self._productsList = prodList
@@ -131,10 +138,22 @@ class PDFgen():
         for q in range(len(self._stands)):
             self.er['A'+ str(q+lastRow)] = self._stands[q].model.get()
             self.er['C'+ str(q+lastRow)] = self._stands[q].number.get()
-          
-       
+ 
+        #self.er['A2':'C'+str(len(self._stands)+lastRow)].style = self.highlight        
+        for row in self.er['A2':'C'+str(len(self._stands)+lastRow)]:
+            for cell in row:
+                cell.border = self.border
         
         self.ex.save('tkinter_test.xlsx')
 
     def _generatePDF(self):
-        pass
+        import win32com.client
+
+        o = win32com.client.Dispatch("excel.application")
+        o.Visible = False
+        wb_path = r'c:\users\igor\source\repos\tkinterproject1\tkinterproject1\tkinter_test.xlsx'
+        wb = o.Workbooks.Open(wb_path)
+        ws_index_list = [1] 
+        path_to_pdf = r'c:\users\igor\desktop\test.pdf'
+        wb.WorkSheets(ws_index_list).Select()
+        wb.ActiveSheet.ExportAsFixedFormat(0, path_to_pdf)
