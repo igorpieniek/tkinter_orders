@@ -1,5 +1,5 @@
 from openpyxl import Workbook
-from openpyxl.styles import NamedStyle, Border, Side
+from openpyxl.styles import NamedStyle, Border, Side, Alignment
 
 class PDFgen():
     def __init__(self):
@@ -30,9 +30,10 @@ class PDFgen():
         
     def _addDefaultCells(self):
         #self.er['A'].width = 15
-        self.er['A2'] = 'model'
-        self.er['B2'] = 'rodzaj'
-        self.er['C2'] = 'ilość'
+        self.er['A2'] = 'Model'
+        self.er['B2'] = 'Suma'
+        self.er['C2'] = 'Rodzaj'
+        self.er['D2'] = 'Ilość'
 
     def _copyProducts(self,prodList):
         self._productsList = []
@@ -60,7 +61,7 @@ class PDFgen():
         for i in range(len(self._dummys)):
             dummyLineToDel = []
             for k in range(len(self._dummys[i].color)):
-                if not self._dummys[i].number[k].get(): 
+                if not int(self._dummys[i].number[k].get()):
                     dummyLineToDel.append(k)    
             if len( dummyLineToDel) > 0 and len( dummyLineToDel) < len(self._dummys[i].color)  :
                 counter = 0
@@ -82,7 +83,7 @@ class PDFgen():
         for i in range(len(self._woodStands)):
             woodLineToDel = []
             for k in range(len(self._woodStands[i].color)):
-                if not self._woodStands[i].number[k].get(): 
+                if not int(self._woodStands[i].number[k].get()): 
                     woodLineToDel.append(k)    
             if len( woodLineToDel) > 0 and len( woodLineToDel) < len(self._woodStands[i].color)  :
                 counter = 0
@@ -93,7 +94,7 @@ class PDFgen():
             elif len( woodLineToDel) == len(self._woodStands[i].color):
                 woodObjtoDel.append(i)
 
-        # Update dummy obj in case all is empty
+        # Update wood stands obj in case all is empty
         if woodObjtoDel:
             counter = 0
             while counter < len(woodObjtoDel):
@@ -101,7 +102,7 @@ class PDFgen():
                 counter +=1
         # Update stands obj incase its empty
         for i in range(len(self._stands)):
-            if self._stands[i].number.get(): standsObjtoDel.append(i)
+            if not int(self._stands[i].number.get()): standsObjtoDel.append(i)
         if standsObjtoDel:
             counter = 0
             while counter < len(standsObjtoDel):
@@ -110,42 +111,57 @@ class PDFgen():
         
 
 
-
-
     def _addToExcel(self):
         lastRow = 3
         # write all dummies
         for i in range(len(self._dummys)):
             self.er['A'+ str(lastRow)] = str(self._dummys[i].model[0].get())
+            self.er['B'+ str(lastRow)] = str(self._dummys[i].sumCalculate())
+            self.er['A'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center')
+            self.er['B'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center')
             k =0
             while k < len(self._dummys[i].color):
-                self.er['B'+ str(k+lastRow)] = self._dummys[i].color[k].get()
-                self.er['C'+ str(k+lastRow)] = self._dummys[i].number[k].get()
+                self.er['C'+ str(k+lastRow)] = self._dummys[i].color[k].get()
+                self.er['D'+ str(k+lastRow)] = self._dummys[i].number[k].get()
+                self.er['C'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
+                self.er['D'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
                 k+=1
+            self.er.merge_cells('B'+ str(lastRow) +':'+ 'B'+str(lastRow -1+ len(self._dummys[i].color)))
+            self.er.merge_cells('A'+ str(lastRow) +':'+ 'A'+str(lastRow -1+ len(self._dummys[i].color)))
             lastRow += len(self._dummys[i].color)
         
         # write all woodStands
         for i in range(len(self._woodStands)):
-            self.er['A'+ str(lastRow)] = 'Statyw drewniany'
+            self.er['A'+ str(lastRow)] = 'Statyw\n drewniany'
+            self.er['B'+ str(lastRow)] = str(self._woodStands[i].sumCalculate())
+            self.er['A'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center',wrap_text = True)
+            self.er['B'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center')
             k =0
             while k < len(self._woodStands[i].color):
-                self.er['B'+ str(k+lastRow)] = self._woodStands[i].color[k].get()
-                self.er['C'+ str(k+lastRow)] = self._woodStands[i].number[k].get()
+                self.er['C'+ str(k+lastRow)] = self._woodStands[i].color[k].get()
+                self.er['D'+ str(k+lastRow)] = self._woodStands[i].number[k].get()
+                self.er['C'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
+                self.er['D'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
                 k+=1
+            self.er.merge_cells('B'+ str(lastRow) +':'+ 'B'+str(lastRow -1+ len(self._woodStands[i].color)))
+            self.er.merge_cells('A'+ str(lastRow) +':'+ 'A'+str(lastRow -1+ len(self._woodStands[i].color)))
             lastRow += len(self._woodStands[i].color)
 
         # write all normal stands
         for q in range(len(self._stands)):
-            self.er['A'+ str(q+lastRow)] = self._stands[q].model.get()
-            self.er['C'+ str(q+lastRow)] = self._stands[q].number.get()
+            self.er['A'+ str(q+lastRow)] = 'Statyw \n metalowy'
+            self.er['C'+ str(q+lastRow)] = self._stands[q].model.get()
+            self.er['D'+ str(q+lastRow)] = self._stands[q].number.get()
+            self.er['A'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center',wrap_text = True )
+            self.er['D'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
  
-        #self.er['A2':'C'+str(len(self._stands)+lastRow)].style = self.highlight        
-        for row in self.er['A2':'C'+str(len(self._stands)+lastRow)]:
+      
+        for row in self.er['A2':'E'+str(len(self._stands)+lastRow-1)]:
             for cell in row:
                 cell.border = self.border
         
         self.ex.save('tkinter_test.xlsx')
-        self.ex.close()
+
 
     def _generatePDF(self):
         import win32com.client
