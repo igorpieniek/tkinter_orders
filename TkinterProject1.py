@@ -5,7 +5,7 @@ from Order import Order
 
 
 root = Tk()
-root.geometry('800x400')
+root.geometry('600x800')
 
 global manager
 manager = windowManager(0)

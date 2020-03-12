@@ -145,6 +145,7 @@ class PDFgen():
                 cell.border = self.border
         
         self.ex.save('tkinter_test.xlsx')
+        self.ex.close()
 
     def _generatePDF(self):
         import win32com.client
@@ -157,3 +158,4 @@ class PDFgen():
         path_to_pdf = r'c:\users\igor\desktop\test.pdf'
         wb.WorkSheets(ws_index_list).Select()
         wb.ActiveSheet.ExportAsFixedFormat(0, path_to_pdf)
+        wb.Close(True, wb_path)
