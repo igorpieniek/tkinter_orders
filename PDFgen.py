@@ -1,5 +1,5 @@
 from openpyxl import Workbook
-from openpyxl.styles import NamedStyle, Border, Side, Alignment
+from openpyxl.styles import NamedStyle, Border, Side, Alignment, Font
 
 class PDFgen():
     def __init__(self):
@@ -7,8 +7,7 @@ class PDFgen():
     
          self.er = self.ex.active
 
-         bd = Side(style='thin', color="000000")
-         self.border = Border(left=bd, top=bd, right=bd, bottom=bd)
+
 
 
 
@@ -29,11 +28,25 @@ class PDFgen():
 
         
     def _addDefaultCells(self):
-        #self.er['A'].width = 15
         self.er['A2'] = 'Model'
         self.er['B2'] = 'Suma'
         self.er['C2'] = 'Rodzaj'
         self.er['D2'] = 'Ilość'
+        self.er['E2'] = 'Uwagi'
+
+        headerFont = Font(size=16, bold= True )
+        for row in self.er['A2':'E2']:
+            for cell in row:
+                cell.font = headerFont
+
+        bd = Side(style='thin', color="000000")
+        self.border = Border(left=bd, top=bd, right=bd, bottom=bd)
+
+        self.er.column_dimensions['A'].width = 20
+        self.er.column_dimensions['C'].width = 12
+        self.er.column_dimensions['E'].width = 34
+
+        self._restFont = Font(size=14 )
 
     def _copyProducts(self,prodList):
         self._productsList = []
@@ -53,112 +66,67 @@ class PDFgen():
                  self._woodStands.append(self._productsList[i])
 
     def _delEmptyLines(self):
-        dummyObjtoDel = []
-        woodObjtoDel =[]
-        standsObjtoDel = []
+        self._dummys = self. _delEmptyLine(self._dummys)
+        self._stands = self. _delEmptyLine(self._stands)
+        self._woodStands = self. _delEmptyLine(self._woodStands)
 
-        # Update of colour and number
-        for i in range(len(self._dummys)):
-            dummyLineToDel = []
-            for k in range(len(self._dummys[i].color)):
-                if not int(self._dummys[i].number[k].get()):
-                    dummyLineToDel.append(k)    
-            if len( dummyLineToDel) > 0 and len( dummyLineToDel) < len(self._dummys[i].color)  :
+    def _delEmptyLine(self, prodList):
+        ObjtoDel = []
+        for i in range(len(prodList)):
+            LineToDel = []
+            for k in range(len(prodList[i].color)):
+                if not int(prodList[i].number[k].get()):
+                    LineToDel.append(k)    
+            if len( LineToDel) > 0 and len(LineToDel) < len(prodList[i].color)  :
                 counter = 0
-                while counter < len(dummyLineToDel):
-                    self._dummys[i].color.pop(dummyLineToDel[counter]-counter)
-                    self._dummys[i].number.pop(dummyLineToDel[counter]-counter)
+                while counter < len(LineToDel):
+                    prodList[i].color.pop(LineToDel[counter]-counter)
+                    prodList[i].number.pop(LineToDel[counter]-counter)
                     counter +=1
-            elif len( dummyLineToDel) == len(self._dummys[i].color):
-                dummyObjtoDel.append(i)
+            elif len( LineToDel) == len(prodList[i].color):
+                ObjtoDel.append(i)
 
         # Update dummy obj in case all is empty
-        if dummyObjtoDel:
+        if ObjtoDel:
             counter = 0
-            while counter < len(dummyObjtoDel):
-                self._dummys.pop(dummyObjtoDel[counter]-counter)
+            while counter < len(ObjtoDel):
+                prodList.pop(ObjtoDel[counter]-counter)
                 counter +=1
+        return prodList
 
-        # Update wood stands
-        for i in range(len(self._woodStands)):
-            woodLineToDel = []
-            for k in range(len(self._woodStands[i].color)):
-                if not int(self._woodStands[i].number[k].get()): 
-                    woodLineToDel.append(k)    
-            if len( woodLineToDel) > 0 and len( woodLineToDel) < len(self._woodStands[i].color)  :
-                counter = 0
-                while counter < len(woodLineToDel):
-                    self._woodStands[i].color.pop(woodLineToDel[counter]-counter)
-                    self._woodStands[i].number.pop(woodLineToDel[counter]-counter)
-                    counter +=1
-            elif len( woodLineToDel) == len(self._woodStands[i].color):
-                woodObjtoDel.append(i)
-
-        # Update wood stands obj in case all is empty
-        if woodObjtoDel:
-            counter = 0
-            while counter < len(woodObjtoDel):
-                self._woodStands.pop(woodObjtoDel[counter]-counter)
-                counter +=1
-        # Update stands obj incase its empty
-        for i in range(len(self._stands)):
-            if not int(self._stands[i].number.get()): standsObjtoDel.append(i)
-        if standsObjtoDel:
-            counter = 0
-            while counter < len(standsObjtoDel):
-                self._stands.pop(standsObjtoDel[counter]-counter)
-                counter +=1
-        
 
 
     def _addToExcel(self):
         lastRow = 3
         # write all dummies
-        for i in range(len(self._dummys)):
-            self.er['A'+ str(lastRow)] = str(self._dummys[i].model[0].get())
-            self.er['B'+ str(lastRow)] = str(self._dummys[i].sumCalculate())
-            self.er['A'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center')
-            self.er['B'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center')
-            k =0
-            while k < len(self._dummys[i].color):
-                self.er['C'+ str(k+lastRow)] = self._dummys[i].color[k].get()
-                self.er['D'+ str(k+lastRow)] = self._dummys[i].number[k].get()
-                self.er['C'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
-                self.er['D'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
-                k+=1
-            self.er.merge_cells('B'+ str(lastRow) +':'+ 'B'+str(lastRow -1+ len(self._dummys[i].color)))
-            self.er.merge_cells('A'+ str(lastRow) +':'+ 'A'+str(lastRow -1+ len(self._dummys[i].color)))
-            lastRow += len(self._dummys[i].color)
+        elementList = [self._dummys, self._woodStands, self._stands]
+        for product in elementList:
+            for i in range(len(product)):
+                if   product == elementList[0] :self.er['A'+ str(lastRow)] = str(product[i].model[0].get())
+                elif product == elementList[1] :self.er['A'+ str(lastRow)] = 'Statyw drewniany'
+                elif product == elementList[2] :self.er['A'+ str(lastRow)] = 'Statyw metalowy'
+                self.er['B'+ str(lastRow)] = str(product[i].sumCalculate())
+                self.er['A'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center',wrap_text = True)
+                self.er['B'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center')
+                k =0
+                while k < len(product[i].color):
+                    self.er['C'+ str(k+lastRow)] = product[i].color[k].get()
+                    self.er['D'+ str(k+lastRow)] = product[i].number[k].get()
+                    self.er['C'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
+                    self.er['D'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
+                    k+=1
+                self.er.merge_cells('B'+ str(lastRow) +':'+ 'B'+str(lastRow -1+ len(product[i].color)))
+                self.er.merge_cells('A'+ str(lastRow) +':'+ 'A'+str(lastRow -1+ len(product[i].color)))
+                lastRow += len(product[i].color)
         
-        # write all woodStands
-        for i in range(len(self._woodStands)):
-            self.er['A'+ str(lastRow)] = 'Statyw\n drewniany'
-            self.er['B'+ str(lastRow)] = str(self._woodStands[i].sumCalculate())
-            self.er['A'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center',wrap_text = True)
-            self.er['B'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center')
-            k =0
-            while k < len(self._woodStands[i].color):
-                self.er['C'+ str(k+lastRow)] = self._woodStands[i].color[k].get()
-                self.er['D'+ str(k+lastRow)] = self._woodStands[i].number[k].get()
-                self.er['C'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
-                self.er['D'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
-                k+=1
-            self.er.merge_cells('B'+ str(lastRow) +':'+ 'B'+str(lastRow -1+ len(self._woodStands[i].color)))
-            self.er.merge_cells('A'+ str(lastRow) +':'+ 'A'+str(lastRow -1+ len(self._woodStands[i].color)))
-            lastRow += len(self._woodStands[i].color)
 
-        # write all normal stands
-        for q in range(len(self._stands)):
-            self.er['A'+ str(q+lastRow)] = 'Statyw \n metalowy'
-            self.er['C'+ str(q+lastRow)] = self._stands[q].model.get()
-            self.er['D'+ str(q+lastRow)] = self._stands[q].number.get()
-            self.er['A'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center',wrap_text = True )
-            self.er['D'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
- 
       
-        for row in self.er['A2':'E'+str(len(self._stands)+lastRow-1)]:
+        for row in self.er['A2':'E'+str(lastRow-1)]:
             for cell in row:
                 cell.border = self.border
+        for row in self.er['A3':'E'+str(lastRow-1)]:
+            for cell in row:
+                cell.font = self._restFont    
         
         self.ex.save('tkinter_test.xlsx')
 

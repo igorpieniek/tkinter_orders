@@ -272,42 +272,74 @@ class WoodLine():
             
 #############################################################################################
 class StandsLine():
-    def __init__(self,root, lineNum):
-         self.root = root
-         self.lineNum = lineNum
+    def __init__(self,root ,lineNum):
+        self.root = root
+        self.lineNum = lineNum
 
-         self.genre = Genre()
-         self.toDelate = False
-         
+        self.color = []
+        self.coloropt = []
+        self.number = []
+        self._genreButtons = []
+        self._delateButtons = []
+        self.genre = Genre()
+        self._colorNum = 0
 
-         self._addStand()
+        self.toDelate = False
 
-    def _addStand(self):
+        self.addStandsClick()
+
+    def addStandsClick(self):     
         self._addModel()
+        self._addStandsColor()
         self._addNumberEntry()
+    
+        self._genreButtons.append( Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) )
+        self._genreButtons[len(self._genreButtons)-1].grid( row =1, column = 0)
 
-        self._delateButton = Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) 
-        self._delateButton.grid( row = 0, column = 3, stick = N+E)
+        self._delateButtons.append( Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) )
+        self._delateButtons[len(self._delateButtons)-1].grid( row = 0, column = 3)
 
-        self.mod = Label(self.root, text= "Statyw metalowy",padx=10, pady=0 )
-        self.mod.grid(row=0, column=0,stick = W)
+    def _addModel(self):
+
+        self.model = Label(self.root, text= "Statyw metalowy",padx=10, pady=0 )
+        self.model.grid(row=0, column=0)
+
+
+    def _addStandsColor(self):
+        self.color.append(StringVar())
+        self.color[ len(self.color)-1 ].set(self.genre.stands[self._colorNum])
+        self.coloropt.append( OptionMenu(self.root, self.color[ len(self.color)-1 ],*self.genre.stands))
+        self.coloropt[ len(self.coloropt)-1 ].config(width = 10)
+        self.coloropt[ len(self.coloropt)-1 ].grid(padx=20, pady=0,  row= self._colorNum, column=1)
 
 
     def _addNumberEntry(self):
-        self.number = Entry(self.root, width=4, textvariable = IntVar()) 
-        self.number.grid( row= 0 , column=2)
-
-
-    def sumCalculate(self):
-        return self.number.get() 
+        self.number.append( Entry(self.root, width=4,textvariable = IntVar()) )
+        self.number[len(self.number)-1].grid( row= self._colorNum , column=2)
     
-    def _addModel(self):
-        self.model = StringVar()
-        self.model.set(self.genre.stands[0])
-        self.modelopt = OptionMenu(self.root,  self.model,*self.genre.stands) 
-        self.modelopt.configure(width = 5)
-        self.modelopt.grid(padx=20, pady=0, row=0, column=1)
+    def sumCalculate(self):
+        sum = 0
+        for i in range(len( self.number)):
+            sum +=int(self.number[i].get())
+        return sum
 
+    def _addInputLine(self):
+        if   self._colorNum < len(self.genre.stands)-1:
+            self._colorNum += 1
+            self._addStandsColor()
+            self._addNumberEntry()
+        
+    
     def _delThisInputFrame(self):
-        self.toDelate = True
-        self.root.destroy()
+        if len(self.color)>1:
+            self.color.pop(-1)
+            self.coloropt[-1].destroy()
+            self.coloropt.pop(-1)
+
+            self.number[-1].destroy()
+            self.number.pop(-1)
+            self._colorNum -= 1
+        else:
+            self.toDelate = True
+            self.root.destroy()
+            
