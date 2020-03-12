@@ -85,7 +85,7 @@ class Order():
    
     def generatePDFClick(self):
         self._inputUpdate()
-        self.pdf.process(self.allProducts)
+        self.pdf.process(self.allProducts,self.company)
 
     def addMainButtons(self):
         self.buttons = []
@@ -99,14 +99,16 @@ class Order():
         self.buttons[2].grid(row = 0, column = 2,padx=20, pady=3, sticky=W+N)
 
         self.buttons.append(Button(self.controlFrame, text= "Cofnij",padx=10, pady=3, command = lambda:self.backClick()))
-        self.buttons[3].grid( sticky=S)
+        self.buttons[3].grid(row =1, column = 0, sticky=S)
 
         self.buttons.append(Button(self.controlFrame, text= "Zapisz",padx=10, pady=3, command = lambda:self.saveClick()))
-        self.buttons[4].grid( sticky=S)
+        self.buttons[4].grid( row =2, column = 0, sticky=S)
 
         self.buttons.append(Button(self.controlFrame, text= "Generuj PDF",padx=10, pady=3, command = lambda:self.generatePDFClick()))
-        self.buttons[5].grid( sticky=S)
-    
+        self.buttons[5].grid(row =3, column = 0, sticky=S)
+    def addCompany(self):
+        self.company = ( Entry(self.controlFrame, width=10,  text = 'Firma' ,textvariable = StringVar()) )
+        self.company.grid( row= 0 , column=0,padx = 10, pady=8, sticky = N+W+E)
 
     def genreOptAction(self, gen):
         if gen == self.genre.gen[0]:
@@ -117,6 +119,7 @@ class Order():
 
     def process(self):
         self.addFrames()
+        self.addCompany()
         self.addMainButtons()
         self.addDummyClick()
 

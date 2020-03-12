@@ -12,10 +12,11 @@ class PDFgen():
 
 
 
-    def process(self, prodList):
+    def process(self, prodList, companyName):
         self._clearExcelSheet()
         self._addDefaultCells()
         self._copyProducts(prodList)
+        self._copyCompanyName(companyName)
         self._sortProducts()
         self._delEmptyLines()
         self._addToExcel()
@@ -43,14 +44,23 @@ class PDFgen():
         self.border = Border(left=bd, top=bd, right=bd, bottom=bd)
 
         self.er.column_dimensions['A'].width = 20
+        self.er.row_dimensions[1].height=30
         self.er.column_dimensions['C'].width = 12
         self.er.column_dimensions['E'].width = 34
 
         self._restFont = Font(size=14 )
+        self._companyFont = Font(size = 18, bold =True)
 
     def _copyProducts(self,prodList):
         self._productsList = []
         self._productsList = prodList
+
+    def _copyCompanyName(self,companyName):
+        self.er.merge_cells('A1:B1')
+        self.er['A1'] = str(companyName.get())
+        self.er['A1'].alignment = Alignment(horizontal='left', vertical='center')
+        cell = self.er['A1']
+        cell.font = self._companyFont
 
     def _sortProducts(self):
         self._dummys = []
