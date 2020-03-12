@@ -41,6 +41,11 @@ class Order():
         self.addInputFrame()
         self.allProducts.append(StandsLine( self.inputFrame[len(self.inputFrame) - 1], len(self.inputFrame) - 1) )
 
+    def addStateWoodClick(self):
+        self._inputUpdate()
+        self.addInputFrame()
+        self.allProducts.append(WoodLine( self.inputFrame[len(self.inputFrame) - 1], len(self.inputFrame) - 1) ) 
+
     def _inputUpdate(self):
         if self.allProducts and self.inputFrame: 
             self._updateProductsObj()
@@ -79,33 +84,28 @@ class Order():
         pass
    
     def generatePDFClick(self):
+        self._inputUpdate()
         self.pdf.process(self.allProducts)
-        for i in range(len(self.allProducts)):   
-            if isinstance(self.allProducts[i],DummyLine ):
-                for k in range(len(self.allProducts[i].color)):
-                    print(str(self.allProducts[i].model[0].get()) + " "+
-                          str(self.allProducts[i].color[k].get()) + " "+
-                          str(self.allProducts[i].number[k].get()))
-            if isinstance(self.allProducts[i],StandsLine ): 
-                print(str(self.allProducts[i].model.get()) + " "+
-                          str(self.allProducts[i].number.get()))
 
     def addMainButtons(self):
         self.buttons = []
-        self.buttons.append(Button(self.addElementsFrame, text= "Dodaj manekiny",padx=10, pady=7, command = lambda:self.addDummyClick()))
+        self.buttons.append(Button(self.addElementsFrame, text= "Dodaj\nmanekiny",padx=5, pady=7, command = lambda:self.addDummyClick()))
         self.buttons[0].grid(row = 0,  column = 0,padx=20, pady=3, sticky=W+N)
 
-        self.buttons.append(Button(self.addElementsFrame, text= "Dodaj statyw",padx=10, pady=7, command = lambda:self.addStateClick()))
+        self.buttons.append(Button(self.addElementsFrame, text= "Dodaj\nstatyw",padx=5, pady=7, command = lambda:self.addStateClick()))
         self.buttons[1].grid(row = 0, column = 1,padx=20, pady=3, sticky=W+N)
 
-        self.buttons.append(Button(self.controlFrame, text= "Cofnij",padx=10, pady=3, command = lambda:self.backClick()))
-        self.buttons[2].grid( sticky=S)
+        self.buttons.append(Button(self.addElementsFrame, text= "Dodaj statyw\ndrewniany",padx=5, pady=7, command = lambda:self.addStateWoodClick()))
+        self.buttons[2].grid(row = 0, column = 2,padx=20, pady=3, sticky=W+N)
 
-        self.buttons.append(Button(self.controlFrame, text= "Zapisz",padx=10, pady=3, command = lambda:self.saveClick()))
+        self.buttons.append(Button(self.controlFrame, text= "Cofnij",padx=10, pady=3, command = lambda:self.backClick()))
         self.buttons[3].grid( sticky=S)
 
-        self.buttons.append(Button(self.controlFrame, text= "Generuj PDF",padx=10, pady=3, command = lambda:self.generatePDFClick()))
+        self.buttons.append(Button(self.controlFrame, text= "Zapisz",padx=10, pady=3, command = lambda:self.saveClick()))
         self.buttons[4].grid( sticky=S)
+
+        self.buttons.append(Button(self.controlFrame, text= "Generuj PDF",padx=10, pady=3, command = lambda:self.generatePDFClick()))
+        self.buttons[5].grid( sticky=S)
     
 
     def genreOptAction(self, gen):
@@ -192,7 +192,74 @@ class DummyLine():
         else:
             self.toDelate = True
             self.root.destroy()
+#############################################################################################
+class WoodLine():
+
+    def __init__(self,root ,lineNum):
+        self.root = root
+        self.lineNum = lineNum
+
+        self.color = []
+        self.coloropt = []
+        self.number = []
+        self._genreButtons = []
+        self._delateButtons = []
+        self.genre = Genre()
+        self._colorNum = 0
+
+        self.toDelate = False
+
+        self.addWoodClick()
+
+    def addWoodClick(self):     
+        self._addModel()
+        self._addWoodColor()
+        self._addNumberEntry()
+    
+        self._genreButtons.append( Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) )
+        self._genreButtons[len(self._genreButtons)-1].grid( row =1, column = 0)
+
+        self._delateButtons.append( Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) )
+        self._delateButtons[len(self._delateButtons)-1].grid( row = 0, column = 3)
+
+    def _addModel(self):
+
+        self.model = Label(self.root, text= "Statyw drewniany",padx=10, pady=0 )
+        self.model.grid(row=0, column=0)
+
+
+    def _addWoodColor(self):
+        self.color.append(StringVar())
+        self.color[ len(self.color)-1 ].set(self.genre.woodStands[self._colorNum])
+        self.coloropt.append( OptionMenu(self.root, self.color[ len(self.color)-1 ],*self.genre.woodStands))
+        self.coloropt[ len(self.coloropt)-1 ].config(width = 10)
+        self.coloropt[ len(self.coloropt)-1 ].grid(padx=20, pady=0,  row= self._colorNum, column=1)
+
+
+    def _addNumberEntry(self):
+        self.number.append( Entry(self.root, width=4) )
+        self.number[len(self.number)-1].grid( row= self._colorNum , column=2)
+
+    def _addInputLine(self):
+        if   self._colorNum < len(self.genre.woodStands)-1:
+            self._colorNum += 1
+            self._addWoodColor()
+            self._addNumberEntry()
         
+    
+    def _delThisInputFrame(self):
+        if len(self.color)>1:
+            self.color.pop(-1)
+            self.coloropt[-1].destroy()
+            self.coloropt.pop(-1)
+
+            self.number[-1].destroy()
+            self.number.pop(-1)
+            self._colorNum -= 1
+        else:
+            self.toDelate = True
+            self.root.destroy()
+            
 #############################################################################################
 class StandsLine():
     def __init__(self,root, lineNum):
