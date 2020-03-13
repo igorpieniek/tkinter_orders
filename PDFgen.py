@@ -31,8 +31,8 @@ class PDFgen():
     def _addDefaultCells(self):
         self.er['A2'] = 'Model'
         self.er['B2'] = 'Suma'
-        self.er['C2'] = 'Rodzaj'
-        self.er['D2'] = 'Ilość'
+        self.er['C2'] = 'Ilość'
+        self.er['D2'] = 'Rodzaj'
         self.er['E2'] = 'Uwagi'
 
         headerFont = Font(size=16, bold= True )
@@ -45,7 +45,7 @@ class PDFgen():
 
         self.er.column_dimensions['A'].width = 20
         self.er.row_dimensions[1].height=30
-        self.er.column_dimensions['C'].width = 12
+        self.er.column_dimensions['D'].width = 12
         self.er.column_dimensions['E'].width = 34
 
         self._restFont = Font(size=14 )
@@ -120,10 +120,10 @@ class PDFgen():
                 self.er['B'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center')
                 k =0
                 while k < len(product[i].color):
-                    self.er['C'+ str(k+lastRow)] = product[i].color[k].get()
-                    self.er['D'+ str(k+lastRow)] = product[i].number[k].get()
+                    self.er['D'+ str(k+lastRow)] = product[i].color[k].get()
+                    self.er['C'+ str(k+lastRow)] = product[i].number[k].get()
                     self.er['C'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
-                    self.er['D'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
+                    self.er['D'+ str(k+lastRow)].alignment = Alignment(horizontal='center', vertical='center')
                     k+=1
                 self.er.merge_cells('B'+ str(lastRow) +':'+ 'B'+str(lastRow -1+ len(product[i].color)))
                 self.er.merge_cells('A'+ str(lastRow) +':'+ 'A'+str(lastRow -1+ len(product[i].color)))

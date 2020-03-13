@@ -106,7 +106,8 @@ class Order():
 
         self.buttons.append(Button(self.controlFrame, text= "Generuj PDF",padx=10, pady=3, command = lambda:self.generatePDFClick()))
         self.buttons[5].grid(row =3, column = 0, sticky=S)
-    def addCompany(self):
+
+    def addEntrySection(self):
         self.company = ( Entry(self.controlFrame, width=10,  text = 'Firma' ,textvariable = StringVar()) )
         self.company.grid( row= 0 , column=0,padx = 10, pady=8, sticky = N+W+E)
 
@@ -119,7 +120,7 @@ class Order():
 
     def process(self):
         self.addFrames()
-        self.addCompany()
+        self.addEntrySection()
         self.addMainButtons()
         self.addDummyClick()
 
