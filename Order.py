@@ -3,6 +3,7 @@ from Genre import Genre
 from PDFgen import *
 from tkcalendar import Calendar, DateEntry
 from Database import *
+import datetime
 
 class Order():
     def __init__(self,root):
@@ -16,6 +17,7 @@ class Order():
         self.Stands = []
         self.allProducts = []
         self._lineNumToDel = []
+        self._payment = 0
 
 
     def addInputFrame(self):
@@ -90,6 +92,7 @@ class Order():
     def saveClick(self):
         # save to database
         arrayToSend = []
+
         for prod in self.allProducts:
             for i in range(len(prod.color)):
                 if isinstance(prod,DummyLine ):
@@ -98,7 +101,9 @@ class Order():
                      object = 'statyw metalowy'
                 elif isinstance(prod,WoodLine ):
                      object = 'statyw drwniany'
-                arrayToSend.append([10,12,2005,11,6,2010,self.invoice.get(), self.company.get(), 2137,
+                arrayToSend.append([self._orderDate.day,   self._orderDate.month, self._orderDate.year ,
+                                    self._collectDate.day, self._collectDate,     self._collectDate.year,
+                                    self.invoice.get(), self.company.get(), 2137,
                                 object, prod.color[i].get(), int(prod.number[i].get()) ])
         self._database.insertOrder(arrayToSend)
    
@@ -126,6 +131,12 @@ class Order():
         self.buttons.append(Button(self.controlFrame, text= "Generuj PDF",padx=10, pady=3, command = lambda:self.generatePDFClick()))
         self.buttons[5].grid(row =2, column = 0, sticky=N)
 
+        self.buttons.append(Button(self.nameFrame, text='Data zamówienia', command=lambda:self._orderDateFun(0)))
+        self.buttons[6].grid(row = 0, column = 2, padx=10, pady=10)
+
+        self.buttons.append(Button(self.nameFrame, text='Data odbioru', command=lambda: self._orderDateFun(1)))
+        self.buttons[7].grid(row = 0, column = 3, padx=10, pady=10)
+
     def addEntrySection(self):
         self.companyLabel = Label(self.nameFrame, text= "Nazwa firmy",padx=10, pady=0 )
         self.companyLabel.grid(row=0, column=0)
@@ -137,19 +148,36 @@ class Order():
         self.invoice = ( Entry(self.nameFrame, width=10 ,textvariable = StringVar()) )
         self.invoice.grid( row= 1 , column=1,padx = 10, pady=8, sticky = N+W+E)
 
-    def _tempCalendar(self):
+        today = str(datetime.date.today().day)+'-'+str(datetime.date.today().month)+'-'+str(datetime.date.today().year)
+        self.DateOrderLabel = Label(self.nameFrame, text = today,padx=10, pady=0 )
+        self.DateOrderLabel.grid(row=1, column=2)
 
-        def example2():
-            top =Toplevel(self.nameFrame)
+        self.DateCollectLabel = Label(self.nameFrame, text = '',padx=10, pady=0 )
+        self.DateCollectLabel.grid(row=1, column=3)
 
-            Label(top, text='Choose date').pack(padx=10, pady=10)
 
-            cal = DateEntry(top, width=12, background='darkblue',
-                            foreground='white', borderwidth=2)
-            cal.pack(padx=10, pady=10)
+    def _orderDateFun(self, ver):
+        def print_sel():
+            if ver == 0: 
+                self._orderDate = cal.selection_get()
+                self.DateOrderLabel.config(text = str(self._orderDate.day) +'-'+str(self._orderDate.month) +'-'+str(self._orderDate.year) )
+            elif ver==1 :
+               self._collectDate = cal.selection_get()
+               self.DateCollectLabel.config(text = str(self._collectDate.day) +'-'+str(self._collectDate.month) +'-'+str(self._collectDate.year) )
+            top.destroy()
 
-        a2 = Button(self.nameFrame, text='DateEntry', command=example2)
-        a2.grid(row= 0 , column=2,padx = 10, pady=8)
+        top = Toplevel(self.root)    
+        today = datetime.date.today()
+    
+        cal = Calendar(top, font="Arial 14", selectmode='day',
+                           disabledforeground='red',
+                           cursor="hand1", year=today.year, month=today.month, day=today.day)
+        cal.pack(fill="both", expand=True)
+        Button(top, text="ok", command=print_sel).pack()            
+
+    def _getPayment(self):
+        pass
+
 
     def genreOptAction(self, gen):
         if gen == self.genre.gen[0]:
@@ -161,7 +189,6 @@ class Order():
     def process(self):
         self.addFrames()
         self.addEntrySection()
-        self._tempCalendar()
         self.addMainButtons()
         self.addDummyClick()
 
