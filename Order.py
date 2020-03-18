@@ -20,12 +20,13 @@ class Order():
         self._payment = 0
         self._orderDate= datetime.date.today()
         self._collectDate= datetime.date.today()
-
+    
+    # Add new input frame for every Dummy/Stand/WoodenStand object
     def addInputFrame(self):
         self.inputFrame.append( LabelFrame(self.allInputsFrame, padx = 5, pady=5) )
         self.inputFrame[-1].grid(row = len(self.inputFrame)-1 ,column = 0, stick = N+W)
 
-
+    # Add rest constans frames on order window 
     def addFrames(self):
         self.addElementsFrame = LabelFrame(self.root, padx = 5, pady=5,width =300, background = "blue")
         self.addElementsFrame.grid(row = 1,column = 1, stick = W+N+E)
@@ -38,7 +39,9 @@ class Order():
         
         self.nameFrame = LabelFrame(self.root, padx = 5, pady=5)
         self.nameFrame.grid(row= 0, columnspan = 2,column = 0, stick = W+N+S)
-
+    
+    # Actions after click of button: creating new objects depends on what user want to add. Functions 
+    # also update sequence of frames obcject in case some of them was previous delated
     def addDummyClick(self):
         self._inputUpdate()
         self.addInputFrame()
@@ -54,23 +57,25 @@ class Order():
         self.addInputFrame()
         self.allProducts.append(WoodLine( self.inputFrame[len(self.inputFrame) - 1], len(self.inputFrame) - 1) ) 
 
+    # Main objects update function. It contains 2 smaller functions. One is updating products object and second
+    # to update frames which was connected to product object 
     def _inputUpdate(self):
         if self.allProducts and self.inputFrame: 
             self._updateProductsObj()
             self._updateInputFrames()
             self._lineNumToDel = []
 
+    # Function that update product object frames
     def _updateInputFrames(self):
         if self._lineNumToDel:
-            counter = self._lineNumToDel[0]
-            dynCounter = 0
+            counter = self._lineNumToDel[0] 
             for counter in self._lineNumToDel:             
-                self.inputFrame.pop(counter - dynCounter)              
+                self.inputFrame.pop(counter)   #delate chosen frames           
 
             for i in range(len(self.inputFrame)):
-                self.inputFrame[i].grid(row = self.allProducts[i].lineNum ,column = 0)
+                self.inputFrame[i].grid(row = self.allProducts[i].lineNum ,column = 0) # update frames which ramains
 
-
+    # Function that update parameters in object in case one of them was deleted before
     def _updateProductsObj(self):
         counter = 0
         while counter < len(self.allProducts):
@@ -101,8 +106,8 @@ class Order():
                      object = 'statyw metalowy'
                 elif isinstance(prod,WoodLine ):
                      object = 'statyw drwniany'
-                arrayToSend.append([self._orderDate.day,   self._orderDate.month, self._orderDate.year ,
-                                    self._collectDate.day, self._collectDate.month,     self._collectDate.year,
+                arrayToSend.append([self._orderDate.day,   self._orderDate.month,   self._orderDate.year ,
+                                    self._collectDate.day, self._collectDate.month, self._collectDate.year,
                                     self.invoice.get(), self.company.get(), self._getPayment(),
                                     object, prod.color[i].get(), int(prod.number[i].get()) ])
         self._database.insertOrder(arrayToSend)
