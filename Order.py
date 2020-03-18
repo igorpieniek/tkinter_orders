@@ -1,12 +1,15 @@
 from tkinter import *
 from Genre import Genre
 from PDFgen import *
+from tkcalendar import Calendar, DateEntry
+from Database import *
 
 class Order():
     def __init__(self,root):
         self.genre = Genre()
         self.pdf = PDFgen()
         self.root = root
+        self._database = Database()
 
         self.inputFrame = []
         self.Dummys = []
@@ -20,16 +23,18 @@ class Order():
         self.inputFrame[-1].grid(row = len(self.inputFrame)-1 ,column = 0, stick = N+W)
 
 
-
     def addFrames(self):
         self.addElementsFrame = LabelFrame(self.root, padx = 5, pady=5,width =300, background = "blue")
-        self.addElementsFrame.grid(row = 0,column = 1, stick = W+N+E)
+        self.addElementsFrame.grid(row = 1,column = 1, stick = W+N+E)
 
         self.allInputsFrame = LabelFrame(self.root, padx = 5, pady=5)
-        self.allInputsFrame.grid(row= 1,column = 1, stick = W+N+S)
+        self.allInputsFrame.grid(row= 2,column = 1, stick = W+N+S)
 
         self.controlFrame = LabelFrame(self.root, padx = 5, pady=5)
-        self.controlFrame.grid(row= 0, rowspan = 2,column = 0, stick = W+N+S)
+        self.controlFrame.grid(row= 1, rowspan = 2,column = 0, stick = W+N+S)
+        
+        self.nameFrame = LabelFrame(self.root, padx = 5, pady=5)
+        self.nameFrame.grid(row= 0, columnspan = 2,column = 0, stick = W+N+S)
 
     def addDummyClick(self):
         self._inputUpdate()
@@ -77,11 +82,25 @@ class Order():
             else: counter +=1
 
 
-    def backClick():
-        pass
+    def backClick(self):
+        temp = self._database.getOrderby_companyName('FEMI')
+        for i in temp:
+            print(i)
 
-    def saveClick():
-        pass
+    def saveClick(self):
+        # save to database
+        arrayToSend = []
+        for prod in self.allProducts:
+            for i in range(len(prod.color)):
+                if isinstance(prod,DummyLine ):
+                     object = str(prod.model[0].get())
+                elif isinstance(prod,StandsLine ):
+                     object = 'statyw metalowy'
+                elif isinstance(prod,WoodLine ):
+                     object = 'statyw drwniany'
+                arrayToSend.append([10,12,2005,11,6,2010,self.invoice.get(), self.company.get(), 2137,
+                                object, prod.color[i].get(), int(prod.number[i].get()) ])
+        self._database.insertOrder(arrayToSend)
    
     def generatePDFClick(self):
         self._inputUpdate()
@@ -99,17 +118,38 @@ class Order():
         self.buttons[2].grid(row = 0, column = 2,padx=20, pady=3, sticky=W+N)
 
         self.buttons.append(Button(self.controlFrame, text= "Cofnij",padx=10, pady=3, command = lambda:self.backClick()))
-        self.buttons[3].grid(row =1, column = 0, sticky=S)
+        self.buttons[3].grid(row =0, column = 0, sticky=N)
 
         self.buttons.append(Button(self.controlFrame, text= "Zapisz",padx=10, pady=3, command = lambda:self.saveClick()))
-        self.buttons[4].grid( row =2, column = 0, sticky=S)
+        self.buttons[4].grid( row =1, column = 0, sticky=N)
 
         self.buttons.append(Button(self.controlFrame, text= "Generuj PDF",padx=10, pady=3, command = lambda:self.generatePDFClick()))
-        self.buttons[5].grid(row =3, column = 0, sticky=S)
+        self.buttons[5].grid(row =2, column = 0, sticky=N)
 
     def addEntrySection(self):
-        self.company = ( Entry(self.controlFrame, width=10,  text = 'Firma' ,textvariable = StringVar()) )
-        self.company.grid( row= 0 , column=0,padx = 10, pady=8, sticky = N+W+E)
+        self.companyLabel = Label(self.nameFrame, text= "Nazwa firmy",padx=10, pady=0 )
+        self.companyLabel.grid(row=0, column=0)
+        self.company = ( Entry(self.nameFrame, width=10 ,textvariable = StringVar()) )
+        self.company.grid( row= 1 , column=0,padx = 10, pady=8, sticky = N+W+E)
+
+        self.invoiceLabel = Label(self.nameFrame, text= "Faktura nr",padx=10, pady=0 )
+        self.invoiceLabel.grid(row=0, column=1)
+        self.invoice = ( Entry(self.nameFrame, width=10 ,textvariable = StringVar()) )
+        self.invoice.grid( row= 1 , column=1,padx = 10, pady=8, sticky = N+W+E)
+
+    def _tempCalendar(self):
+
+        def example2():
+            top =Toplevel(self.nameFrame)
+
+            Label(top, text='Choose date').pack(padx=10, pady=10)
+
+            cal = DateEntry(top, width=12, background='darkblue',
+                            foreground='white', borderwidth=2)
+            cal.pack(padx=10, pady=10)
+
+        a2 = Button(self.nameFrame, text='DateEntry', command=example2)
+        a2.grid(row= 0 , column=2,padx = 10, pady=8)
 
     def genreOptAction(self, gen):
         if gen == self.genre.gen[0]:
@@ -121,6 +161,7 @@ class Order():
     def process(self):
         self.addFrames()
         self.addEntrySection()
+        self._tempCalendar()
         self.addMainButtons()
         self.addDummyClick()
 

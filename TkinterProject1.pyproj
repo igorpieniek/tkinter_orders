@@ -21,7 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="class1.py">
+    <Compile Include="Database.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PDFgen.py">
