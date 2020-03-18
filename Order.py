@@ -18,7 +18,8 @@ class Order():
         self.allProducts = []
         self._lineNumToDel = []
         self._payment = 0
-
+        self._orderDate= datetime.date.today()
+        self._collectDate= datetime.date.today()
 
     def addInputFrame(self):
         self.inputFrame.append( LabelFrame(self.allInputsFrame, padx = 5, pady=5) )
@@ -92,7 +93,6 @@ class Order():
     def saveClick(self):
         # save to database
         arrayToSend = []
-
         for prod in self.allProducts:
             for i in range(len(prod.color)):
                 if isinstance(prod,DummyLine ):
@@ -102,9 +102,9 @@ class Order():
                 elif isinstance(prod,WoodLine ):
                      object = 'statyw drwniany'
                 arrayToSend.append([self._orderDate.day,   self._orderDate.month, self._orderDate.year ,
-                                    self._collectDate.day, self._collectDate,     self._collectDate.year,
-                                    self.invoice.get(), self.company.get(), 2137,
-                                object, prod.color[i].get(), int(prod.number[i].get()) ])
+                                    self._collectDate.day, self._collectDate.month,     self._collectDate.year,
+                                    self.invoice.get(), self.company.get(), self._getPayment(),
+                                    object, prod.color[i].get(), int(prod.number[i].get()) ])
         self._database.insertOrder(arrayToSend)
    
     def generatePDFClick(self):
@@ -132,28 +132,33 @@ class Order():
         self.buttons[5].grid(row =2, column = 0, sticky=N)
 
         self.buttons.append(Button(self.nameFrame, text='Data zamówienia', command=lambda:self._orderDateFun(0)))
-        self.buttons[6].grid(row = 0, column = 2, padx=10, pady=10)
+        self.buttons[6].grid(row = 0, column = 3, padx=5, pady=3)
 
         self.buttons.append(Button(self.nameFrame, text='Data odbioru', command=lambda: self._orderDateFun(1)))
-        self.buttons[7].grid(row = 0, column = 3, padx=10, pady=10)
+        self.buttons[7].grid(row = 0, column = 4, padx=5, pady=3)
 
     def addEntrySection(self):
         self.companyLabel = Label(self.nameFrame, text= "Nazwa firmy",padx=10, pady=0 )
         self.companyLabel.grid(row=0, column=0)
-        self.company = ( Entry(self.nameFrame, width=10 ,textvariable = StringVar()) )
-        self.company.grid( row= 1 , column=0,padx = 10, pady=8, sticky = N+W+E)
+        self.company = ( Entry(self.nameFrame, width=15 ,textvariable = StringVar()) )
+        self.company.grid( row= 1 , column=0,padx = 10, pady=3, sticky = N+W+E)
 
         self.invoiceLabel = Label(self.nameFrame, text= "Faktura nr",padx=10, pady=0 )
         self.invoiceLabel.grid(row=0, column=1)
-        self.invoice = ( Entry(self.nameFrame, width=10 ,textvariable = StringVar()) )
-        self.invoice.grid( row= 1 , column=1,padx = 10, pady=8, sticky = N+W+E)
+        self.invoice = ( Entry(self.nameFrame, width=15 ,textvariable = StringVar()) )
+        self.invoice.grid( row= 1 , column=1,padx = 10, pady=3, sticky = N+W+E)
+
+        self.paymentLabel = Label(self.nameFrame, text= "Płatność",padx=10, pady=0 )
+        self.paymentLabel.grid(row=0, column=2)
+        self.paymentEntry = ( Entry(self.nameFrame, width=5 ,textvariable = IntVar()) )
+        self.paymentEntry.grid( row= 1 , column=2,padx = 10, pady=3, sticky = N+W+E)
 
         today = str(datetime.date.today().day)+'-'+str(datetime.date.today().month)+'-'+str(datetime.date.today().year)
-        self.DateOrderLabel = Label(self.nameFrame, text = today,padx=10, pady=0 )
-        self.DateOrderLabel.grid(row=1, column=2)
+        self.DateOrderLabel = Label(self.nameFrame, text = today,padx=10, pady=3 )
+        self.DateOrderLabel.grid(row=1, column=3)
 
-        self.DateCollectLabel = Label(self.nameFrame, text = '',padx=10, pady=0 )
-        self.DateCollectLabel.grid(row=1, column=3)
+        self.DateCollectLabel = Label(self.nameFrame, text = '',padx=10, pady=3 )
+        self.DateCollectLabel.grid(row=1, column=4)
 
 
     def _orderDateFun(self, ver):
@@ -176,7 +181,8 @@ class Order():
         Button(top, text="ok", command=print_sel).pack()            
 
     def _getPayment(self):
-        pass
+        self._payment = int(self.paymentEntry.get())
+        return self._payment
 
 
     def genreOptAction(self, gen):
