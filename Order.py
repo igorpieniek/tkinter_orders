@@ -89,12 +89,12 @@ class Order():
 
             else: counter +=1
 
-
+    # Function to close adding order window TODO
     def backClick(self):
         temp = self._database.getOrderby_companyName('FEMI')
         for i in temp:
             print(i)
-
+    # Action function executed afer clicking "Zapisz" - it create matrix and send it to database class
     def saveClick(self):
         # save to database
         arrayToSend = []
@@ -111,11 +111,13 @@ class Order():
                                     self.invoice.get(), self.company.get(), self._getPayment(),
                                     object, prod.color[i].get(), int(prod.number[i].get()) ])
         self._database.insertOrder(arrayToSend)
-   
+
+    # Fuction that uses pdfprocess and create pdf file
     def generatePDFClick(self):
         self._inputUpdate()
         self.pdf.process(self.allProducts,self.company)
 
+    # Function contains adding all buttons
     def addMainButtons(self):
         self.buttons = []
         self.buttons.append(Button(self.addElementsFrame, text= "Dodaj\nmanekiny",padx=5, pady=7, command = lambda:self.addDummyClick()))
@@ -141,7 +143,8 @@ class Order():
 
         self.buttons.append(Button(self.nameFrame, text='Data odbioru', command=lambda: self._orderDateFun(1)))
         self.buttons[7].grid(row = 0, column = 4, padx=5, pady=3)
-
+    
+    # Add oppurtunity to add company name, invoice number, payment and initialize choosing date
     def addEntrySection(self):
         self.companyLabel = Label(self.nameFrame, text= "Nazwa firmy",padx=10, pady=0 )
         self.companyLabel.grid(row=0, column=0)
@@ -165,7 +168,7 @@ class Order():
         self.DateCollectLabel = Label(self.nameFrame, text = '',padx=10, pady=3 )
         self.DateCollectLabel.grid(row=1, column=4)
 
-
+    # Add calendar
     def _orderDateFun(self, ver):
         def print_sel():
             if ver == 0: 
@@ -183,20 +186,14 @@ class Order():
                            disabledforeground='red',
                            cursor="hand1", year=today.year, month=today.month, day=today.day)
         cal.pack(fill="both", expand=True)
-        Button(top, text="ok", command=print_sel).pack()            
-
+        Button(top, text="ok", command=print_sel).pack() 
+        
+    # Update payment and return it
     def _getPayment(self):
         self._payment = int(self.paymentEntry.get())
         return self._payment
 
-
-    def genreOptAction(self, gen):
-        if gen == self.genre.gen[0]:
-            pass
-        else:
-            pass
-
-
+    # MAIN process of order object
     def process(self):
         self.addFrames()
         self.addEntrySection()
