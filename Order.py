@@ -91,7 +91,7 @@ class Order():
 
     # Function to close adding order window TODO
     def backClick(self):
-        temp = self._database.getOrderby_companyName('FEMI')
+        temp = self._database.getOrderby_orderMonthandYear(3,2021)
         for i in temp:
             print(i)
     # Action function executed afer clicking "Zapisz" - it create matrix and send it to database class

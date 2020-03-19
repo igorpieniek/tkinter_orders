@@ -1,4 +1,5 @@
 from tkinter import *
+from Database import Database
 
 class History(object):
     def __init__(self,root,database):
@@ -19,4 +20,8 @@ class History(object):
         self._tree.heading("two", text="Type",anchor=tk.W)
         self._tree.heading("three", text="Size",anchor=tk.W)
 
-   
+    def _readDatabase(self,month = None,year = None):
+       import datetime
+       if month == None : month = datetime.date.today().month
+       if year == None : year = datetime.date.today().year
+       rawArray = self._database.getOrderby_orderMonth( month)

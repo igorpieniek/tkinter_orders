@@ -46,6 +46,9 @@ class Database(object):
         self._c.execute("SELECT * FROM orders WHERE company=:companyName", {'companyName': name})
         return self._c.fetchall()
 
+    def getOrderby_orderMonthandYear(self,month,year):
+        self._c.execute("SELECT * FROM orders WHERE mouth_order=:month AND year_order=:year", {'month': month, 'year': year})
+        return self._c.fetchall()
 
     def update_Payment(self, order, pay):
         with self._conn:
