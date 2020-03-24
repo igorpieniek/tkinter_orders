@@ -4,40 +4,34 @@ from Genre import *
 class Dummy(object):
     def __init__(self, model=None, color = None, num = None):
         self._genre = Genre()
- 
-        if model: self._model = model
+        self._isLocked = False
+        self._model = None
+        self._color = None
+        self._number = None
 
+        if model and color and num: 
+            self.addOption(model,color,num)
 
-        if color: self._color = color
-        else: self._color = []
+    def __del__(sel):
+        del self._model,self._color, self._number
 
-        if num: self._number = num
-        else: self._color = []
-    
-    def addOption(self, color, num):
+    def addOption(self, model,color, num):
         # check in color is valid
-        if isinstance(color, list):
-            for col in color:
-                if not col in self._genre.color: error('No such color on genre list!')
-        else:
-           if not color in self._genre.color: error('No such color on genre list!')
-        
-        if num > 0: # onlyy if number is  
-            self._color.append(color)
-            self._number.append(num)
+        if self._isLocked: print('This object was used, you cant change it ! ')
+        if not model in self._genre.model: error('No such dummy model on genre list!')
+        if not color in self._genre.color: error('No such color on genre list!')
 
-    def delateOption(self, lineNumber):
-        if self._color:
-            self._color.pop(lineNumber)
-            self._number.pop(lineNumber)
+        if num > 0: # onlyy if number is  
+            self._model = model
+            self._color = color
+            self._number = num
+            self._isLocked = True
+        else: print('0 of this model -> it isnt added')
+
 
     def getData(self):
         output = []
-        for a in range(len(self._color)):
-            output.append([self._color[a], self._number[a]])
+        if not self._model  : return output
+        output.append([self._model, self._color, self._number])
         return output
-
-    def setModel(self, model):
-        # check in color is valid
-        if not model in self._genre.dummys: error('No such color on genre list!')
-        self._model = model    
+  

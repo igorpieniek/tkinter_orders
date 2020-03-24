@@ -21,7 +21,9 @@ class History(object):
         self._tree.heading("three", text="Size",anchor=tk.W)
 
     def _readDatabase(self,month = None,year = None):
-       import datetime
-       if month == None : month = datetime.date.today().month
-       if year == None : year = datetime.date.today().year
-       rawArray = self._database.getOrderby_orderMonth( month)
+        import datetime
+        if month == None : month = datetime.date.today().month
+        if year == None : year = datetime.date.today().year
+        rawArray = self._database.getOrderby_orderMonth( month,year)
+
+                    

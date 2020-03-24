@@ -66,6 +66,11 @@ class PDFgen():
         self._dummys = []
         self._stands = []
         self._woodStands = []
+        #test
+        import pickle
+        F = open('datafile.pkl','wb')
+        pickle.dump(self._productsList,F)
+        F.close()
         from Order import DummyLine, StandsLine, WoodLine
         for i in range(len(self._productsList)):   
              if isinstance(self._productsList[i],DummyLine ):

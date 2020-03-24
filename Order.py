@@ -203,6 +203,7 @@ class Order():
 
 
 ####################################################################################################################
+from Dummy import *
 class DummyLine():
 
     def __init__(self,root ,lineNum):
@@ -264,7 +265,8 @@ class DummyLine():
         for i in range(len( self.number)):
             sum +=int(self.number[i].get())
         return sum
-    
+
+
     def _delThisInputFrame(self):
         if len(self.color)>1:
             self.color.pop(-1)
