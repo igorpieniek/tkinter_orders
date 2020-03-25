@@ -21,7 +21,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Dummy.py">
+    <Compile Include="ProductClass\WoodenStands.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ProductClass\Dummy.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="History.py">
@@ -46,6 +49,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TkinterProject1.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ProductClass\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
