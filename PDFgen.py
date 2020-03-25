@@ -66,11 +66,7 @@ class PDFgen():
         self._dummys = []
         self._stands = []
         self._woodStands = []
-        #test
-        import pickle
-        F = open('datafile.pkl','wb')
-        pickle.dump(self._productsList,F)
-        F.close()
+
         from Order import DummyLine, StandsLine, WoodLine
         for i in range(len(self._productsList)):   
              if isinstance(self._productsList[i],DummyLine ):
@@ -117,7 +113,7 @@ class PDFgen():
         elementList = [self._dummys, self._woodStands, self._stands]
         for product in elementList:
             for i in range(len(product)):
-                if   product == elementList[0] :self.er['A'+ str(lastRow)] = str(product[i].model[0].get())
+                if   product == elementList[0] :self.er['A'+ str(lastRow)] = str(product[i].model.get())
                 elif product == elementList[1] :self.er['A'+ str(lastRow)] = 'Statyw drewniany'
                 elif product == elementList[2] :self.er['A'+ str(lastRow)] = 'Statyw metalowy'
                 self.er['B'+ str(lastRow)] = str(product[i].sumCalculate())

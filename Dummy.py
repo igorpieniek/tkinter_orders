@@ -40,3 +40,6 @@ class Dummy(object):
         output = [self._model, self._color, self._number]
         return output
   
+    def isEmpty(self):
+        if  self._model and self._color and self._number: return False
+        else: return True
