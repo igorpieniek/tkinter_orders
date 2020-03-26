@@ -105,7 +105,7 @@ class Order():
                 elif isinstance(prod,StandsLine ):
                      object = 'statyw metalowy'
                 elif isinstance(prod,WoodLine ):
-                     object = 'statyw drwniany'
+                     object = prod.getModel()
                 arrayToSend.append([self._orderDate.day,   self._orderDate.month,   self._orderDate.year ,
                                     self._collectDate.day, self._collectDate.month, self._collectDate.year,
                                     self.invoice.get(), self.company.get(), self._getPayment(),
@@ -281,7 +281,7 @@ class DummyLine():
     def getColor(self, index = None):
         data = self.getData()
         if not data: return []
-        if not index :
+        if index == None :
             temp = []
             for el in data:
                 temp.append(el.getData()[1])
@@ -291,7 +291,7 @@ class DummyLine():
     def getNumber(self, index = None):
         data = self.getData()
         if not data: return []
-        if not index :
+        if index == None  :
             temp = []
             for el in data:
                 temp.append(el.getData()[2])
@@ -312,7 +312,7 @@ class DummyLine():
             self.toDelate = True
             self.root.destroy()
 #############################################################################################
-from ProductClass.WoodenStands import *
+from ProductClass.WoodenStand import *
 class WoodLine():
 
     def __init__(self,root ,lineNum):
@@ -350,8 +350,8 @@ class WoodLine():
 
     def _addWoodColor(self):
         self._color.append(StringVar())
-        self._color[ len(self._color)-1 ].set(self.genre.woodStands[self._colorNum])
-        self._coloropt.append( OptionMenu(self.root, self._color[-1], *self.genre.woodStands))
+        self._color[ len(self._color)-1 ].set(self._genre.woodStands[self._colorNum])
+        self._coloropt.append( OptionMenu(self.root, self._color[-1], *self._genre.woodStands))
         self._coloropt[ -1 ].config(width = 10)
         self._coloropt[ -1 ].grid(padx=20, pady=0,  row= self._colorNum, column=1)
 
@@ -382,7 +382,7 @@ class WoodLine():
     def getColor(self, index = None):
         data = self.getData()
         if not data: return []
-        if not index :
+        if index == None :
             temp = []
             for el in data:
                 temp.append(el.getData()[1])
@@ -392,7 +392,7 @@ class WoodLine():
     def getNumber(self, index = None):
         data = self.getData()
         if not data: return []
-        if not index :
+        if index == None :
             temp = []
             for el in data:
                 temp.append(el.getData()[2])
@@ -400,7 +400,7 @@ class WoodLine():
         else : return data[index].getData()[2]
 
     def _addInputLine(self):
-        if   self._colorNum < len(self.genre.woodStands)-1:
+        if   self._colorNum < len(self._genre.woodStands)-1:
             self._colorNum += 1
             self._addWoodColor()
             self._addNumberEntry()
@@ -420,20 +420,22 @@ class WoodLine():
             self.root.destroy()
             
 #############################################################################################
+from ProductClass.Stand import *
 class StandsLine():
     def __init__(self,root ,lineNum):
         self.root = root
         self.lineNum = lineNum
+        self.toDelate = False
 
-        self.color = []
-        self.coloropt = []
-        self.number = []
+        self._color = []
+        self._coloropt = []
+        self._number = []
         self._genreButtons = []
         self._delateButtons = []
-        self.genre = Genre()
+        self._genre = Genre()
         self._colorNum = 0
 
-        self.toDelate = False
+
 
         self.addStandsClick()
 
@@ -443,10 +445,10 @@ class StandsLine():
         self._addNumberEntry()
     
         self._genreButtons.append( Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) )
-        self._genreButtons[len(self._genreButtons)-1].grid( row =1, column = 0)
+        self._genreButtons[-1].grid( row =1, column = 0)
 
         self._delateButtons.append( Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) )
-        self._delateButtons[len(self._delateButtons)-1].grid( row = 0, column = 3)
+        self._delateButtons[-1].grid( row = 0, column = 3)
 
     def _addModel(self):
 
@@ -455,38 +457,71 @@ class StandsLine():
 
 
     def _addStandsColor(self):
-        self.color.append(StringVar())
-        self.color[ len(self.color)-1 ].set(self.genre.stands[self._colorNum])
-        self.coloropt.append( OptionMenu(self.root, self.color[ len(self.color)-1 ],*self.genre.stands))
-        self.coloropt[ len(self.coloropt)-1 ].config(width = 10)
-        self.coloropt[ len(self.coloropt)-1 ].grid(padx=20, pady=0,  row= self._colorNum, column=1)
+        self._color.append(StringVar())
+        self._color[-1 ].set(self._genre.stands[self._colorNum])
+        self._coloropt.append( OptionMenu(self.root, self._color[ -1 ],*self._genre.stands))
+        self._coloropt[-1 ].config(width = 10)
+        self._coloropt[-1 ].grid(padx=20, pady=0,  row= self._colorNum, column=1)
 
 
     def _addNumberEntry(self):
-        self.number.append( Entry(self.root, width=4,textvariable = IntVar()) )
-        self.number[len(self.number)-1].grid( row= self._colorNum , column=2)
+        self._number.append( Entry(self.root, width=4,textvariable = IntVar()) )
+        self._number[-1].grid( row= self._colorNum , column=2)
     
     def sumCalculate(self):
         sum = 0
-        for i in range(len( self.number)):
-            sum +=int(self.number[i].get())
+        for i in range(len( self._number)):
+            sum +=int(self._number[i].get())
         return sum
 
+    def getData(self):
+        self._allData = []
+        for index in range(len(self._color)):
+            temp = Stand(self._color[index].get(), int(self._number[index].get()) )
+            if not temp.isEmpty(): 
+                self._allData.append( temp )
+        return self._allData
+
+    def getModel(self):
+        temp = self.getData()
+        if temp :  return temp[0].getData()[0]
+        else: return temp
+
+    def getColor(self, index = None):
+        data = self.getData()
+        if not data: return []
+        if index == None :
+            temp = []
+            for el in data:
+                temp.append(el.getData()[1])
+            return temp
+        else : return data[index].getData()[1]
+
+    def getNumber(self, index = None):
+        data = self.getData()
+        if not data: return []
+        if index == None :
+            temp = []
+            for el in data:
+                temp.append(el.getData()[2])
+            return temp
+        else : return data[index].getData()[2]
+
     def _addInputLine(self):
-        if   self._colorNum < len(self.genre.stands)-1:
+        if   self._colorNum < len(self._genre.stands)-1:
             self._colorNum += 1
             self._addStandsColor()
             self._addNumberEntry()
         
     
     def _delThisInputFrame(self):
-        if len(self.color)>1:
-            self.color.pop(-1)
-            self.coloropt[-1].destroy()
-            self.coloropt.pop(-1)
+        if len(self._color)>1:
+            self._color.pop(-1)
+            self._coloropt[-1].destroy()
+            self._coloropt.pop(-1)
 
-            self.number[-1].destroy()
-            self.number.pop(-1)
+            self._number[-1].destroy()
+            self._number.pop(-1)
             self._colorNum -= 1
         else:
             self.toDelate = True

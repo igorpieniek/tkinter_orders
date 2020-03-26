@@ -1,15 +1,15 @@
 # create simple dummy object
 from Genre import *
 
-class WoodenStand(object):
+class Stand(object):
     def __init__(self,color = None, num = None):
         self._genre = Genre()
         self._isLocked = False
-        self._model = 'Statyw drewniany'
+        self._model = 'Statyw metalowy'
         self._color = None
         self._number = None
 
-        if model and color and num: 
+        if color and num: 
             self.addOption(color,num)
 
     def __del__(self):
@@ -24,7 +24,7 @@ class WoodenStand(object):
     def addOption(self, color, num):
         # check in color is valid
         if self._isLocked: print('This object was used, you cant change it ! ')
-        if not color in self._genre.woodStands:error('No such color of wooden stand on genre list!')
+        if not color in self._genre.stands : error('No such color of wooden stand on genre list!')
 
         if num > 0: # onlyy if number is  
             self._color = color

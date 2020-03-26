@@ -21,7 +21,8 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ProductClass\WoodenStands.py">
+    <Compile Include="ProductClass\Stand.py" />
+    <Compile Include="ProductClass\WoodenStand.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ProductClass\Dummy.py">
