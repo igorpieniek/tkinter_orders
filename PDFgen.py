@@ -8,17 +8,13 @@ class PDFgen():
          self.er = self.ex.active
 
 
-
-
-
-
     def process(self, prodList, companyName):
         self._clearExcelSheet()
         self._addDefaultCells()
         self._copyProducts(prodList)
         self._copyCompanyName(companyName)
         self._sortProducts()
-        self._delEmptyLines()
+        #self._delEmptyLines()
         self._addToExcel()
         self._generatePDF()
 
@@ -76,59 +72,57 @@ class PDFgen():
              elif isinstance(self._productsList[i],WoodLine ):
                  self._woodStands.append(self._productsList[i])
 
-    def _delEmptyLines(self):
-        self._dummys = self. _delEmptyLine(self._dummys)
-        self._stands = self. _delEmptyLine(self._stands)
-        self._woodStands = self. _delEmptyLine(self._woodStands)
+    #def _delEmptyLines(self):
+    #    self._dummys = self._delEmptyLine(self._dummys)
+    #    self._stands = self._delEmptyLine(self._stands)
+    #    self._woodStands = self. _delEmptyLine(self._woodStands)
 
-    def _delEmptyLine(self, prodList):
-        ObjtoDel = []
-        for i in range(len(prodList)):
-            LineToDel = []
-            for k in range(len(prodList[i].color)):
-                if not int(prodList[i].number[k].get()):
-                    LineToDel.append(k)    
-            if len( LineToDel) > 0 and len(LineToDel) < len(prodList[i].color)  :
-                counter = 0
-                while counter < len(LineToDel):
-                    prodList[i].color.pop(LineToDel[counter]-counter)
-                    prodList[i].number.pop(LineToDel[counter]-counter)
-                    counter +=1
-            elif len( LineToDel) == len(prodList[i].color):
-                ObjtoDel.append(i)
+    #def _delEmptyLine(self, prodList):
+    #    ObjtoDel = []
+    #    for i in range(len(prodList)):
+    #        LineToDel = []
+    #        for k in range(len(prodList[i].color)):
+    #            if not int(prodList[i].number[k].get()):
+    #                LineToDel.append(k)    
+    #        if len( LineToDel) > 0 and len(LineToDel) < len(prodList[i].color)  :
+    #            counter = 0
+    #            while counter < len(LineToDel):
+    #                prodList[i].color.pop(LineToDel[counter]-counter)
+    #                prodList[i].number.pop(LineToDel[counter]-counter)
+    #                counter +=1
+    #        elif len( LineToDel) == len(prodList[i].color):
+    #            ObjtoDel.append(i)
 
-        # Update dummy obj in case all is empty
-        if ObjtoDel:
-            counter = 0
-            while counter < len(ObjtoDel):
-                prodList.pop(ObjtoDel[counter]-counter)
-                counter +=1
-        return prodList
+        ## Update dummy obj in case all is empty
+        #if ObjtoDel:
+        #    counter = 0
+        #    while counter < len(ObjtoDel):
+        #        prodList.pop(ObjtoDel[counter]-counter)
+        #        counter +=1
+        #return prodList
 
 
 
     def _addToExcel(self):
         lastRow = 3
         # write all dummies
-        elementList = [self._dummys, self._woodStands, self._stands]
-        for product in elementList:
+
+        for product in [self._dummys, self._woodStands, self._stands]:
             for i in range(len(product)):
-                if   product == elementList[0] :self.er['A'+ str(lastRow)] = str(product[i].model.get())
-                elif product == elementList[1] :self.er['A'+ str(lastRow)] = 'Statyw drewniany'
-                elif product == elementList[2] :self.er['A'+ str(lastRow)] = 'Statyw metalowy'
+                self.er['A'+ str(lastRow)] = product[i].getModel()
                 self.er['B'+ str(lastRow)] = str(product[i].sumCalculate())
                 self.er['A'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center',wrap_text = True)
                 self.er['B'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center')
                 k =0
-                while k < len(product[i].color):
-                    self.er['D'+ str(k+lastRow)] = product[i].color[k].get()
-                    self.er['C'+ str(k+lastRow)] = product[i].number[k].get()
+                while k < len(product[i].getColor()):
+                    self.er['D'+ str(k+lastRow)] = product[i].getColor(k)
+                    self.er['C'+ str(k+lastRow)] = product[i].getNumber(k)
                     self.er['C'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
                     self.er['D'+ str(k+lastRow)].alignment = Alignment(horizontal='center', vertical='center')
                     k+=1
-                self.er.merge_cells('B'+ str(lastRow) +':'+ 'B'+str(lastRow -1+ len(product[i].color)))
-                self.er.merge_cells('A'+ str(lastRow) +':'+ 'A'+str(lastRow -1+ len(product[i].color)))
-                lastRow += len(product[i].color)
+                self.er.merge_cells('B'+ str(lastRow) +':'+ 'B'+str(lastRow -1+ len(product[i].getColor() )))
+                self.er.merge_cells('A'+ str(lastRow) +':'+ 'A'+str(lastRow -1+ len(product[i].getColor() )))
+                lastRow += len(product[i].getColor())
         
 
       
