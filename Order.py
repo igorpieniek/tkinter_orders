@@ -100,16 +100,10 @@ class Order():
         arrayToSend = []
         for prod in self.allProducts:
             for i in range(len( prod.getData() )):
-                if isinstance(prod,DummyLine ):
-                     object = prod.getModel()
-                elif isinstance(prod,StandsLine ):
-                     object = 'statyw metalowy'
-                elif isinstance(prod,WoodLine ):
-                     object = prod.getModel()
                 arrayToSend.append([self._orderDate.day,   self._orderDate.month,   self._orderDate.year ,
                                     self._collectDate.day, self._collectDate.month, self._collectDate.year,
                                     self.invoice.get(), self.company.get(), self._getPayment(),
-                                    object, prod.getColor(i), prod.getNumber(i) ])
+                                    prod.getModel(), prod.getColor(i), prod.getNumber(i) ])
         self._database.insertOrder(arrayToSend)
 
     # Fuction that uses pdfprocess and create pdf file
@@ -214,8 +208,6 @@ class DummyLine():
         self._color = []
         self._coloropt = []
         self._number = []
-        self._genreButtons = []
-        self._delateButtons = []
         self._genre = Genre()
         self._colorNum = 0
 
@@ -228,11 +220,11 @@ class DummyLine():
         self._addDummyColor()
         self._addNumberEntry()
     
-        self._genreButtons.append( Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) )
-        self._genreButtons[len(self._genreButtons)-1].grid( row =1, column = 0)
+        self._genreButtons =  Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) 
+        self._genreButtons.grid( row =1, column = 0)
 
-        self._delateButtons.append( Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) )
-        self._delateButtons[len(self._delateButtons)-1].grid( row = 0, column = 3)
+        self._delateButtons = Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) 
+        self._delateButtons.grid( row = 0, column = 3)
 
     def _addModel(self):
         self._model = StringVar()
@@ -322,8 +314,6 @@ class WoodLine():
         self._color = []
         self._coloropt = []
         self._number = []
-        self._genreButtons = []
-        self._delateButtons = []
         self._genre = Genre()
         self._colorNum = 0
 
@@ -336,11 +326,11 @@ class WoodLine():
         self._addWoodColor()
         self._addNumberEntry()
     
-        self._genreButtons.append( Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) )
-        self._genreButtons[-1].grid( row =1, column = 0)
+        self._genreButtons = Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) 
+        self._genreButtons.grid( row =1, column = 0)
 
-        self._delateButtons.append( Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) )
-        self._delateButtons[-1].grid( row = 0, column = 3)
+        self._delateButtons = Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) 
+        self._delateButtons.grid( row = 0, column = 3)
 
     def _addModel(self):
 
@@ -430,12 +420,8 @@ class StandsLine():
         self._color = []
         self._coloropt = []
         self._number = []
-        self._genreButtons = []
-        self._delateButtons = []
         self._genre = Genre()
         self._colorNum = 0
-
-
 
         self.addStandsClick()
 
@@ -444,11 +430,11 @@ class StandsLine():
         self._addStandsColor()
         self._addNumberEntry()
     
-        self._genreButtons.append( Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) )
-        self._genreButtons[-1].grid( row =1, column = 0)
+        self._genreButtons = Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) 
+        self._genreButtons.grid( row =1, column = 0)
 
-        self._delateButtons.append( Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) )
-        self._delateButtons[-1].grid( row = 0, column = 3)
+        self._delateButtons = Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) 
+        self._delateButtons.grid( row = 0, column = 3)
 
     def _addModel(self):
 
