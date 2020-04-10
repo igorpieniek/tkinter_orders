@@ -15,27 +15,23 @@ class History(object):
         self.__addButtons()
         self.__addDateOptions()
         self._addTree()
-        self.__updateTree
+        self.__updateTree()
         self._tree.pack()
 
 
     def _addFrames(self):
-        self.__controlFrame = LabelFrame(self._root,width =300)
+        self.__controlFrame = LabelFrame(self._root,width =200)
         self.__controlFrame.grid(row = 0,column = 0, stick = W+N+E)
 
-        self.__editFrame = LabelFrame(self._root, width =50)
-        self.__editFrame.grid(row = 0,column = 1, stick = W+N+E)
 
         self.__treeFrame = LabelFrame(self._root, padx = 5, pady=5)
-        self.__treeFrame.grid(row= 1,column = 0, columnspan= 2, stick = W+N+S)
+        self.__treeFrame.grid(row= 1,column = 0,  stick = W+N+S)
     
     def __addButtons(self):
         
         self.__OKButton = Button(self.__controlFrame, text= "OK",padx=10, pady=7, command = lambda:self.__updateTree() )
         self.__OKButton.grid(row = 0, column = 2, padx=5, pady=3)
 
-        self.__editButton = Button(self.__editFrame, text= "edytuj",padx=10, pady=7, state = DISABLED,command = lambda:self.__editOrder() )
-        self.__editButton.grid(row = 0, column = 0, padx=5, pady=3)
 
     def __addDateOptions(self):
         self.__month = StringVar()
@@ -68,6 +64,8 @@ class History(object):
         self._tree.column("Nr faktury", width=90, minwidth=50)
         self._tree.column("Kwota", width=40, minwidth=30)
 
+        self._tree.bind("<Double-1>", self.__OnDoubleClick) #double click action
+
     def __updateTree(self):
         #TODO : update tree after OK click - read month & year, clear tree + add orders from this month
         self._tree.delete(*self._tree.get_children()) #clear all tree window
@@ -75,9 +73,14 @@ class History(object):
         year = int(self.__year.get())
         self._readDatabase(month,year)
         self._addLines()
+
     def __editOrder(self):
         #TODO: open new Order window with marked order
         pass
+    def __OnDoubleClick(self,event):
+        if self._tree.selection():
+            item = self._tree.selection()[0]
+            print("you clicked on", self._tree.item(item,"text"))
     def __updateAvailableYears(self):
         self.__availableYears = self._database.getAllYears()
         

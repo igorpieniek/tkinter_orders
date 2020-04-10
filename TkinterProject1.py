@@ -12,14 +12,15 @@ root.geometry('600x800')
 global manager
 manager = windowManager(0)
 
-from startModule import startModule
-startwin = startModule(root)
+#from startModule import startModule
+#startwin = startModule(root)
 
 orderFrame = LabelFrame(root, padx = 10, pady=10,width=500)
 orderFrame.grid(row = 0, column  =0)
 
 
 #order = Order(orderFrame)
+#order.process()
 history = History(root,Database())
 
 #if manager.getStatus() == 'START':
