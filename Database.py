@@ -48,7 +48,16 @@ class Database(object):
 
     def getOrderby_orderMonthandYear(self,month,year):
         self._c.execute("SELECT * FROM orders WHERE mouth_order=:month AND year_order=:year", {'month': month, 'year': year})
-        return self._c.fetchall()
+        rawArray = self._c.fetchall()
+        output = []
+        if rawArray: 
+            last = rawArray[0][:9]
+            output.append(rawArray[0])
+            for line in rawArray:
+                 if not line[:9] == last : 
+                     output.append(line)
+                     last = line[:9]
+        return output
 
     def update_Payment(self, order, pay):
         with self._conn:
@@ -62,4 +71,10 @@ class Database(object):
             c.execute("DELETE from employees WHERE first = :first AND last = :last",
                       {'first': emp.first, 'last': emp.last})  
 
-
+    def getOrderList_month_year(self, month, year):
+        raw = self.getOrderby_orderMonthandYear(month,year)
+        # rebuilding list of products
+        #TODO:
+    def getAllYears(self):
+        rawList = [el[0] for el in self._c.execute("SELECT year_order FROM orders" ) ]
+        return list(set(rawList))
