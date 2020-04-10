@@ -15,7 +15,7 @@ class History(object):
         self.__addButtons()
         self.__addDateOptions()
         self._addTree()
-        self._addLines()
+        self.__updateTree
         self._tree.pack()
 
 
@@ -68,13 +68,13 @@ class History(object):
         self._tree.column("Nr faktury", width=90, minwidth=50)
         self._tree.column("Kwota", width=40, minwidth=30)
 
-        #self._tree.heading("#0",text="name",anchor=w)
-        #self._tree.heading("one", text="date modified",anchor=w)
-        #self._tree.heading("two", text="type",anchor=w)
-        #self._tree.heading("three", text="size",anchor=w)
     def __updateTree(self):
         #TODO : update tree after OK click - read month & year, clear tree + add orders from this month
-        pass
+        self._tree.delete(*self._tree.get_children()) #clear all tree window
+        month = self.__monthNames.index(self.__month.get()) + 1 # getting month number (+1 because of numering starts from 1)
+        year = int(self.__year.get())
+        self._readDatabase(month,year)
+        self._addLines()
     def __editOrder(self):
         #TODO: open new Order window with marked order
         pass
@@ -88,7 +88,6 @@ class History(object):
         self._rawArray = self._database.getOrderby_orderMonthandYear( month,year)
 
     def _addLines(self):
-        self._readDatabase()
         for index,line in enumerate(self._rawArray):
             self._tree.insert("",str(index),values = (str(index), 
                                                  line[7], 
