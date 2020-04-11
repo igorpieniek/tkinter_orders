@@ -6,7 +6,7 @@ from Database import *
 import datetime
 
 class Order():
-    def __init__(self,root):
+    def __init__(self,root, rawArray = None):
         self.genre = Genre()
         self.pdf = PDFgen()
         self.root = root
@@ -20,6 +20,8 @@ class Order():
         self._payment = 0
         self._orderDate= datetime.date.today()
         self._collectDate= datetime.date.today()
+
+        if rawArray: self.__reBuildOrder(rawArray)
     
     # Add new input frame for every Dummy/Stand/WoodenStand object
     def addInputFrame(self):
@@ -193,6 +195,11 @@ class Order():
         self.addEntrySection()
         self.addMainButtons()
         self.addDummyClick()
+
+
+    def __reBuildOrder(self, rawArray):
+        self.process()
+
 
 
 

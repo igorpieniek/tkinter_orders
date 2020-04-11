@@ -77,8 +77,14 @@ class History(object):
 
     def __OnDoubleClick(self,event):
         if self._tree.selection():
-            item = self._tree.selection()[0]
-            print("you clicked on", self._tree.item(item,"text"))
+            it = self._tree.item( self._tree.focus() )['values']
+            dateSep = it[2].split('-')
+            dateSep = [int(i) for i in dateSep]
+            self._database.getOneOrder(companyName = it[1], 
+                                       day_order =   dateSep[0],
+                                       month_order = dateSep[1],
+                                       year_order =  dateSep[2],
+                                       )
 
     def __updateAvailableYears(self):
         self.__availableYears = self._database.getAllYears()

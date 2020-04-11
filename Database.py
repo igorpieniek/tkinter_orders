@@ -75,6 +75,18 @@ class Database(object):
         raw = self.getOrderby_orderMonthandYear(month,year)
         # rebuilding list of products
         #TODO:
+
+    def getOneOrder(self, *,companyName, day_order, month_order, year_order):
+        self._c.execute("""SELECT * FROM orders WHERE company=:companyName AND 
+                         day_order=: day_order AND
+                        month_order:= month_order AND 
+                        year_order:= year_order """, 
+                        {'companyName': companyName, 
+                         'day_order' :  day_order, 
+                         'month_order': month_order, 
+                         'year_order': year_order})
+        return self._c.fetchall()
+
     def getAllYears(self):
         rawList = [el[0] for el in self._c.execute("SELECT year_order FROM orders" ) ]
         return list(set(rawList))
