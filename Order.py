@@ -198,8 +198,28 @@ class Order():
 
 
     def __reBuildOrder(self, rawArray):
-        self.process()
+        self.process() # to add all frames, buttons etc.
+        dateOrder = datetime.date(day = rawArray[0][0], month = rawArray[0][1], year =rawArray[0][2])
+        dateCollect =  datetime.date(day = rawArray[0][3], month = rawArray[0][4], year =rawArray[0][5])
+        fvNum = rawArray[0][6]
+        compName = rawArray[0][7]
+        payment = rawArray[0][8]
+        productsRaw = [el[9:] for el in rawArray] # geting onlu product info
 
+        dummyDict = {line[0]: [] for line in productsRaw if line[0] in self.genre.dummys} #get all names of dummys in order
+        woodenstands = []
+        stands = []
+        for line in productsRaw: #sorting data
+            if line[0] in self.genre.dummys:
+                dummyDict[line[0]].append(Dummy(line[0], line[1], line[2]))
+            elif line[0] == 'Statyw drewniany':
+                woodenstands.append(WoodenStand(line[1], line[2]))
+            elif line[0] == 'Statyw metalowy':
+                stands.append(Stand(line[1], line[2]))
+        print(dummyDict)
+        
+
+            
 
 
 

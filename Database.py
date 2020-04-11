@@ -78,9 +78,9 @@ class Database(object):
 
     def getOneOrder(self, *,companyName, day_order, month_order, year_order):
         self._c.execute("""SELECT * FROM orders WHERE company=:companyName AND 
-                         day_order=: day_order AND
-                        month_order:= month_order AND 
-                        year_order:= year_order """, 
+                         day_order= :day_order AND
+                        mouth_order = :month_order AND 
+                        year_order = :year_order """, 
                         {'companyName': companyName, 
                          'day_order' :  day_order, 
                          'month_order': month_order, 

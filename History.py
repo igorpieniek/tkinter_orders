@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from Database import Database
 import datetime
+from Order import Order
 
 class History(object):
     def __init__(self,root,database):          
@@ -80,11 +81,12 @@ class History(object):
             it = self._tree.item( self._tree.focus() )['values']
             dateSep = it[2].split('-')
             dateSep = [int(i) for i in dateSep]
-            self._database.getOneOrder(companyName = it[1], 
+            order = self._database.getOneOrder(companyName = it[1], 
                                        day_order =   dateSep[0],
                                        month_order = dateSep[1],
-                                       year_order =  dateSep[2],
-                                       )
+                                       year_order =  dateSep[2]  )
+            for line in order: print(line)
+            Order(self._root,order )
 
     def __updateAvailableYears(self):
         self.__availableYears = self._database.getAllYears()
@@ -94,6 +96,8 @@ class History(object):
         if month == None : month = datetime.date.today().month
         if year == None : year = datetime.date.today().year
         self._rawArray = self._database.getOrderby_orderMonthandYear( month,year)
+
+
 
     def _addLines(self):
         for index,line in enumerate(self._rawArray):
