@@ -7,7 +7,8 @@ from Database import Database
 
 
 root = Tk()
-root.geometry('600x800')
+root.geometry('406x350')
+root.title('historia')
 
 global manager
 manager = windowManager(0)
