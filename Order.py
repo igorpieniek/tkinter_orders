@@ -44,20 +44,20 @@ class Order():
     
     # Actions after click of button: creating new objects depends on what user want to add. Functions 
     # also update sequence of frames obcject in case some of them was previous delated
-    def addDummyClick(self):
+    def addDummyClick(self, prodList = None):
         self._inputUpdate()
         self.addInputFrame()
-        self.allProducts.append(DummyLine( self.inputFrame[len(self.inputFrame) - 1] , len(self.inputFrame) - 1) )
+        self.allProducts.append(DummyLine( self.inputFrame[-1] , len(self.inputFrame) - 1, prodList) )
 
-    def addStateClick(self):
+    def addStateClick(self, prodList = None):
         self._inputUpdate()
         self.addInputFrame()
-        self.allProducts.append(StandsLine( self.inputFrame[len(self.inputFrame) - 1], len(self.inputFrame) - 1) )
+        self.allProducts.append(StandsLine( self.inputFrame[-1], len(self.inputFrame) - 1, prodList) )
 
-    def addStateWoodClick(self):
+    def addStateWoodClick(self, prodList = None):
         self._inputUpdate()
         self.addInputFrame()
-        self.allProducts.append(WoodLine( self.inputFrame[len(self.inputFrame) - 1], len(self.inputFrame) - 1) ) 
+        self.allProducts.append(WoodLine( self.inputFrame[-1], len(self.inputFrame) - 1, prodList) ) 
 
     # Main objects update function. It contains 2 smaller functions. One is updating products object and second
     # to update frames which was connected to product object 
@@ -198,7 +198,9 @@ class Order():
 
 
     def __reBuildOrder(self, rawArray):
-        self.process() # to add all frames, buttons etc.
+        self.addFrames()
+        self.addEntrySection()
+        self.addMainButtons()
         dateOrder = datetime.date(day = rawArray[0][0], month = rawArray[0][1], year =rawArray[0][2])
         dateCollect =  datetime.date(day = rawArray[0][3], month = rawArray[0][4], year =rawArray[0][5])
         fvNum = rawArray[0][6]
@@ -216,7 +218,12 @@ class Order():
                 woodenstands.append(WoodenStand(line[1], line[2]))
             elif line[0] == 'Statyw metalowy':
                 stands.append(Stand(line[1], line[2]))
-        print(dummyDict)
+        
+        #sending data
+        if dummyDict:
+            for item in dummyDict: self.addDummyClick(dummyDict[item]) #send element
+        if woodenstands: self.addStateWoodClick(woodenstands) #send wooden stand element
+        if stands: self.addStateClick(stands) #send stand element
         
 
             
@@ -227,7 +234,7 @@ class Order():
 from ProductClass.Dummy import *
 class DummyLine():
 
-    def __init__(self,root ,lineNum):
+    def __init__(self,root ,lineNum, dummysList = None):
         self.root = root
         self.lineNum = lineNum
 
@@ -240,36 +247,47 @@ class DummyLine():
 
         self.toDelate = False
 
-        self.addDummyClick()
+        self.addButtons()
+
+        if dummysList : self.__rebuildFrame( dummysList)
+        else: 
+            self.addDummyClick()
+
 
     def addDummyClick(self):     
         self._addModel()
         self._addDummyColor()
         self._addNumberEntry()
-    
+
+    def addButtons(self):
         self._genreButtons =  Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) 
         self._genreButtons.grid( row =1, column = 0)
 
         self._delateButtons = Button(self.root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) 
         self._delateButtons.grid( row = 0, column = 3)
 
-    def _addModel(self):
+    def _addModel(self, value = None):
         self._model = StringVar()
-        self._model.set(self._genre.dummys[0])
+        if value:  self._model.set(value)
+        else : self._model.set(self._genre.dummys[0])
         self._modelopt = OptionMenu(self.root,  self._model,*self._genre.dummys) 
         self._modelopt.configure(width = 5)
         self._modelopt.grid(padx=20, pady=0, row=0, column=0)
 
-    def _addDummyColor(self):
+    def _addDummyColor(self, value = None):
         self._color.append(StringVar())
-        self._color[ -1 ].set(self._genre.color[self._colorNum])
+        if value: self._color[ -1 ].set(value)
+        else: self._color[ -1 ].set(self._genre.color[self._colorNum])
         self._coloropt.append( OptionMenu(self.root, self._color[-1],*self._genre.color) )
         self._coloropt[ -1 ].config(width = 10)
         self._coloropt[ -1 ].grid(padx=20, pady=0,  row= self._colorNum, column=1)
 
 
-    def _addNumberEntry(self):
-        self._number.append( Entry(self.root, width=4, textvariable = IntVar()) )
+    def _addNumberEntry(self, value = None):
+        var = IntVar()
+        if value : var.set(value) 
+        self._number.append( Entry(self.root, width=4, textvariable = var) )
+
         self._number[-1].grid( row= self._colorNum , column=2)
 
     def _addInputLine(self):
@@ -330,6 +348,15 @@ class DummyLine():
         else:
             self.toDelate = True
             self.root.destroy()
+
+    def __rebuildFrame(self, list):
+        self._addModel(list[0].getData()[0])
+        for el in list:
+            self._addDummyColor( el.getData()[1] )
+            self._addNumberEntry( el.getData()[2])
+
+
+
 #############################################################################################
 from ProductClass.WoodenStand import *
 class WoodLine():

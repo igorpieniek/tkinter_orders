@@ -86,7 +86,8 @@ class History(object):
                                        month_order = dateSep[1],
                                        year_order =  dateSep[2]  )
             for line in order: print(line)
-            Order(self._root,order )
+            top =Toplevel(self._root)
+            Order(top, order )
 
     def __updateAvailableYears(self):
         self.__availableYears = self._database.getAllYears()
