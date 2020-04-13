@@ -231,13 +231,154 @@ class Order():
 
 
 ####################################################################################################################
+class basicProduct():
+    def __init__(self, root ,frameNum, models, kinds, rebuildList = None):
+        self.__root = root
+        self.frameNum = frameNum # number of frame in order array
+        self._modelsList = models # list to model menu
+        self._kindsList = kinds # list to kind menu
+
+        self._kind = []
+        self._kindOpt = []
+        self._number = []
+        self.__lineNum = 0 #number of current line in frames
+
+        self.toDelate = False #is number to delete
+
+        self.addButtons() # add buttons 'delete' and 'add genre'
+
+        if rebuildList : self.__rebuildFrame( rebuildList )
+        else:  self._addInputLine()
+
+    def addButtons(self):
+        self._genreButtons =  Button(self.__root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) 
+        self._genreButtons.grid( row =1, column = 0)
+
+        self._delateButtons = Button(self.__root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) 
+        self._delateButtons.grid( row = 0, column = 3)
+
+    # Function which add model menu or model label
+    def _addModel(self, value = None):
+        if isinstance(self._modelsList, str):    self.__addModelAsLabel()
+        elif isinstance(self._modelsList, list): self.__addModelAsOptionMenu(value)
+
+    def __addModelAsLabel(self):
+        self._model = Label(self.__root, text = self._modelsList, padx=10, pady=0 )
+        self._model.grid(row=0, column=0)
+
+    def __addModelAsOptionMenu(self, value):
+        [self._model, self._modelOpt ] = self.__addOptionMenu(optList = self._modelsList, 
+                                              row = 0,
+                                              column = 0,
+                                              width = 5,
+                                              initValue = value)
+    
+    # Function which add kind menu (eg. colors)
+    def _addKind(self, value = None):
+        [kind, menu ] = self.__addOptionMenu(optList = self._kindsList, 
+                                              row = self.__lineNum,
+                                              column = 1,
+                                              width = 10,
+                                              initValue = value)
+        self._kind.append( kind )
+        self._kindOpt.append( menu )
+
+    # Main function of adding and configure option menu
+    def __addOptionMenu(self,*, optList, row, column, width, initValue = None):
+        outOption = StringVar()
+        if initValue:  outOption.set( initValue )
+        else : outOption.set(optList[0])
+        optionMenu = OptionMenu(self.__root,  outOption, *optList) 
+        optionMenu.configure(width = width)
+        optionMenu.grid(padx=20, pady=0, row=row, column=column)
+        return [outOption, optionMenu]
+
+    # Function that add Entry place -> to write quantity of specified product
+    def _addNumberEntry(self, value = None):
+        var = IntVar()
+        if value : var.set(value) 
+        self._number.append( Entry(self.__root, width=4, textvariable = var) )
+        self._number[-1].grid( row = self.__lineNum , column=2)
+    
+    # Function that add new line inside this Frame object
+    def _addInputLine(self, kind = None, value = None):
+        if   self.__lineNum < len(self._kindsList) -1:
+            self.__lineNum += 1
+            if kind and value:
+                self._addKind( kind )
+                self._addNumberEntry(value)
+            else:
+                self._addKind()
+                self._addNumberEntry()
+
+    # To calculate sum of all products in this frame
+    def sumCalculate(self):
+        sum = 0
+        for i in range(len( self._number)):
+            sum +=int(self._number[i].get())
+        return sum
+    #### poprawione do tego miejsca
+    def getData(self):
+        allData = []
+        for index in range(self.__lineNum):
+            temp = Dummy(self._model.get(), self._color[index].get(), int(self._number[index].get()) )
+            if not temp.isEmpty(): 
+                allData.append( temp )
+        return allData
+
+    def getModel(self):
+        temp = self.getData()
+        if temp :  return temp[0].getData()[0]
+        else: return temp
+
+    def getColor(self, index = None):
+        data = self.getData()
+        if not data: return []
+        if index == None :
+            temp = []
+            for el in data:
+                temp.append(el.getData()[1])
+            return temp
+        else : return data[index].getData()[1]
+
+    def getNumber(self, index = None):
+        data = self.getData()
+        if not data: return []
+        if index == None  :
+            temp = []
+            for el in data:
+                temp.append(el.getData()[2])
+            return temp
+        else : return data[index].getData()[2]
+
+    # Function whitch delete Frame and everything inside frame
+    def _delThisInputFrame(self):
+        if len( self.__lineNum ) > 1:
+            self._kind.pop(-1)
+            self._kindOpt[-1].destroy()
+            self._kindOpt.pop(-1)
+
+            self._number[-1].destroy()
+            self._number.pop(-1)
+            self.__lineNum -= 1
+        else:
+            self.toDelate = True
+            self.__root.destroy()
+    
+    # Function to rebuild frame from histry window
+    def __rebuildFrame(self, list):
+        self._addModel(list[0].getData()[0])
+        for index,el in enumerate(list):
+            if not index:
+                self._addKind( el.getData()[1] )
+                self._addNumberEntry( el.getData()[2] )
+            else: self._addInputLine( el.getData()[1], el.getData()[2] )
+####################################################################################################################
 from ProductClass.Dummy import *
 class DummyLine():
-
     def __init__(self,root ,lineNum, dummysList = None):
         self.root = root
         self.lineNum = lineNum
-
 
         self._color = []
         self._coloropt = []
@@ -247,17 +388,10 @@ class DummyLine():
 
         self.toDelate = False
 
-        self.addButtons()
+        self.addButtons() # add buttons 'delete' and 'add genre'
 
         if dummysList : self.__rebuildFrame( dummysList)
-        else: 
-            self._addInputLine()
-
-
-    def addDummyClick(self):     
-        self._addModel()
-        self._addDummyColor()
-        self._addNumberEntry()
+        else:  self._addInputLine()
 
     def addButtons(self):
         self._genreButtons =  Button(self.root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) 
@@ -364,6 +498,8 @@ class DummyLine():
 
 
 #############################################################################################
+
+
 from ProductClass.WoodenStand import *
 class WoodLine():
 
