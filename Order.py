@@ -251,7 +251,7 @@ class DummyLine():
 
         if dummysList : self.__rebuildFrame( dummysList)
         else: 
-            self.addDummyClick()
+            self._addInputLine()
 
 
     def addDummyClick(self):     
@@ -290,11 +290,15 @@ class DummyLine():
 
         self._number[-1].grid( row= self._colorNum , column=2)
 
-    def _addInputLine(self):
+    def _addInputLine(self, color =None, value = None):
         if   self._colorNum < len(self._genre.color) -1:
             self._colorNum += 1
-            self._addDummyColor()
-            self._addNumberEntry()
+            if color and value:
+                self._addDummyColor(color)
+                self._addNumberEntry(value)
+            else:
+                self._addDummyColor()
+                self._addNumberEntry()
 
     def sumCalculate(self):
         sum = 0
@@ -351,9 +355,11 @@ class DummyLine():
 
     def __rebuildFrame(self, list):
         self._addModel(list[0].getData()[0])
-        for el in list:
-            self._addDummyColor( el.getData()[1] )
-            self._addNumberEntry( el.getData()[2])
+        for index,el in enumerate(list):
+            if not index:
+                self._addDummyColor( el.getData()[1] )
+                self._addNumberEntry( el.getData()[2] )
+            else: self._addInputLine(el.getData()[1], el.getData()[2] )
 
 
 
