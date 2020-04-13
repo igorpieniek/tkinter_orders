@@ -232,11 +232,12 @@ class Order():
 
 ####################################################################################################################
 class basicProduct():
-    def __init__(self, root ,frameNum, models, kinds, rebuildList = None):
+    def __init__(self, root ,frameNum, models, kinds,prodObj, rebuildList = None):
         self.__root = root
         self.frameNum = frameNum # number of frame in order array
         self._modelsList = models # list to model menu
         self._kindsList = kinds # list to kind menu
+        self._prodObj = prodObj
 
         self._kind = []
         self._kindOpt = []
@@ -320,8 +321,10 @@ class basicProduct():
     #### poprawione do tego miejsca
     def getData(self):
         allData = []
+
         for index in range(self.__lineNum):
-            temp = Dummy(self._model.get(), self._color[index].get(), int(self._number[index].get()) )
+            if self._prodObj == Dummy:  temp = self._prodObj(self._model.get(), self._kind[index].get(), int(self._number[index].get()) )
+            else: temp = self._prodObj(self._kind[index].get(), int(self._number[index].get()) )
             if not temp.isEmpty(): 
                 allData.append( temp )
         return allData
