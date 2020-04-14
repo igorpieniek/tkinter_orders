@@ -1,35 +1,40 @@
 import sqlite3
+import sys
 
 class Database(object):
     def __init__(self):
         self._conn = sqlite3.connect('orders.db')
 
         self._c = self._conn.cursor()
+
         try:
-            self._c.execute("""CREATE TABLE orders (
-                        index integer,
-                        day_order integer,
-                        mouth_order integer,
-                        year_order integer,
-                        day_collect integer,
-                        mouth_collect integer,
-                        year_collect integer,
+            self._c.execute("""CREATE TABLE IF NOT EXISTS orders (
+                        id int,
+                        day_order int,
+                        mouth_order int,
+                        year_order int,
+                        day_collect int,
+                        mouth_collect int,
+                        year_collect int,
                         fv_num text,
                         company text,
-                        payment integer,
-                        object  text,
-                        color   text,
-                        quantity    integer         
+                        payment int,
+                        object text,
+                        color text,
+                        quantity int        
                         )""")
         except:
-              print('database init OK!')
+              print('database init problem: ' ,sys.exc_info()[0])
+
+        else: print('Database init OK!')
+
     def insertOrder(self,order):
         ind = self.__getNextIndex()
         for oneLine in order:
             with self._conn:
-                self._c.execute("""INSERT INTO orders VALUES (:index :day_order, :mouth_order, :year_order, :day_collect,
+                self._c.execute("""INSERT INTO orders VALUES (:id, :day_order, :mouth_order, :year_order, :day_collect,
                                 :mouth_collect, :year_collect, :fv_num, :company, :payment,:object, :color, :quantity)""", 
-                                {'index': ind,
+                                {'id': ind,
                                  'day_order': oneLine[0], 
                                  'mouth_order': oneLine[1], 
                                  'year_order': oneLine[2],

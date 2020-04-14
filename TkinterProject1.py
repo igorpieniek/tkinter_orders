@@ -20,10 +20,10 @@ orderFrame = LabelFrame(root, padx = 10, pady=10,width=500)
 orderFrame.grid(row = 0, column  =0)
 
 
-#order = Order(orderFrame)
-#order.process()
-dat = Database()
-history = History(root,dat)
+order = Order(orderFrame)
+order.process()
+#dat = Database()
+#history = History(root,dat)
 
 #if manager.getStatus() == 'START':
 #      #START WINDOW
