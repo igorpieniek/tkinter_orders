@@ -125,16 +125,16 @@ class Order():
         self.buttons.append(Button(self.addElementsFrame, text= "Dodaj statyw\ndrewniany",padx=5, pady=7, command = lambda:self.addStateWoodClick()))
         self.buttons[2].grid(row = 0, column = 2,padx=20, pady=3, sticky=W+N)
 
-        self.buttons.append(Button(self.controlFrame, text= "Cofnij",padx=10, pady=3, command = lambda:self.backClick()))
+        self.buttons.append(Button(self.controlFrame, text= "Cofnij",padx=10, pady=3,width=10, command = lambda:self.backClick()))
         self.buttons[3].grid(row =0, column = 0, sticky=N)
 
-        self.buttons.append(Button(self.controlFrame, text= "Zapisz",padx=10, pady=3, command = lambda:self.saveClick()))
+        self.buttons.append(Button(self.controlFrame, text= "Zapisz",padx=10, pady=3,width=10, command = lambda:self.saveClick()))
         self.buttons[4].grid( row =1, column = 0, sticky=N)
 
-        self.buttons.append(Button(self.controlFrame, text= "Generuj PDF\n zamówienie",padx=10, pady=3, command = lambda:self.generatePDFClick()))
+        self.buttons.append(Button(self.controlFrame, text= "Generuj PDF\n zamówienie",padx=10, pady=3, width=10, command = lambda:self.generatePDFClick()))
         self.buttons[5].grid(row =2, column = 0, sticky=N)
 
-        self.buttons.append(Button(self.controlFrame, text= "Generuj PDF\n koszulki",padx=10, pady=3, command = lambda:self.generatePDFClick()))
+        self.buttons.append(Button(self.controlFrame, text= "Generuj PDF\n koszulki",padx=10, pady=3,width=10, command = lambda:self.generatePDFClick()))
         self.buttons[6].grid(row =3, column = 0, sticky=N)
 
         self.buttons.append(Button(self.nameFrame, text='Data zamówienia', command=lambda:self._orderDateFun(0)))
