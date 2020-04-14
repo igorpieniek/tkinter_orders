@@ -75,18 +75,18 @@ class Order():
                 self.inputFrame.pop(counter)   #delate chosen frames           
 
             for i in range(len(self.inputFrame)):
-                self.inputFrame[i].grid(row = self.allProducts[i].lineNum ,column = 0) # update frames which ramains
+                self.inputFrame[i].grid(row = self.allProducts[i].frameNum ,column = 0) # update frames which ramains
 
     # Function that update parameters in object in case one of them was deleted before
     def _updateProductsObj(self):
         counter = 0
         while counter < len(self.allProducts):
             if len(self.allProducts) != 0 and self.allProducts[counter].toDelate == True:
-                self._lineNumToDel.append( self.allProducts[counter].lineNum)
+                self._lineNumToDel.append( self.allProducts[counter].frameNum)
                 self.allProducts.pop(counter)
                 k = counter
                 while k < len(self.allProducts):
-                    self.allProducts[k].lineNum -= 1
+                    self.allProducts[k].frameNum -= 1
                     k +=1
 
             else: counter +=1
@@ -131,14 +131,17 @@ class Order():
         self.buttons.append(Button(self.controlFrame, text= "Zapisz",padx=10, pady=3, command = lambda:self.saveClick()))
         self.buttons[4].grid( row =1, column = 0, sticky=N)
 
-        self.buttons.append(Button(self.controlFrame, text= "Generuj PDF",padx=10, pady=3, command = lambda:self.generatePDFClick()))
+        self.buttons.append(Button(self.controlFrame, text= "Generuj PDF\n zamówienie",padx=10, pady=3, command = lambda:self.generatePDFClick()))
         self.buttons[5].grid(row =2, column = 0, sticky=N)
 
+        self.buttons.append(Button(self.controlFrame, text= "Generuj PDF\n koszulki",padx=10, pady=3, command = lambda:self.generatePDFClick()))
+        self.buttons[6].grid(row =3, column = 0, sticky=N)
+
         self.buttons.append(Button(self.nameFrame, text='Data zamówienia', command=lambda:self._orderDateFun(0)))
-        self.buttons[6].grid(row = 0, column = 3, padx=5, pady=3)
+        self.buttons[7].grid(row = 0, column = 3, padx=5, pady=3)
 
         self.buttons.append(Button(self.nameFrame, text='Data odbioru', command=lambda: self._orderDateFun(1)))
-        self.buttons[7].grid(row = 0, column = 4, padx=5, pady=3)
+        self.buttons[8].grid(row = 0, column = 4, padx=5, pady=3)
     
     # Add oppurtunity to add company name, invoice number, payment and initialize choosing date
     def addEntrySection(self):
@@ -239,6 +242,8 @@ class basicProduct():
         self._kindsList = kinds # list to kind menu
         self._prodObj = prodObj
 
+        self._model = None
+        self._modelOpt = None
         self._kind = []
         self._kindOpt = []
         self._number = []
@@ -252,11 +257,11 @@ class basicProduct():
         else:  self._addInputLine()
 
     def addButtons(self):
-        self._genreButtons =  Button(self.__root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) 
-        self._genreButtons.grid( row =1, column = 0)
+        self._genreButton =  Button(self.__root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) 
+        self._genreButton.grid( row =1, column = 0)
 
-        self._delateButtons = Button(self.__root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) 
-        self._delateButtons.grid( row = 0, column = 3)
+        self._deleteButton = Button(self.__root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) 
+        self._deleteButton.grid( row = 0, column = 3)
 
     # Function which add model menu or model label
     def _addModel(self, value = None):
@@ -302,15 +307,17 @@ class basicProduct():
         self._number[-1].grid( row = self.__lineNum , column=2)
     
     # Function that add new line inside this Frame object
-    def _addInputLine(self, kind = None, value = None):
-        if   self.__lineNum < len(self._kindsList) -1:
-            self.__lineNum += 1
+    def _addInputLine(self, kind = None, value = None, model = None):
+        if   self.__lineNum < len(self._kindsList) -1:        
             if kind and value:
+                if not self._model: self._addModel(model)
                 self._addKind( kind )
                 self._addNumberEntry(value)
             else:
+                if not self._model: self._addModel(model)
                 self._addKind()
                 self._addNumberEntry()
+            self.__lineNum += 1
 
     # To calculate sum of all products in this frame
     def sumCalculate(self):
@@ -356,7 +363,7 @@ class basicProduct():
 
     # Function whitch delete Frame and everything inside frame
     def _delThisInputFrame(self):
-        if len( self.__lineNum ) > 1:
+        if self.__lineNum  > 1:
             self._kind.pop(-1)
             self._kindOpt[-1].destroy()
             self._kindOpt.pop(-1)
@@ -365,17 +372,16 @@ class basicProduct():
             self._number.pop(-1)
             self.__lineNum -= 1
         else:
+            if self._modelOpt: self._modelOpt.destroy()
+            self._genreButton.destroy()
+            self._deleteButton.destroy()
             self.toDelate = True
             self.__root.destroy()
     
     # Function to rebuild frame from histry window
     def __rebuildFrame(self, list):
         self._addModel(list[0].getData()[0])
-        for index,el in enumerate(list):
-            if not index:
-                self._addKind( el.getData()[1] )
-                self._addNumberEntry( el.getData()[2] )
-            else: self._addInputLine( el.getData()[1], el.getData()[2] )
+        for el in list: self._addInputLine( el.getData()[1], el.getData()[2] )
 ####################################################################################################################
 from ProductClass.Dummy import *
 from ProductClass.WoodenStand import *
