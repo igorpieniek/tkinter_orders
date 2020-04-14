@@ -22,7 +22,8 @@ orderFrame.grid(row = 0, column  =0)
 
 #order = Order(orderFrame)
 #order.process()
-history = History(root,Database())
+dat = Database()
+history = History(root,dat)
 
 #if manager.getStatus() == 'START':
 #      #START WINDOW

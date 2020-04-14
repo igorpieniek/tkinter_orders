@@ -7,6 +7,7 @@ class Database(object):
         self._c = self._conn.cursor()
         try:
             self._c.execute("""CREATE TABLE orders (
+                        index integer,
                         day_order integer,
                         mouth_order integer,
                         year_order integer,
@@ -23,11 +24,13 @@ class Database(object):
         except:
               print('database init OK!')
     def insertOrder(self,order):
+        ind = self.__getNextIndex()
         for oneLine in order:
             with self._conn:
-                self._c.execute("""INSERT INTO orders VALUES (:day_order, :mouth_order, :year_order, :day_collect,
+                self._c.execute("""INSERT INTO orders VALUES (:index :day_order, :mouth_order, :year_order, :day_collect,
                                 :mouth_collect, :year_collect, :fv_num, :company, :payment,:object, :color, :quantity)""", 
-                                {'day_order': oneLine[0], 
+                                {'index': ind,
+                                 'day_order': oneLine[0], 
                                  'mouth_order': oneLine[1], 
                                  'year_order': oneLine[2],
                                  'day_collect': oneLine[3], 
@@ -88,5 +91,24 @@ class Database(object):
         return self._c.fetchall()
 
     def getAllYears(self):
-        rawList = [el[0] for el in self._c.execute("SELECT year_order FROM orders" ) ]
-        return list(set(rawList))
+        return self.__getColumn( 'year_order' )
+
+    # Check random column value-> if something exist return False
+    def isDatabaseEmpty(self):
+        if self.__getColumn( 'index' ): return False
+        else: return True
+
+    #function that get current individual order index
+    def __getNextIndex(self):
+        indexList = self.__getColumn( 'index' )
+        if not indexList: return 0
+        return max( indexList )
+
+    def __getColumn(self, column):
+        try:
+            rawList = [el[0] for el in self._c.execute("SELECT "+column+" FROM orders" ) ]
+        except:
+            print('No such element or empty database!')
+            return []
+        else: return list(set(rawList))
+

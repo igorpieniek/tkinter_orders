@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 from Database import Database
 import datetime
 from Order import Order
@@ -8,16 +9,19 @@ class History(object):
     def __init__(self,root,database):          
         self._root = root
         self._database = database
+        if self._database.isDatabaseEmpty():
+            self.__databaseErrorAction()
+            return
 
         self.__monthNames = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 
                              'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień']
+
         self.__updateAvailableYears()
         self._addFrames();
         self.__addButtons()
         self.__addDateOptions()
         self._addTree()
         self.__updateTree()
-
 
 
     def _addFrames(self):
@@ -107,5 +111,8 @@ class History(object):
                                                  str(line[0])+'-'+str(line[1])+'-'+str(line[2]),
                                                  line[6],
                                                  str(line[8]) ) )
+    def __databaseErrorAction(self):
+        messagebox.showerror('Błąd!', 'Żadne zamówienie nie zostało wprowadzone\nBaza danych jest pusta!')
+        self._root.destroy()
 
                     
