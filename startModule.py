@@ -1,33 +1,44 @@
 from tkinter import *
 
+from History import *
 
 
 
-class startModule():
+
+
+class StartModule():
     def __init__(self,root):
         self._status = -1
-        self.root = root
+        self._root = root
+        self.clearWindow()
+        self.process()
 
-    def newOrder(self):
+    def _newOrder(self):
+        from Order import Order
         self._status = 1
-        self.quit()
+        self.clearWindow()
+        order = Order(self._root )
+        order.process()
 
-    def history(self):
+    def _history(self):
         self._status = 2
-        self.quit()
+        self.clearWindow()
+        history = History(self._root )
 
     def addButtons(self):
         self.buttons = []
-        self.buttons.append(Button(self.root, text= "Nowe zamówienie",padx=10, pady=7, command = lambda:self.newOrder()))
-        self.buttons.append(Button(self.root, text= "Historia zamówień",  padx=10, pady=7, command = lambda: self.history()))
-        self.buttons.append(Button(self.root, text= "Zamknij", padx=10, pady=7, command = self.root.quit))
+        self.buttons.append(Button(self._root, text= "Nowe zamówienie",padx=10, pady=7, command = lambda:self._newOrder()))
+        self.buttons.append(Button(self._root, text= "Historia zamówień",  padx=10, pady=7, command = lambda: self._history()))
+        self.buttons.append(Button(self._root, text= "Zamknij", padx=10, pady=7, command = lambda: self._end()))
 
         for i in range(len(self.buttons)):
             self.buttons[i].pack()
+    def _end(self):
+        self._root.destroy()
 
-    def quit(self):
-        for i in range(len(self.buttons)):
-            self.buttons[i].pack_forget()
+    def clearWindow(self):
+        for widget in self._root.winfo_children():
+            widget.destroy()
 
     def process(self):
         self.addButtons()

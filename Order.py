@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from Genre import Genre
 from PDFgen import *
+from startModule import *
 from tkcalendar import Calendar, DateEntry
 from Database import *
 import datetime
@@ -113,9 +114,12 @@ class Order():
 
     # Function to close adding order window TODO
     def backClick(self):
-        temp = self._database.getOrderby_orderMonthandYear(3,2021)
-        for i in temp:
-            print(i)
+        # TODO: create some protection - question about saving data which was input
+        sm = StartModule(self.root)
+        sm.clearWindow()
+        sm.process()
+    
+
     # Action function executed afer clicking "Zapisz" - it create matrix and send it to database class
     def saveClick(self):
         self._inputUpdate() #update all products

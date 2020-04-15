@@ -3,12 +3,12 @@ from tkinter import ttk
 from tkinter import messagebox
 from Database import Database
 import datetime
-from Order import Order
+from Order import *
 
 class History(object):
-    def __init__(self,root,database):          
+    def __init__(self,root):          
         self._root = root
-        self._database = database
+        self._database = Database()
         if self._database.isDatabaseEmpty():
             self.__databaseErrorAction()
             return
@@ -31,7 +31,7 @@ class History(object):
         self.__controlFrame.grid(row = 0,column = 0, stick = W+N+S)
 
 
-        self.__treeFrame = LabelFrame(self._root, padx = 5, pady=5)
+        self.__treeFrame = LabelFrame(self._root, padx = 5, pady=5,)
         self.__treeFrame.grid(row= 1,column = 0,  stick = W+N+S)
     
     def __addButtons(self):       
@@ -72,6 +72,7 @@ class History(object):
 
         self._tree.bind("<Double-1>", self.__OnDoubleClick) #double click action
 
+        self._tree.configure(height = 25)
         self._tree.grid(padx=5, pady=5, )
     
     def __addScrollbar(self):
