@@ -144,20 +144,26 @@ class Order():
         self.buttons[8].grid(row = 0, column = 4, padx=5, pady=3)
     
     # Add oppurtunity to add company name, invoice number, payment and initialize choosing date
-    def addEntrySection(self):
+    def addEntrySection(self,*,companyName = None, invoiceNum = None, payValue = None):
         self.companyLabel = Label(self.nameFrame, text= "Nazwa firmy",padx=10, pady=0 )
         self.companyLabel.grid(row=0, column=0)
-        self.company = ( Entry(self.nameFrame, width=15 ,textvariable = StringVar()) )
+        comp = StringVar()
+        if companyName : comp.set(companyName)
+        self.company = ( Entry(self.nameFrame, width=15 ,textvariable = comp) )
         self.company.grid( row= 1 , column=0,padx = 10, pady=3, sticky = N+W+E)
 
         self.invoiceLabel = Label(self.nameFrame, text= "Faktura nr",padx=10, pady=0 )
         self.invoiceLabel.grid(row=0, column=1)
-        self.invoice = ( Entry(self.nameFrame, width=15 ,textvariable = StringVar()) )
+        inv = StringVar()
+        if invoiceNum: inv.set(invoiceNum)
+        self.invoice = ( Entry(self.nameFrame, width=15 ,textvariable = inv) )
         self.invoice.grid( row= 1 , column=1,padx = 10, pady=3, sticky = N+W+E)
 
         self.paymentLabel = Label(self.nameFrame, text= "Płatność",padx=10, pady=0 )
         self.paymentLabel.grid(row=0, column=2)
-        self.paymentEntry = ( Entry(self.nameFrame, width=5 ,textvariable = IntVar()) )
+        payment = IntVar()
+        if payValue: payment.set( payValue)
+        self.paymentEntry = ( Entry(self.nameFrame, width=5 ,textvariable = payment) )
         self.paymentEntry.grid( row= 1 , column=2,padx = 10, pady=3, sticky = N+W+E)
 
         today = str(datetime.date.today().day)+'-'+str(datetime.date.today().month)+'-'+str(datetime.date.today().year)
@@ -202,14 +208,11 @@ class Order():
 
     def __reBuildOrder(self, rawArray):
         self.addFrames()
-        self.addEntrySection()
+        self.addEntrySection(companyName =rawArray[0][8], invoiceNum =rawArray[0][7], payValue = rawArray[0][9])
         self.addMainButtons()
-        dateOrder = datetime.date(day = rawArray[0][0], month = rawArray[0][1], year =rawArray[0][2])
-        dateCollect =  datetime.date(day = rawArray[0][3], month = rawArray[0][4], year =rawArray[0][5])
-        fvNum = rawArray[0][6]
-        compName = rawArray[0][7]
-        payment = rawArray[0][8]
-        productsRaw = [el[9:] for el in rawArray] # geting onlu product info
+        dateOrder = datetime.date(day = rawArray[0][1], month = rawArray[0][2], year =rawArray[0][3])
+        dateCollect =  datetime.date(day = rawArray[0][4], month = rawArray[0][5], year =rawArray[0][6])
+        productsRaw = [el[10:] for el in rawArray] # geting onlu product info
 
         dummyDict = {line[0]: [] for line in productsRaw if line[0] in self.genre.dummys} #get all names of dummys in order
         woodenstands = []
@@ -293,7 +296,7 @@ class basicProduct():
     def __addOptionMenu(self,*, optList, row, column, width, initValue = None):
         outOption = StringVar()
         if initValue:  outOption.set( initValue )
-        else : outOption.set(optList[0])
+        else : outOption.set(optList[self.__lineNum])
         optionMenu = OptionMenu(self.__root,  outOption, *optList) 
         optionMenu.configure(width = width)
         optionMenu.grid(padx=20, pady=0, row=row, column=column)
@@ -308,7 +311,7 @@ class basicProduct():
     
     # Function that add new line inside this Frame object
     def _addInputLine(self, kind = None, value = None, model = None):
-        if   self.__lineNum < len(self._kindsList) -1:        
+        if   self.__lineNum < len(self._kindsList) :        
             if kind and value:
                 if not self._model: self._addModel(model)
                 self._addKind( kind )

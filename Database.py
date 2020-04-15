@@ -59,12 +59,12 @@ class Database(object):
         rawArray = self._c.fetchall()
         output = []
         if rawArray: 
-            last = rawArray[0][:9]
-            output.append(rawArray[0])
+            last = rawArray[0][1:10]
+            output.append(rawArray[0][1:])
             for line in rawArray:
-                 if not line[:9] == last : 
-                     output.append(line)
-                     last = line[:9]
+                 if not line[1:10] == last : 
+                     output.append(line[1:])
+                     last = line[1:10]
         return output
 
     def update_Payment(self, order, pay):
@@ -100,12 +100,12 @@ class Database(object):
 
     # Check random column value-> if something exist return False
     def isDatabaseEmpty(self):
-        if self.__getColumn( 'index' ): return False
+        if self.__getColumn( 'id' ): return False
         else: return True
 
     #function that get current individual order index
     def __getNextIndex(self):
-        indexList = self.__getColumn( 'index' )
+        indexList = self.__getColumn( 'id' )
         if not indexList: return 0
         return max( indexList )
 
