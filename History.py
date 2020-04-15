@@ -20,6 +20,7 @@ class History(object):
         self._addFrames();
         self.__addButtons()
         self.__addDateOptions()
+        self.__addScrollbar()
         self._addTree()
         self.__updateTree()
 
@@ -54,7 +55,7 @@ class History(object):
 
 
     def _addTree(self):
-        self._tree = ttk.Treeview(self.__treeFrame, columns = ( "Lp.","Nazwa firmy", "Data zamówienia","Nr faktury","Kwota",) )
+        self._tree = ttk.Treeview(self.__treeFrameCanv, columns = ( "Lp.","Nazwa firmy", "Data zamówienia","Nr faktury","Kwota",) )
         self._tree['show'] = 'headings' #removig first column
 
         self._tree.heading("Lp.",text="Lp.")
@@ -72,6 +73,19 @@ class History(object):
         self._tree.bind("<Double-1>", self.__OnDoubleClick) #double click action
 
         self._tree.grid(padx=5, pady=5, )
+    
+    def __addScrollbar(self):
+        def scrollAction(event):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        canvas = Canvas( self.__treeFrame)
+        self.__treeFrameCanv = Frame(canvas)
+        self.__scroll = Scrollbar(self.__treeFrame, orient = 'vertical', command = canvas.yview)
+        canvas.configure( yscrollcommand = self.__scroll.set )
+        self.__scroll.pack( side = 'right', fill = 'y' )
+        canvas.pack( side = 'left' )
+        canvas.create_window( (0,0),window= self.__treeFrameCanv, anchor='nw' )
+        self.__treeFrameCanv.bind("<Configure>", scrollAction)
 
     def __updateTree(self):
         self._tree.delete(*self._tree.get_children()) #clear all tree window
