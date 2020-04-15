@@ -144,7 +144,7 @@ class Order():
         self.buttons[8].grid(row = 0, column = 4, padx=5, pady=3)
     
     # Add oppurtunity to add company name, invoice number, payment and initialize choosing date
-    def addEntrySection(self,*,companyName = None, invoiceNum = None, payValue = None):
+    def addEntrySection(self,*,companyName = None, invoiceNum = None, payValue = None, dateOrder=None, dateCollect=None ):
         self.companyLabel = Label(self.nameFrame, text= "Nazwa firmy",padx=10, pady=0 )
         self.companyLabel.grid(row=0, column=0)
         comp = StringVar()
@@ -166,11 +166,14 @@ class Order():
         self.paymentEntry = ( Entry(self.nameFrame, width=5 ,textvariable = payment) )
         self.paymentEntry.grid( row= 1 , column=2,padx = 10, pady=3, sticky = N+W+E)
 
-        today = str(datetime.date.today().day)+'-'+str(datetime.date.today().month)+'-'+str(datetime.date.today().year)
-        self.DateOrderLabel = Label(self.nameFrame, text = today,padx=10, pady=3 )
+        if dateOrder: dateOrder = str(dateOrder.day)+'-'+str(dateOrder.month)+'-'+str(dateOrder.year)
+        else : dateOrder = str(datetime.date.today().day)+'-'+str(datetime.date.today().month)+'-'+str(datetime.date.today().year)
+        self.DateOrderLabel = Label(self.nameFrame, text = dateOrder,padx=10, pady=3 )
         self.DateOrderLabel.grid(row=1, column=3)
 
-        self.DateCollectLabel = Label(self.nameFrame, text = '',padx=10, pady=3 )
+        if dateCollect: dateCollect = str(dateCollect.day)+'-'+str(dateCollect.month)+'-'+str(dateCollect.year)
+        else : dateCollect = ''
+        self.DateCollectLabel = Label(self.nameFrame, text = dateCollect,padx=10, pady=3 )
         self.DateCollectLabel.grid(row=1, column=4)
 
     # Add calendar
@@ -208,10 +211,12 @@ class Order():
 
     def __reBuildOrder(self, rawArray):
         self.addFrames()
-        self.addEntrySection(companyName =rawArray[0][8], invoiceNum =rawArray[0][7], payValue = rawArray[0][9])
         self.addMainButtons()
         dateOrder = datetime.date(day = rawArray[0][1], month = rawArray[0][2], year =rawArray[0][3])
         dateCollect =  datetime.date(day = rawArray[0][4], month = rawArray[0][5], year =rawArray[0][6])
+        self.addEntrySection(companyName =rawArray[0][8], invoiceNum =rawArray[0][7], payValue = rawArray[0][9],
+                             dateOrder = dateOrder, dateCollect = dateCollect)
+
         productsRaw = [el[10:] for el in rawArray] # geting onlu product info
 
         dummyDict = {line[0]: [] for line in productsRaw if line[0] in self.genre.dummys} #get all names of dummys in order
