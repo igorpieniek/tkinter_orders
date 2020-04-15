@@ -5,6 +5,7 @@ from PDFgen import *
 from tkcalendar import Calendar, DateEntry
 from Database import *
 import datetime
+import copy
 
 class Order():
     def __init__(self,root, rawArray = None):
@@ -18,6 +19,7 @@ class Order():
         self.Stands = []
         self.allProducts = []
         self._lineNumToDel = []
+        self.__rebulidAllProducts = None
         self._payment = 0
         self._orderDate= datetime.date.today()
         self._collectDate= datetime.date.today()
@@ -107,15 +109,18 @@ class Order():
         elif not self.allProducts:
             messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
             return
-        # save to database
-        arrayToSend = []
-        for prod in self.allProducts:
-            for i in range(len( prod.getData() )):
-                arrayToSend.append([self._orderDate.day,   self._orderDate.month,   self._orderDate.year ,
-                                    self._collectDate.day, self._collectDate.month, self._collectDate.year,
-                                    self.invoice.get(), self.company.get(), self._getPayment(),
-                                    prod.getModel(), prod.getColor(i), prod.getNumber(i) ])
-        self._database.insertOrder(arrayToSend)
+
+        if self.__isRebuildChanged():
+            # save to database
+            arrayToSend = []
+            for prod in self.allProducts:
+                for i in range(len( prod.getData() )):
+                    arrayToSend.append([self._orderDate.day,   self._orderDate.month,   self._orderDate.year ,
+                                        self._collectDate.day, self._collectDate.month, self._collectDate.year,
+                                        self.invoice.get(), self.company.get(), self._getPayment(),
+                                        prod.getModel(), prod.getColor(i), prod.getNumber(i) ])
+            self._database.insertOrder(arrayToSend)
+        else: print('Nothing changed -> it wont be saved again!')
 
     # Fuction that uses pdfprocess and create pdf file
     def generatePDFClick(self):
@@ -175,12 +180,16 @@ class Order():
         self.paymentEntry = ( Entry(self.nameFrame, width=5 ,textvariable = payment) )
         self.paymentEntry.grid( row= 1 , column=2,padx = 10, pady=3, sticky = N+W+E)
 
-        if dateOrder: dateOrder = str(dateOrder.day)+'-'+str(dateOrder.month)+'-'+str(dateOrder.year)
+        if dateOrder:
+           self._orderDate = dateOrder
+           dateOrder = str(dateOrder.day)+'-'+str(dateOrder.month)+'-'+str(dateOrder.year)
         else : dateOrder = str(datetime.date.today().day)+'-'+str(datetime.date.today().month)+'-'+str(datetime.date.today().year)
         self.DateOrderLabel = Label(self.nameFrame, text = dateOrder,padx=10, pady=3 )
         self.DateOrderLabel.grid(row=1, column=3)
 
-        if dateCollect: dateCollect = str(dateCollect.day)+'-'+str(dateCollect.month)+'-'+str(dateCollect.year)
+        if dateCollect:
+            self._collectDate = dateCollect
+            dateCollect = str(dateCollect.day)+'-'+str(dateCollect.month)+'-'+str(dateCollect.year)
         else : dateCollect = ''
         self.DateCollectLabel = Label(self.nameFrame, text = dateCollect,padx=10, pady=3 )
         self.DateCollectLabel.grid(row=1, column=4)
@@ -203,7 +212,7 @@ class Order():
                            disabledforeground='red',
                            cursor="hand1", year=today.year, month=today.month, day=today.day)
         cal.pack(fill="both", expand=True)
-        Button(top, text="ok", command=print_sel).pack() 
+        Button(top, text="zatwierdź", command=print_sel).pack() 
         
     # Update payment and return it
     def _getPayment(self):
@@ -221,10 +230,14 @@ class Order():
     def __reBuildOrder(self, rawArray):
         self.addFrames()
         self.addMainButtons()
-        dateOrder = datetime.date(day = rawArray[0][1], month = rawArray[0][2], year =rawArray[0][3])
-        dateCollect =  datetime.date(day = rawArray[0][4], month = rawArray[0][5], year =rawArray[0][6])
-        self.addEntrySection(companyName =rawArray[0][8], invoiceNum =rawArray[0][7], payValue = rawArray[0][9],
-                             dateOrder = dateOrder, dateCollect = dateCollect)
+        self.__reCompanyName = rawArray[0][8]
+        self.__reInvoiceNum =  rawArray[0][7]
+        self.__rePayment = rawArray[0][9]
+        self.__reDateOrder = datetime.date(day = rawArray[0][1], month = rawArray[0][2], year =rawArray[0][3])
+        self.__reDateCollect =  datetime.date(day = rawArray[0][4], month = rawArray[0][5], year =rawArray[0][6])
+
+        self.addEntrySection(companyName = self.__reCompanyName, invoiceNum = self.__reInvoiceNum, payValue = self.__rePayment,
+                             dateOrder = self.__reDateOrder, dateCollect = self.__reDateCollect)
 
         productsRaw = [el[10:] for el in rawArray] # geting onlu product info
 
@@ -244,9 +257,23 @@ class Order():
             for item in dummyDict: self.addDummyClick(dummyDict[item]) #send element
         if woodenstands: self.addStateWoodClick(woodenstands) #send wooden stand element
         if stands: self.addStateClick(stands) #send stand element
-        
 
-            
+        self.__rebulidAllProducts = copy.copy(self.allProducts)
+
+    # compare current data in order window with rebuild data
+    def __isRebuildChanged(self):
+        if self.__rebulidAllProducts: # if rebuilding was done ever in this window
+            #if len(self.allProducts) == len( self.__rebulidAllProducts): 
+            #    for index, original in enumerate(self.allProducts):
+            #        if not original ==  self.__rebulidAllProducts[index]: return True# fail
+            if not self.allProducts is self.__rebulidAllProducts: return True
+            elif not len(self.allProducts) == len( self.__rebulidAllProducts): return True
+            elif not self.__reCompanyName == self.company.get(): return True
+            elif not self.__reInvoiceNum == self.invoice.get(): return True
+            elif not self.__reDateOrder == self._orderDate: return True
+            elif not self.__reDateCollect == self._collectDate: return True
+            else: return False
+        else: return True
 
 
 
