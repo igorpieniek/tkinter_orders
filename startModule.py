@@ -1,17 +1,18 @@
 from tkinter import *
 
-from History import *
+
 
 
 
 
 
 class StartModule():
-    def __init__(self,root):
+    def __init__(self,root, openMenu = True):
         self._status = -1
         self._root = root
-        self.clearWindow()
-        self.process()
+        if openMenu:
+            self.clearWindow()
+            self.process()
 
     def _newOrder(self):
         from Order import Order
@@ -21,6 +22,7 @@ class StartModule():
         order.process()
 
     def _history(self):
+        from History import History
         self._status = 2
         self.clearWindow()
         history = History(self._root )

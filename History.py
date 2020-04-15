@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from Database import Database
+from startModule import *
 import datetime
 from Order import *
 
@@ -9,6 +10,7 @@ class History(object):
     def __init__(self,root):          
         self._root = root
         self._database = Database()
+        self.__startmod = StartModule(self._root, openMenu=False)
         if self._database.isDatabaseEmpty():
             self.__databaseErrorAction()
             return
@@ -37,6 +39,12 @@ class History(object):
     def __addButtons(self):       
         self.__OKButton = Button(self.__controlFrame, text= "OK",padx=10, pady=2, command = lambda:self.__updateTree() )
         self.__OKButton.grid(row = 0, column = 2, padx=5, pady=3)
+
+        self.__backButton = Button(self.__controlFrame, text= "cofnij",padx=10, pady=2, command = lambda:self.__backToMainMenu() )
+        self.__backButton.grid(row = 0, column = 3, padx=5, pady=3)
+
+        self.__delButton = Button(self.__controlFrame, text= "usuń",padx=10, pady=2, command = lambda:self.__updateTree() )
+        self.__delButton.grid(row = 0, column = 4, padx=5, pady=3)
 
 
     def __addDateOptions(self):
@@ -131,3 +139,6 @@ class History(object):
         self._root.destroy()
 
                     
+    def __backToMainMenu(self):
+        self.__startmod.clearWindow()
+        self.__startmod.process()
