@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from Genre import Genre
 from PDFgen import *
 from tkcalendar import Calendar, DateEntry
@@ -98,6 +99,14 @@ class Order():
             print(i)
     # Action function executed afer clicking "Zapisz" - it create matrix and send it to database class
     def saveClick(self):
+        self._inputUpdate() #update all products
+        # check if empty
+        if not self.company.get():
+            messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez wprowadzenia nazwy firmy!')
+            return
+        elif not self.allProducts:
+            messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
+            return
         # save to database
         arrayToSend = []
         for prod in self.allProducts:
