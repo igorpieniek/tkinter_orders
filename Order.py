@@ -36,8 +36,21 @@ class Order():
         self.addElementsFrame = LabelFrame(self.root, padx = 5, pady=5,width =300, background = "blue")
         self.addElementsFrame.grid(row = 1,column = 1, stick = W+N+E)
 
-        self.allInputsFrame = LabelFrame(self.root, padx = 5, pady=5)
-        self.allInputsFrame.grid(row= 2,column = 1, stick = W+N+S)
+        self.allInputsFrameMain = LabelFrame(self.root, padx = 5, pady=5)
+        self.allInputsFrameMain.grid(row= 2,column = 1, stick = W+N+S)
+        
+        def myfunction(event):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+        # scrollbar test
+        canvas = Canvas(self.allInputsFrameMain)
+        self.allInputsFrame = Frame(canvas)
+        self.scroll = Scrollbar(self.allInputsFrameMain, orient = 'vertical', command = canvas.yview)
+        canvas.configure(yscrollcommand=self.scroll.set)
+        self.scroll.pack(side = 'right', fill = 'y')
+        canvas.pack(side = 'left')
+        canvas.create_window((1,2),window= self.allInputsFrame, anchor='nw')
+        self.allInputsFrame.bind("<Configure>",myfunction)
+       
 
         self.controlFrame = LabelFrame(self.root, padx = 5, pady=5)
         self.controlFrame.grid(row= 1, rowspan = 2,column = 0, stick = W+N+S)
