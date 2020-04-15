@@ -25,6 +25,9 @@ class Order():
         self._collectDate= datetime.date.today()
 
         if rawArray: self.__reBuildOrder(rawArray)
+        else:  self.process()
+
+
     
     # Add new input frame for every Dummy/Stand/WoodenStand object
     def addInputFrame(self):
@@ -39,25 +42,26 @@ class Order():
         self.allInputsFrameMain = LabelFrame(self.root, padx = 5, pady=5)
         self.allInputsFrameMain.grid(row= 2,column = 1, stick = W+N+S)
         
-        def myfunction(event):
+        self.controlFrame = LabelFrame(self.root, padx = 5, pady=5)
+        self.controlFrame.grid(row= 1, rowspan = 2,column = 0, stick = W+N+S)
+        
+        self.nameFrame = LabelFrame(self.root, padx = 5, pady=5)
+        self.nameFrame.grid(row= 0, columnspan = 2,column = 0, stick = W+N+S)
+
+    # Add scrollbar to input frame
+    def __addScrollbar(self):
+        def scrollAction(event):
             canvas.configure(scrollregion=canvas.bbox("all"))
-        # scrollbar test
+
         canvas = Canvas(self.allInputsFrameMain)
         self.allInputsFrame = Frame(canvas)
         self.scroll = Scrollbar(self.allInputsFrameMain, orient = 'vertical', command = canvas.yview)
         canvas.configure(yscrollcommand=self.scroll.set)
         self.scroll.pack(side = 'right', fill = 'y')
         canvas.pack(side = 'left')
-        canvas.create_window((1,2),window= self.allInputsFrame, anchor='nw')
-        self.allInputsFrame.bind("<Configure>",myfunction)
-       
+        canvas.create_window((0,0),window= self.allInputsFrame, anchor='nw')
+        self.allInputsFrame.bind("<Configure>", scrollAction)
 
-        self.controlFrame = LabelFrame(self.root, padx = 5, pady=5)
-        self.controlFrame.grid(row= 1, rowspan = 2,column = 0, stick = W+N+S)
-        
-        self.nameFrame = LabelFrame(self.root, padx = 5, pady=5)
-        self.nameFrame.grid(row= 0, columnspan = 2,column = 0, stick = W+N+S)
-    
     # Actions after click of button: creating new objects depends on what user want to add. Functions 
     # also update sequence of frames obcject in case some of them was previous delated
     def addDummyClick(self, prodList = None):
@@ -235,13 +239,16 @@ class Order():
     # MAIN process of order object
     def process(self):
         self.addFrames()
+        self.__addScrollbar()
         self.addEntrySection()
         self.addMainButtons()
         self.addDummyClick()
+        
 
 
     def __reBuildOrder(self, rawArray):
         self.addFrames()
+        self.__addScrollbar()
         self.addMainButtons()
         self.__reCompanyName = rawArray[0][8]
         self.__reInvoiceNum =  rawArray[0][7]
