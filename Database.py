@@ -1,6 +1,7 @@
 import sqlite3
 import sys
 
+
 class Database(object):
     def __init__(self):
         self._conn = sqlite3.connect('orders.db')
@@ -60,12 +61,14 @@ class Database(object):
         output = []
         if rawArray: 
             last = rawArray[0][1:10]
-            output.append(rawArray[0][1:])
+            output.append(list(rawArray[0][1:]))
             for line in rawArray:
                  if not line[1:10] == last : 
-                     output.append(line[1:])
-                     last = line[1:10]
-        return output
+                     output.append(list(line[1:]))
+                     last = line[1:10]  
+                     
+        return  sorted(output, key=lambda a_entry: a_entry[0]) # sort all output orders by day order
+                                                               # SO says its slower than NumPy - maybe to change future
 
     def update_Payment(self, order, pay):
         with self._conn:
