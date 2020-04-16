@@ -159,7 +159,7 @@ class Order():
         self.buttons.append(Button(self.addElementsFrame, text= "Dodaj statyw\ndrewniany",padx=5, pady=7, command = lambda:self.addStateWoodClick()))
         self.buttons[2].grid(row = 0, column = 2,padx=20, pady=3, sticky=W+N)
 
-        self.buttons.append(Button(self.controlFrame, text= "Cofnij",padx=10, pady=3,width=10, command = lambda:self.backClick()))
+        self.buttons.append(Button(self.controlFrame, text= "Cofnij",padx=10, pady=3,width=10, state = ACTIVE, command = lambda:self.backClick()))
         self.buttons[3].grid(row =0, column = 0, sticky=N)
 
         self.buttons.append(Button(self.controlFrame, text= "Zapisz",padx=10, pady=3,width=10, command = lambda:self.saveClick()))
@@ -253,6 +253,7 @@ class Order():
         self.addFrames()
         self.__addScrollbar()
         self.addMainButtons()
+        self.buttons[3].configure(state= DISABLED)
         self.__reCompanyName = rawArray[0][8]
         self.__reInvoiceNum =  rawArray[0][7]
         self.__rePayment = rawArray[0][9]
