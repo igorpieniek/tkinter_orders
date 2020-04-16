@@ -11,9 +11,10 @@ root.geometry('406x350')
 root.title('')
 
 global manager
-manager = windowManager(0)
+manager = windowManager(root)
 
-startModule = StartModule(root)
+
+#startModule = StartModule(root)
 
 ##from startModule import startModule
 ##startwin = startModule(root)
