@@ -11,10 +11,11 @@ class windowManager():
         self.__currentWindow = self.__windowInit('start')
         self.__topWindow = []
 
-    def __windowInit(self, name, reArray =None):
-        if name == 'start': return StartModule(self.__root,)
-        elif name == 'order':  return Order(self.__root, reArray )
-        elif name == 'history':  return  History(self.__root, )
+    def __windowInit(self, name, reArray =None, root = None):
+        if not root : root = self.__root
+        if name == 'start': return StartModule(root = root,  windowManager = self)
+        elif name == 'order':  return Order(root = root, windowManager = self, rawArray = reArray )
+        elif name == 'history':  return  History(root = root, windowManager = self )
         else: print('No such window name')
 
     def backToLastWindow(self):
@@ -31,8 +32,8 @@ class windowManager():
             self.__currentWindow = self.__windowInit(name)
 
     def newRebuildOrderWindow(self,*,array):
-        self.__topWindow = TopLevel(self.__root)
-        reOrder = self.__windowInit('order', array)
+        self.__topWindow.append(Toplevel(self.__root) )
+        reOrder = self.__windowInit('order', reArray = array, root = self.__topWindow[-1])
 
 
     def __clearWindow(self):

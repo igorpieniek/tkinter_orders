@@ -9,10 +9,11 @@ import datetime
 import copy
 
 class Order():
-    def __init__(self,root, rawArray = None):
+    def __init__(self,*,root, windowManager, rawArray = None):
         self.genre = Genre()
         self.pdf = PDFgen()
         self.root = root
+        self.__windowManager = windowManager
         self._database = Database()
 
         self.inputFrame = []
@@ -115,9 +116,7 @@ class Order():
     # Function to close adding order window TODO
     def backClick(self):
         # TODO: create some protection - question about saving data which was input
-        sm = StartModule(self.root)
-        sm.clearWindow()
-        sm.process()
+        self.__windowManager.backToLastWindow()
     
 
     # Action function executed afer clicking "Zapisz" - it create matrix and send it to database class

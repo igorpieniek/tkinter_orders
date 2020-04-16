@@ -7,10 +7,10 @@ import datetime
 from Order import *
 
 class History(object):
-    def __init__(self,root):          
+    def __init__(self,*,root, windowManager):          
         self._root = root
+        self.__windowManager = windowManager
         self._database = Database()
-        self.__startmod = StartModule(self._root, openMenu=False)
         if self._database.isDatabaseEmpty():
             self.__databaseErrorAction()
             return
@@ -113,8 +113,9 @@ class History(object):
                                        month_order = dateSep[1],
                                        year_order =  dateSep[2]  )
             for line in order: print(line)
-            top =Toplevel(self._root)
-            Order(top, order )
+
+            self.__windowManager.newRebuildOrderWindow(array = order)
+
 
     def __updateAvailableYears(self):
         self.__availableYears = self._database.getAllYears()
@@ -140,5 +141,5 @@ class History(object):
 
                     
     def __backToMainMenu(self):
-        self.__startmod.clearWindow()
-        self.__startmod.process()
+        self.__windowManager.backToLastWindow()
+       

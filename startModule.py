@@ -1,31 +1,18 @@
 from tkinter import *
 
 
-
-
-
-
-
 class StartModule():
-    def __init__(self,root, openMenu = True):
-        self._status = -1
+    def __init__(self,*,root,  windowManager, openMenu = True):
+        self.__windowManager = windowManager
         self._root = root
         if openMenu:
-            self.clearWindow()
             self.process()
 
     def _newOrder(self):
-        from Order import Order
-        self._status = 1
-        self.clearWindow()
-        order = Order(self._root )
-        order.process()
+        self.__windowManager.changeWindow('order')
 
     def _history(self):
-        from History import History
-        self._status = 2
-        self.clearWindow()
-        history = History(self._root )
+        self.__windowManager.changeWindow('history')
 
     def addButtons(self):
         self.buttons = []
@@ -38,13 +25,9 @@ class StartModule():
     def _end(self):
         self._root.destroy()
 
-    def clearWindow(self):
-        for widget in self._root.winfo_children():
-            widget.destroy()
 
     def process(self):
         self.addButtons()
-        return self._status
 
 
 
