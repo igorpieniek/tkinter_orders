@@ -129,9 +129,11 @@ class History(object):
             self.__windowManager.newRebuildOrderWindow(array = order)
     
     def __deleteOrder(self):
-        if self.__todeleteOrder: self._database.remove_order(self.__todeleteOrder)
-        print('Order deleted')
-        self.__updateTree()
+        MsgBox = messagebox.askquestion ('Usunięcie zamówienia','Czy napewno chcesz usunąć wybrane zamówienie?',icon = 'warning', )
+        if MsgBox == 'yes':
+            if self.__todeleteOrder: self._database.remove_order(self.__todeleteOrder)
+            print('Order deleted')
+            self.__updateTree()
 
     def __updateAvailableYears(self):
         self.__availableYears = self._database.getAllYears()
