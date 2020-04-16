@@ -37,26 +37,23 @@ class History(object):
         self.__treeFrame.grid(row= 1,column = 0,  stick = W+N+S)
     
     def __addButtons(self):       
-        self.__OKButton = Button(self.__controlFrame, text= "OK",padx=10, pady=2, command = lambda:self.__updateTree() )
-        self.__OKButton.grid(row = 0, column = 2, padx=5, pady=3)
-
         self.__backButton = Button(self.__controlFrame, text= "cofnij",padx=10, pady=2, command = lambda:self.__backToMainMenu() )
-        self.__backButton.grid(row = 0, column = 3, padx=5, pady=3)
+        self.__backButton.grid(row = 0, column = 2, padx=5, pady=3)
 
         self.__delButton = Button(self.__controlFrame, text= "usuń",padx=10, pady=2, command = lambda:self.__updateTree() )
-        self.__delButton.grid(row = 0, column = 4, padx=5, pady=3)
+        self.__delButton.grid(row = 0, column = 3, padx=5, pady=3)
 
 
     def __addDateOptions(self):
         self.__month = StringVar()
         self.__month.set(self.__monthNames[datetime.date.today().month-1])
-        self.__monthOpt = OptionMenu(self.__controlFrame,  self.__month, *self.__monthNames) 
+        self.__monthOpt = OptionMenu(self.__controlFrame,  self.__month, command = lambda x : self.__updateTree(), *self.__monthNames) 
         self.__monthOpt.configure(width = 10)
         self.__monthOpt.grid(padx=5, pady=0, row=0, column=0)
 
         self.__year = IntVar()
         self.__year.set(datetime.date.today().year)
-        self.__yearOpt = OptionMenu(self.__controlFrame,  self.__year, *self.__availableYears) 
+        self.__yearOpt = OptionMenu(self.__controlFrame,  self.__year, command = lambda x : self.__updateTree(), *self.__availableYears) 
         self.__yearOpt.configure(width = 10)
         self.__yearOpt.grid(padx=5, pady=0, row=0, column=1)
 
