@@ -7,10 +7,10 @@ import datetime
 from Order import *
 
 class History(object):
-    def __init__(self,*,root, windowManager):          
+    def __init__(self,*,root, database,windowManager):          
         self._root = root
         self.__windowManager = windowManager
-        self._database = Database()
+        self._database = database
         if self._database.isDatabaseEmpty():
             self.__databaseErrorAction()
             return

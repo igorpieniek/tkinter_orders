@@ -5,17 +5,17 @@ from Order import Order
 from tkinter import *
 
 class windowManager():
-    def __init__(self,root):
+    def __init__(self,root,data):
         self.__root = root
-
+        self.__database = data
         self.__currentWindow = self.__windowInit('start')
         self.__topWindow = []
 
     def __windowInit(self, name, reArray =None, root = None):
         if not root : root = self.__root
-        if name == 'start': return StartModule(root = root,  windowManager = self)
-        elif name == 'order':  return Order(root = root, windowManager = self, rawArray = reArray )
-        elif name == 'history':  return  History(root = root, windowManager = self )
+        if name == 'start': return StartModule(root = root, windowManager = self)
+        elif name == 'order':  return Order(root = root, windowManager = self,  database =  self.__database, rawArray = reArray )
+        elif name == 'history':  return  History(root = root,  database =  self.__database ,windowManager = self )
         else: print('No such window name')
 
     def backToLastWindow(self):

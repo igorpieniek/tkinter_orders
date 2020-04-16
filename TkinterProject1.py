@@ -7,11 +7,11 @@ from Database import Database
 from startModule import *
 
 root = Tk()
-root.geometry('406x350')
+root.geometry('550x450')
 root.title('')
 
-global manager
-manager = windowManager(root)
+data = Database()
+manager = windowManager(root,data)
 
 
 #startModule = StartModule(root)

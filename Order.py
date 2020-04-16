@@ -9,12 +9,12 @@ import datetime
 import copy
 
 class Order():
-    def __init__(self,*,root, windowManager, rawArray = None):
+    def __init__(self,*,root, windowManager,database, rawArray = None):
         self.genre = Genre()
         self.pdf = PDFgen()
         self.root = root
         self.__windowManager = windowManager
-        self._database = Database()
+        self._database = database
 
         self.inputFrame = []
         self.Dummys = []
