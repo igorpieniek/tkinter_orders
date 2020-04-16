@@ -79,8 +79,14 @@ class Database(object):
 
     def remove_order(self, order):
         with conn:
-            c.execute("DELETE from employees WHERE first = :first AND last = :last",
-                      {'first': emp.first, 'last': emp.last})  
+            c.execute("""DELETE from orders WHERE day_order = :day_order 
+                        AND mouth_order = :mouth_order
+                        AND year_order = :year_order
+                        AND company = :company""",
+                      {'day_order': order['day_order'],
+                      'mouth_order': order['month_order'],
+                      'year_order': order['year_order'],
+                       'company': order['company'] })  
 
     def getOrderList_month_year(self, month, year):
         raw = self.getOrderby_orderMonthandYear(month,year)
