@@ -17,6 +17,7 @@ class History(object):
 
         self.__monthNames = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 
                              'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień']
+        self.__todeleteOrder = {} # declaration of order dictionary to removing from database
 
         self.__updateAvailableYears()
         self._addFrames();
@@ -40,7 +41,7 @@ class History(object):
         self.__backButton = Button(self.__controlFrame, text= "cofnij",padx=10, pady=2, command = lambda:self.__backToMainMenu() )
         self.__backButton.grid(row = 0, column = 2, padx=5, pady=3)
 
-        self.__delButton = Button(self.__controlFrame, text= "usuń",padx=10, pady=2, command = lambda:self.__updateTree() )
+        self.__delButton = Button(self.__controlFrame, text= "usuń",padx=10, pady=2, state=DISABLED, command = lambda:self.__deleteOrder() )
         self.__delButton.grid(row = 0, column = 3, padx=5, pady=3)
 
 
@@ -75,7 +76,9 @@ class History(object):
         self._tree.column("Nr faktury", width=100, minwidth=50)
         self._tree.column("Kwota", width=60, minwidth=30)
 
-        self._tree.bind("<Double-1>", self.__OnDoubleClick) #double click action
+        self._tree.bind("<ButtonRelease-1>", self.__singleClick) #single mouse click action
+        self._tree.bind("<Double-1>", self.__OnDoubleClick) #double mouse click action
+
 
         self._tree.configure(height = 25)
         self._tree.grid(padx=5, pady=5, )
@@ -94,11 +97,23 @@ class History(object):
         self.__treeFrameCanv.bind("<Configure>", scrollAction)
 
     def __updateTree(self):
+        self.__delButton.configure(state=DISABLED)
         self._tree.delete(*self._tree.get_children()) #clear all tree window
         month = self.__monthNames.index(self.__month.get()) + 1 # getting month number (+1 because of numering starts from 1)
         year = int(self.__year.get())
         self._readDatabase(month,year)
         self._addLines()
+
+    def __singleClick(self,event):
+        if self._tree.selection():
+            self.__delButton.configure(state=ACTIVE)
+            item  = self._tree.item( self._tree.focus() )['values']
+            dateSep = item[2].split('-')
+            dateSep = [int(i) for i in dateSep]
+            self.__todeleteOrder = {  'day_order' :dateSep[0],
+                                      'month_order': dateSep[1],
+                                      'year_order' : dateSep[2],
+                                        'company': item[1]}
 
     def __OnDoubleClick(self,event):
         if self._tree.selection():
@@ -112,7 +127,11 @@ class History(object):
             for line in order: print(line)
 
             self.__windowManager.newRebuildOrderWindow(array = order)
-
+    
+    def __deleteOrder(self):
+        if self.__todeleteOrder: self._database.remove_order(self.__todeleteOrder)
+        print('Order deleted')
+        self.__updateTree()
 
     def __updateAvailableYears(self):
         self.__availableYears = self._database.getAllYears()
