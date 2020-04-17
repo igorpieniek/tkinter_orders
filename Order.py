@@ -253,7 +253,7 @@ class Order():
         self.addFrames()
         self.__addScrollbar()
         self.addMainButtons()
-        self.buttons[3].configure(state= DISABLED)
+        self.buttons[3].configure(state= DISABLED) # 'cofnij' button
         self.__reCompanyName = rawArray[0][8]
         self.__reInvoiceNum =  rawArray[0][7]
         self.__rePayment = rawArray[0][9]
@@ -282,10 +282,19 @@ class Order():
         if woodenstands: self.addStateWoodClick(woodenstands) #send wooden stand element
         if stands: self.addStateClick(stands) #send stand element
 
-        self.__rebulidAllProducts = copy.copy(self.allProducts)
+        self.__rebulidAllProducts = [dummyDict, woodenstands, stands]
 
     # compare current data in order window with rebuild data
     def __isRebuildChanged(self):
+        def compareProducts(products):
+            for product in self.allProducts:
+                prodData = product.getData()
+                for element in range(len(prodData)): #levef of simple product class
+                    if isinstance(element, Dummy):
+                        pass
+
+
+
         if self.__rebulidAllProducts: # if rebuilding was done ever in this window
             #if len(self.allProducts) == len( self.__rebulidAllProducts): 
             #    for index, original in enumerate(self.allProducts):
@@ -393,7 +402,7 @@ class basicProduct():
         for i in range(len( self._number)):
             sum +=int(self._number[i].get())
         return sum
-    #### poprawione do tego miejsca
+
     def getData(self):
         allData = []
 
