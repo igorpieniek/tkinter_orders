@@ -460,7 +460,7 @@ class ProductLine():
         self._addModel(list[0].getData()[0])
         for el in list: self._addInputLine( el.getData()[1], el.getData()[2] )
 ####################################################################################################################
-from ProductClass.basicProduct import *
+from basicProduct import *
 
 class DummyLine(ProductLine):
     def __init__(self,root ,frameNum, dummysList = None):

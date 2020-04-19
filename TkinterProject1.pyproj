@@ -24,7 +24,7 @@
     <Compile Include="orderManager.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ProductClass\basicProduct.py">
+    <Compile Include="basicProduct.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="History.py">
@@ -49,9 +49,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TkinterProject1.py" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ProductClass\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
