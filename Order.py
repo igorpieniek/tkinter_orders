@@ -138,7 +138,7 @@ class Order():
                     arrayToSend.append([self._orderDate.day,   self._orderDate.month,   self._orderDate.year ,
                                         self._collectDate.day, self._collectDate.month, self._collectDate.year,
                                         self.invoice.get(), self.company.get(), self._getPayment(),
-                                        prod.getModel(), prod.getColor(i), prod.getNumber(i) ])
+                                        prod.getModel(), prod.getKind(i), prod.getNumber(i) ])
             self._database.insertOrder(arrayToSend)
         else: print('Nothing changed -> it wont be saved again!')
 
@@ -418,7 +418,7 @@ class ProductLine():
         if temp :  return temp[0].getData()[0]
         else: return temp
 
-    def getColor(self, index = None):
+    def getKind(self, index = None):
         data = self.getData()
         if not data: return []
         if index == None :
