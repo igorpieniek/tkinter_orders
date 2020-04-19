@@ -104,7 +104,7 @@ class Order():
         counter = 0
         while counter < len(self.allProducts):
             if len(self.allProducts) != 0 and self.allProducts[counter].toDelate == True:
-                self._lineNumToDel.append( self.allProducts[counter].frameNum)
+                self._lineNumToDel.apend( self.allProducts[counter].frameNum)
                 self.allProducts.pop(counter)
                 k = counter
                 while k < len(self.allProducts):
@@ -311,7 +311,7 @@ class Order():
 
 
 ####################################################################################################################
-class basicProduct():
+class ProductLine():
     def __init__(self,* ,root ,frameNum, models, kinds,prodObj, rebuildList = None):
         self.__root = root
         self.frameNum = frameNum # number of frame in order array
@@ -464,7 +464,7 @@ from ProductClass.Dummy import *
 from ProductClass.WoodenStand import *
 from ProductClass.Stand import *
 
-class DummyLine(basicProduct):
+class DummyLine(ProductLine):
     def __init__(self,root ,frameNum, dummysList = None):
         self.__genre = Genre()
         super().__init__(root = root, 
@@ -477,7 +477,7 @@ class DummyLine(basicProduct):
 
 
 #############################################################################################
-class WoodLine(basicProduct):
+class WoodLine(ProductLine):
     def __init__(self,root ,frameNum, woodLineList = None):
         self.__genre = Genre()
         super().__init__(root = root, 
@@ -488,7 +488,7 @@ class WoodLine(basicProduct):
                          rebuildList = woodLineList  )
         
 #############################################################################################
-class StandsLine(basicProduct):
+class StandsLine(ProductLine):
     def __init__(self,root ,frameNum, standsLineList = None):
         self.__genre = Genre()
         super().__init__(root = root, 
