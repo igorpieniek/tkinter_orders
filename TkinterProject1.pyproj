@@ -24,11 +24,7 @@
     <Compile Include="orderManager.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ProductClass\Stand.py" />
-    <Compile Include="ProductClass\WoodenStand.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ProductClass\Dummy.py">
+    <Compile Include="ProductClass\basicProduct.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="History.py">

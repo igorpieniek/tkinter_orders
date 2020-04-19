@@ -270,11 +270,11 @@ class Order():
         stands = []
         for line in productsRaw: #sorting data
             if line[0] in self.genre.dummys:
-                dummyDict[line[0]].append(Dummy(line[0], line[1], line[2]))
+                dummyDict[line[0]].append(Dummy(model = line[0], kind = line[1], num = line[2]))
             elif line[0] == 'Statyw drewniany':
-                woodenstands.append(WoodenStand(line[1], line[2]))
+                woodenstands.append(WoodenStand(kind =line[1], num =line[2]))
             elif line[0] == 'Statyw metalowy':
-                stands.append(Stand(line[1], line[2]))
+                stands.append(Stand(kind =line[1], num =line[2]))
         
         #sending data
         if dummyDict:
@@ -407,8 +407,8 @@ class ProductLine():
         allData = []
 
         for index in range(self.__lineNum):
-            if self._prodObj == Dummy:  temp = self._prodObj(self._model.get(), self._kind[index].get(), int(self._number[index].get()) )
-            else: temp = self._prodObj(self._kind[index].get(), int(self._number[index].get()) )
+            if self._prodObj == Dummy:  temp = self._prodObj(model = self._model.get(), kind = self._kind[index].get(), num = int(self._number[index].get()) )
+            else: temp = self._prodObj(kind = self._kind[index].get(), num = int(self._number[index].get()) )
             if not temp.isEmpty(): 
                 allData.append( temp )
         return allData
@@ -460,9 +460,7 @@ class ProductLine():
         self._addModel(list[0].getData()[0])
         for el in list: self._addInputLine( el.getData()[1], el.getData()[2] )
 ####################################################################################################################
-from ProductClass.Dummy import *
-from ProductClass.WoodenStand import *
-from ProductClass.Stand import *
+from ProductClass.basicProduct import *
 
 class DummyLine(ProductLine):
     def __init__(self,root ,frameNum, dummysList = None):
