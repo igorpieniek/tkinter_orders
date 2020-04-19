@@ -7,6 +7,7 @@ from tkcalendar import Calendar, DateEntry
 from Database import *
 import datetime
 import copy
+from orderManager import OrderManager
 
 class Order():
     def __init__(self,*,root, windowManager,database, rawArray = None):
@@ -104,7 +105,7 @@ class Order():
         counter = 0
         while counter < len(self.allProducts):
             if len(self.allProducts) != 0 and self.allProducts[counter].toDelate == True:
-                self._lineNumToDel.apend( self.allProducts[counter].frameNum)
+                self._lineNumToDel.append( self.allProducts[counter].frameNum)
                 self.allProducts.pop(counter)
                 k = counter
                 while k < len(self.allProducts):
@@ -129,8 +130,12 @@ class Order():
         elif not self.allProducts:
             messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
             return
+        ord = OrderManager(productArray = self.allProducts, companyName= self.company.get(),invoice = self.invoice.get(),
+                           payment = self._getPayment(),
+                          dateOrder = self._orderDate, dateCollect =self._collectDate,  )
+        ord.getDataToDatabase()
 
-        if self.__isRebuildChanged():
+        if self.__isRebuildChanged() and False:
             # save to database
             arrayToSend = []
             for prod in self.allProducts:

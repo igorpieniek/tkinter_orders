@@ -1,9 +1,10 @@
-from Order import DummyLine
-from Order import StandsLine
-from Order import WoodLine
+
+
 from basicProduct import *
 from Genre import *
 import datetime
+
+
 
 
 class OrderManager():
@@ -13,10 +14,13 @@ class OrderManager():
         self.__isEmpty = True
         self.__genre = Genre()
 
-        if not array: #in case no argument was added
+        if not productArray: #in case no argument was added
             print('Empty order manager added!')
         else:
-            if isinstance(array[0], DummyLine) or isinstance(array[0], StandsLine) or isinstance(array[0], WoodLine):
+            from Order import DummyLine
+            from Order import WoodLine
+            from Order import StandsLine
+            if isinstance(productArray[0], DummyLine) or isinstance(productArray[0], StandsLine) or isinstance(productArray[0], WoodLine):
                 # there we have event from order window
                 # TODO: CONVERTING DATA TO BASIC ARRAY
                 orderInfo = {
@@ -27,8 +31,7 @@ class OrderManager():
                                 'payment': None, }
                 orderInfo.update(kwargs)
                 self.convertOrderData(productArray, orderInfo)
-                pass
-            elif  isinstance(array[0], list):
+            elif  isinstance(productArray[0], list):
                 #there we have reading from database event (from history call)
                 self.convertToOrder(productArray)
             else: print('Wrong format of array!')
@@ -58,7 +61,7 @@ class OrderManager():
                     elif frame.getModel() == 'Statyw metalowy':
                         stands.append(Stand(kind = frame.getKind(i), num =frame.getNumber(i) ))
         
-            self.__products = {'dummy': dummyDisct, 'woodenStands': woodenstands, 'stands': stands}
+            self.__products = {'dummy': dummyDict, 'woodenStands': woodenstands, 'stands': stands}
             self.__buildMainDict()        
 
     def convertToOrderFromDatabase(self, array):
@@ -86,20 +89,25 @@ class OrderManager():
                 elif line[0] == 'Statyw metalowy':
                     stands.append(Stand(kind =line[1], num =line[2]))
 
-            self.__products = {'dummys': dummyDisct, 'woodenStands': woodenstands, 'stands': stands}
+            self.__products = {'dummys': dummyDict, 'woodenStands': woodenstands, 'stands': stands}
             self.__buildMainDict()
  
-          
+              
     def getDataToDatabase(self):
         if self.__isEmpty: raise NameError('Error: obj is empty!')
         else:
             outArray = []
-            numberOfLines = sum([len(value) for value in self.order['products'].values()])
+            basic = [self.order['dateOrder'].day, self.order['dateOrder'].month, self.order['dateOrder'].year,
+                     self.order['dateCollect'].day,  self.order['dateCollect'].month, self.order['dateCollect'].year,
+                     self.order['invoice'].day, self.order['companyName'], self.order['payment'] ]
 
-            (len(self.order['products']['dummys']) +
-                             len(self.order['products']['']) +
-                             len(self.order['products']['dummys']) )
+            for prod in range( len( self.order['products'] ) ) : #level of list of products (dummys, stands etc.)
+                for line in range( len( prod ) ):        #level of searching in every products
+                    if isinstance(line, dict):
+                        for basicprod in line:  outArray.append( basic + basicprod.getData() ) # level of every dummy obj                                       
+                    else: outArray.append( basic + basicprod.getData()) ## TODO: add products
 
+            for el in outArray: print(el)
 
     def __buildMainDict(self):
         if  self.__isEmpty or not self.__products :
