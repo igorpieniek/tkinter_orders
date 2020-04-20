@@ -58,7 +58,6 @@ class OrderManager():
                          self.__products.append(WoodenStand(kind =frame.getKind(i), num =frame.getNumber(i) ))
                     elif frame.getModel() == 'Statyw metalowy':
                          self.__products.append(Stand(kind = frame.getKind(i), num =frame.getNumber(i) ))
-        self.__buildMainDict()
 
     def convertToOrderFromDatabase(self, array):
         if not self.__isEmpty: 
@@ -102,8 +101,12 @@ class OrderManager():
             woodenstands = []
             stands = []
 
+            for pro in self.__products:
+                if pro.getData()[0] in self.__genre.dummys: dummyDict[pro.getData()[0]].append(pro)
+                elif isinstance(pro,WoodenStand ): woodenstands.append(pro)
+                elif isinstance(pro,Stand ): stands.append(pro)
 
-            self.__products = {'dummys': dummyDict, 'woodenStands': woodenstands, 'stands': stands}
+            productsInDict = {'dummys': dummyDict, 'woodenStands': woodenstands, 'stands': stands}
 
             self.order = {
                              'companyName': self.__companyName,
@@ -111,7 +114,7 @@ class OrderManager():
                              'dateCollect':self.__dateCollect,
                              'invoice': self.__invoiceNum,
                              'payment': self.__payment, 
-                             'products': self.__products}
+                             'products': productsInDict}
       
    ## TO DELETE :::::::::::::::::::         
     #     dummyDict = {line[0]: [] for line in productsRaw if line[0] in self.genre.dummys} #get all names of dummys in order
