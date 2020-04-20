@@ -49,12 +49,12 @@ class OrderManager():
             self.__dateOrder = orderInfo['dateOrder'] #datatime format
             self.__dateCollect =   orderInfo['dateCollect'] #datatime format
 
-            dummyDict = {line[0]: [] for line in array if line.getModel() in self.__genre.dummys} #get all names of dummys in order
+            dummyDict = {line.getModel(): [] for line in array if line.getModel() in self.__genre.dummys} #get all names of dummys in order
             woodenstands = []
             stands = []
             for frame in array: #sorting data
-                for i in range( len( frame.getDate() ) ):
-                    if frame.getModel() in self.genre.dummys:
+                for i in range( len( frame.getData() ) ):
+                    if frame.getModel() in self.__genre.dummys:
                         dummyDict[ frame.getModel() ].append(Dummy(model = frame.getModel(), kind = frame.getKind(i), num = frame.getNumber(i)))
                     elif frame.getModel() == 'Statyw drewniany':
                         woodenstands.append(WoodenStand(kind =frame.getKind(i), num =frame.getNumber(i) ))
@@ -99,15 +99,15 @@ class OrderManager():
             outArray = []
             basic = [self.order['dateOrder'].day, self.order['dateOrder'].month, self.order['dateOrder'].year,
                      self.order['dateCollect'].day,  self.order['dateCollect'].month, self.order['dateCollect'].year,
-                     self.order['invoice'].day, self.order['companyName'], self.order['payment'] ]
+                     self.order['invoice'], self.order['companyName'], self.order['payment'] ]
 
-            for prod in range( len( self.order['products'] ) ) : #level of list of products (dummys, stands etc.)
-                for line in range( len( prod ) ):        #level of searching in every products
-                    if isinstance(line, dict):
-                        for basicprod in line:  outArray.append( basic + basicprod.getData() ) # level of every dummy obj                                       
-                    else: outArray.append( basic + basicprod.getData()) ## TODO: add products
-
-            for el in outArray: print(el)
+            for header,prod in self.order['products'].items()  : #level of list of products (dummys, stands etc.)
+                if isinstance(prod, dict): # prod in format {'model': list of Dummy()}
+                    for dummyModel, basicprod in prod.items(): # basicprod in format: list of Dummy() obj
+                       for line in basicprod: outArray.append( basic + line.getData() ) # level of every Dummy() obj
+                else:
+                    for line in  prod:  outArray.append( basic + line.getData()) #level of searching in every products
+        return outArray
 
     def __buildMainDict(self):
         if  self.__isEmpty or not self.__products :
