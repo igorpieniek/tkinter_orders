@@ -26,7 +26,7 @@ class Order():
         self._orderDate= datetime.date.today()
         self._collectDate= datetime.date.today()
 
-        self.reOrder = None
+        self.__reOrder = OrderManager()
 
         if rawArray: self.__reBuildOrder(rawArray)
         else:  self.process()
@@ -131,20 +131,23 @@ class Order():
         elif not self.allProducts:
             messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
             return
-        order = OrderManager(productArray = self.allProducts, companyName= self.company.get(),invoice = self.invoice.get(),
-                           payment = self._getPayment(),
-                           dateOrder = self._orderDate, dateCollect =self._collectDate,  )
+
+        self.__updateOrderManager()
 
         def checkNaddOrder(): # simple sub function to add warning window
             MsgBox = messagebox.askquestion('Ostrzeżenie','Czy napewno chcesz zapisać zamówienie?',icon = 'warning', )
-            if MsgBox == 'yes': self._database.insertOrder(order.getDataToDatabase())
+            if MsgBox == 'yes': self._database.insertOrder(self.__order.getDataToDatabase())
             
-        if not self.reOrder == None: # in case of comming here from History Window
-            if not order == self.reOrder: checkNaddOrder()
+        if not self.__reOrder.isEmpty(): # in case of comming here from History Window
+            if not self.__order == self.__reOrder: checkNaddOrder()
             else: messagebox.showinfo('Info','Nic nie zostało zmienione')
         else: checkNaddOrder() # in case of comming here from option 'new order'
-
-
+    
+    # Function that update order manager object which gather all data from order window
+    def __updateOrderManager(self):
+        self.__order = OrderManager(productArray = self.allProducts, companyName= self.company.get(),invoice = self.invoice.get(),
+                                    payment = self._getPayment(),
+                                    dateOrder = self._orderDate, dateCollect =self._collectDate,  )
     # Fuction that uses pdfprocess and create pdf file
     def generatePDFClick(self):
         self._inputUpdate()
@@ -258,8 +261,8 @@ class Order():
         self.addMainButtons()
         self.buttons[3].configure(state= DISABLED) # 'cofnij' button
 
-        self.reOrder = OrderManager(productArray = rawArray)
-        order = self.reOrder.getOrderDict()
+        self.__reOrder = OrderManager(productArray = rawArray)
+        order = self.__reOrder.getOrderDict()
         self.addEntrySection(companyName = order['companyName'], invoiceNum = order['invoice'], payValue = order['payment'],
                              dateOrder = order['dateOrder'], dateCollect = order['dateCollect'])
 

@@ -41,7 +41,8 @@ class OrderManager():
         elif self.__isEmpty and obj.__isEmpty: return True
         else: return self.__order == obj.__order
 
-             
+    def isEmpty(self):
+        return self.__isEmpty
 
     def addOrderData(self, array, orderInfo):
         if not self.__isEmpty: # if object is not empty 
