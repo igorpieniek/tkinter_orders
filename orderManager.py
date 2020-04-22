@@ -30,16 +30,16 @@ class OrderManager():
                                 'invoice':None,
                                 'payment': None, }
                 orderInfo.update(kwargs)
-                self.convertOrderData(productArray, orderInfo)
-            elif  isinstance(productArray[0], list):
+                self.addOrderData(productArray, orderInfo)
+            elif  isinstance(productArray[0], list) or  isinstance(productArray[0], tuple):
                 #there we have reading from database event (from history call)
-                self.convertToOrder(productArray)
+                self.addDatabaseData(productArray)
             else: print('Wrong format of array!')
 
     def __eq__(self, obj):
         if not isinstance(obj, OrderManager): return False
         elif self.__isEmpty and obj.__isEmpty: return True
-        else: return self.order == obj.order
+        else: return self.__order == obj.__order
 
              
 
@@ -83,22 +83,26 @@ class OrderManager():
             
             self.__products = []
             for line in productsRaw: #sorting data
-                if line[0] in self.genre.dummys:
+                if line[0] in self.__genre.dummys:
                       self.__products.append(Dummy(model = line[0], kind = line[1], num = line[2]))
                 elif line[0] == 'Statyw drewniany':
                       self.__products.append(WoodenStand(kind =line[1], num =line[2]))
                 elif line[0] == 'Statyw metalowy':
                       self.__products.append(Stand(kind =line[1], num =line[2]))
 
-            self.__buildMainDict()   
+            self.__buildMainDict()  
             
+    def getOrderDict(self):
+        if self.__isEmpty: return {}
+        else: return self.__order
+
     def getDataToDatabase(self):
         if self.__isEmpty: raise NameError('Error: obj is empty!')
         else:
             outArray = []
-            basic = [self.order['dateOrder'].day, self.order['dateOrder'].month, self.order['dateOrder'].year,
-                     self.order['dateCollect'].day,  self.order['dateCollect'].month, self.order['dateCollect'].year,
-                     self.order['invoice'], self.order['companyName'], self.order['payment'] ]
+            basic = [self.__order['dateOrder'].day, self.__order['dateOrder'].month, self.__order['dateOrder'].year,
+                     self.__order['dateCollect'].day,  self.__order['dateCollect'].month, self.__order['dateCollect'].year,
+                     self.__order['invoice'], self.__order['companyName'], self.__order['payment'] ]
 
             for prod in self.__products  :   outArray.append( basic + prod.getData()) #level of searching in every products#level of list of products (dummys, stands etc.)
         return outArray
@@ -121,7 +125,7 @@ class OrderManager():
             productsInDict.update(  {'woodenStands': woodenstands, 'stands': stands})
              
 
-            self.order = {
+            self.__order = {
                              'companyName': self.__companyName,
                              'dateOrder':self.__dateOrder,
                              'dateCollect':self.__dateCollect,

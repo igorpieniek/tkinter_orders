@@ -22,7 +22,6 @@ class Order():
         self.Stands = []
         self.allProducts = []
         self._lineNumToDel = []
-        self.__rebulidAllProducts = None
         self._payment = 0
         self._orderDate= datetime.date.today()
         self._collectDate= datetime.date.today()
@@ -132,10 +131,10 @@ class Order():
             return
         ord = OrderManager(productArray = self.allProducts, companyName= self.company.get(),invoice = self.invoice.get(),
                            payment = self._getPayment(),
-                          dateOrder = self._orderDate, dateCollect =self._collectDate,  )
-        ord.getDataToDatabase()
-
-        if self.__isRebuildChanged() and False:
+                           dateOrder = self._orderDate, dateCollect =self._collectDate,  )
+        print('Porownanie zamowien, wynik: ', ord== self.reOrder)
+        
+        if  False:
             # save to database
             arrayToSend = []
             for prod in self.allProducts:
@@ -259,59 +258,18 @@ class Order():
         self.__addScrollbar()
         self.addMainButtons()
         self.buttons[3].configure(state= DISABLED) # 'cofnij' button
-        self.__reCompanyName = rawArray[0][8]
-        self.__reInvoiceNum =  rawArray[0][7]
-        self.__rePayment = rawArray[0][9]
-        self.__reDateOrder = datetime.date(day = rawArray[0][1], month = rawArray[0][2], year =rawArray[0][3])
-        self.__reDateCollect =  datetime.date(day = rawArray[0][4], month = rawArray[0][5], year =rawArray[0][6])
 
-        self.addEntrySection(companyName = self.__reCompanyName, invoiceNum = self.__reInvoiceNum, payValue = self.__rePayment,
-                             dateOrder = self.__reDateOrder, dateCollect = self.__reDateCollect)
+        self.reOrder = OrderManager(productArray = rawArray)
+        order = self.reOrder.getOrderDict()
+        self.addEntrySection(companyName = order['companyName'], invoiceNum = order['invoice'], payValue = order['payment'],
+                             dateOrder = order['dateOrder'], dateCollect = order['dateCollect'])
 
-        productsRaw = [el[10:] for el in rawArray] # geting onlu product info
-
-        dummyDict = {line[0]: [] for line in productsRaw if line[0] in self.genre.dummys} #get all names of dummys in order
-        woodenstands = []
-        stands = []
-        for line in productsRaw: #sorting data
-            if line[0] in self.genre.dummys:
-                dummyDict[line[0]].append(Dummy(model = line[0], kind = line[1], num = line[2]))
-            elif line[0] == 'Statyw drewniany':
-                woodenstands.append(WoodenStand(kind =line[1], num =line[2]))
-            elif line[0] == 'Statyw metalowy':
-                stands.append(Stand(kind =line[1], num =line[2]))
-        
-        #sending data
-        if dummyDict:
-            for item in dummyDict: self.addDummyClick(dummyDict[item]) #send element
-        if woodenstands: self.addStateWoodClick(woodenstands) #send wooden stand element
-        if stands: self.addStateClick(stands) #send stand element
-
-        self.__rebulidAllProducts = [dummyDict, woodenstands, stands]
-
-    # compare current data in order window with rebuild data
-    def __isRebuildChanged(self):
-        def compareProducts(products):
-            for product in self.allProducts:
-                prodData = product.getData()
-                for element in range(len(prodData)): #levef of simple product class
-                    if isinstance(element, Dummy):
-                        pass
+        for key, products in order['products'].items():
+            if key in self.genre.dummys : self.addDummyClick(products)
+            elif key == 'woodenStands':  self.addStateWoodClick(products)
+            elif key == 'stands': self.addStateClick(products)
 
 
-
-        if self.__rebulidAllProducts: # if rebuilding was done ever in this window
-            #if len(self.allProducts) == len( self.__rebulidAllProducts): 
-            #    for index, original in enumerate(self.allProducts):
-            #        if not original ==  self.__rebulidAllProducts[index]: return True# fail
-            if not self.allProducts is self.__rebulidAllProducts: return True
-            elif not len(self.allProducts) == len( self.__rebulidAllProducts): return True
-            elif not self.__reCompanyName == self.company.get(): return True
-            elif not self.__reInvoiceNum == self.invoice.get(): return True
-            elif not self.__reDateOrder == self._orderDate: return True
-            elif not self.__reDateCollect == self._collectDate: return True
-            else: return False
-        else: return True
 
 
 
