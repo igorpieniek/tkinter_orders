@@ -26,6 +26,8 @@ class Order():
         self._orderDate= datetime.date.today()
         self._collectDate= datetime.date.today()
 
+        self.reOrder = None
+
         if rawArray: self.__reBuildOrder(rawArray)
         else:  self.process()
 
@@ -129,22 +131,19 @@ class Order():
         elif not self.allProducts:
             messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
             return
-        ord = OrderManager(productArray = self.allProducts, companyName= self.company.get(),invoice = self.invoice.get(),
+        order = OrderManager(productArray = self.allProducts, companyName= self.company.get(),invoice = self.invoice.get(),
                            payment = self._getPayment(),
                            dateOrder = self._orderDate, dateCollect =self._collectDate,  )
-        print('Porownanie zamowien, wynik: ', ord== self.reOrder)
-        
-        if  False:
-            # save to database
-            arrayToSend = []
-            for prod in self.allProducts:
-                for i in range(len( prod.getData() )):
-                    arrayToSend.append([self._orderDate.day,   self._orderDate.month,   self._orderDate.year ,
-                                        self._collectDate.day, self._collectDate.month, self._collectDate.year,
-                                        self.invoice.get(), self.company.get(), self._getPayment(),
-                                        prod.getModel(), prod.getKind(i), prod.getNumber(i) ])
-            self._database.insertOrder(arrayToSend)
-        else: print('Nothing changed -> it wont be saved again!')
+
+        def checkNaddOrder(): # simple sub function to add warning window
+            MsgBox = messagebox.askquestion('Ostrzeżenie','Czy napewno chcesz zapisać zamówienie?',icon = 'warning', )
+            if MsgBox == 'yes': self._database.insertOrder(order.getDataToDatabase())
+            
+        if not self.reOrder == None: # in case of comming here from History Window
+            if not order == self.reOrder: checkNaddOrder()
+            else: messagebox.showinfo('Info','Nic nie zostało zmienione')
+        else: checkNaddOrder() # in case of comming here from option 'new order'
+
 
     # Fuction that uses pdfprocess and create pdf file
     def generatePDFClick(self):
