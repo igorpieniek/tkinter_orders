@@ -41,8 +41,7 @@ class BasicProduct():
         return output
   
     def isEmpty(self):
-        if  self.__model and self.__kind and self.__number: return False
-        else: return True    
+        return not self.__isLocked   
 
 from Genre import Genre
 class Dummy(BasicProduct):

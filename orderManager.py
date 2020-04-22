@@ -37,7 +37,10 @@ class OrderManager():
             else: print('Wrong format of array!')
 
     def __eq__(self, obj):
-        if self.__isEmpty and obj.__isEmpty: return True
+        if not isinstance(obj, OrderManager): return False
+        elif self.__isEmpty and obj.__isEmpty: return True
+        else: return self.order == obj.order
+
              
 
     def addOrderData(self, array, orderInfo):
@@ -62,6 +65,7 @@ class OrderManager():
                     elif frame.getModel() == 'Statyw metalowy':
                          self.__products.append(Stand(kind = frame.getKind(i), num =frame.getNumber(i) ))
 
+        self.__buildMainDict()
 
     def addDatabaseData(self, array):
         if not self.__isEmpty: 
@@ -85,7 +89,9 @@ class OrderManager():
                       self.__products.append(WoodenStand(kind =line[1], num =line[2]))
                 elif line[0] == 'Statyw metalowy':
                       self.__products.append(Stand(kind =line[1], num =line[2]))
-              
+
+            self.__buildMainDict()   
+            
     def getDataToDatabase(self):
         if self.__isEmpty: raise NameError('Error: obj is empty!')
         else:
