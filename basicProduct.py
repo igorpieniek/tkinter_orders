@@ -9,15 +9,20 @@ class BasicProduct():
 
         if model and kind and num: 
             self.addOption(model,kind,num)
-
-    def __del__(self):
-        del self.__model,self.__kind, self.__number
     
     def __str__(self):
         if  self.__model and self.__kind and self.__number:
            return 'Model: ' + self.__model +' Kind: '+ self.__kind+' Number: '+str(self.__number)+ ' isLocekd = ' + str(self.__isLocked)
         else: return 'Empty object'
-        
+
+    def __eq__(self, obj):
+        if not isinstance(obj, BasicProduct): raise NameError('Error: you cant compare ', type(obj), ' with object using BasicProduct class!')
+        elif not type(obj) == type(self): return False
+        else:
+            if obj.isEmpty() and self.isEmpty(): return True
+            elif self.getData() == obj.getData(): return True
+            else: return False
+  
 
     def addOption(self, model,kind, num):
         # check in kind is valid
@@ -43,20 +48,20 @@ from Genre import Genre
 class Dummy(BasicProduct):
     def __init__(self, *, model=None, kind=None, num=None):
         self.__genre = Genre()
-        if not model in self.__genre.dummys : raise NameError('No such model of dummy on genre list!')
-        if not kind in self.__genre.color: raise NameError('No such kind of dummy on genre list!')
+        if model and not model in self.__genre.dummys : raise NameError('No such model of dummy on genre list!')
+        if kind and not kind and not kind in self.__genre.color: raise NameError('No such kind of dummy on genre list!')
         super().__init__( model=model, kind=kind, num=num)
 
 class Stand(BasicProduct):
     def __init__(self, *, kind=None, num=None):
         self.__genre = Genre()
         self.__model = 'Statyw metalowy'
-        if not kind in self.__genre.stands : raise NameError('No such kind of wooden stand on genre list!')
+        if kind and not kind in self.__genre.stands : raise NameError('No such kind of wooden stand on genre list!')
         super().__init__( model=self.__model, kind=kind, num=num)
 
 class WoodenStand(BasicProduct):
     def __init__(self, *, kind = None, num = None):
         self.__genre = Genre()
         self.__model = 'Statyw drewniany'
-        if not kind in self.__genre.woodStands: raise NameError(' No such kind of wooden stand on genre list!')
+        if kind and not kind in self.__genre.woodStands: raise NameError(' No such kind of wooden stand on genre list!')
         super().__init__( model=self.__model, kind=kind, num=num)
