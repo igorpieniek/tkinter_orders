@@ -23,6 +23,7 @@ class OrderManager():
             if isinstance(productArray[0], DummyLine) or isinstance(productArray[0], StandsLine) or isinstance(productArray[0], WoodLine):
                 # there we have event from order window
                 # TODO: CONVERTING DATA TO BASIC ARRAY
+                self.TESTobj = [a.__name__ for a in productArray]
                 orderInfo = {
                                 'companyName': None,
                                 'dateOrder':None,
@@ -58,6 +59,8 @@ class OrderManager():
                          self.__products.append(WoodenStand(kind =frame.getKind(i), num =frame.getNumber(i) ))
                     elif frame.getModel() == 'Statyw metalowy':
                          self.__products.append(Stand(kind = frame.getKind(i), num =frame.getNumber(i) ))
+        
+        self.__buildMainDict()
 
     def convertToOrderFromDatabase(self, array):
         if not self.__isEmpty: 
@@ -106,7 +109,11 @@ class OrderManager():
                 elif isinstance(pro,WoodenStand ): woodenstands.append(pro)
                 elif isinstance(pro,Stand ): stands.append(pro)
 
-            productsInDict = {'dummys': dummyDict, 'woodenStands': woodenstands, 'stands': stands}
+            productsInDict = {}
+            productsInDict.update(dummyDict)
+            productsInDict.update(  {'woodenStands': woodenstands, 'stands': stands})
+            print( productsInDict)
+             
 
             self.order = {
                              'companyName': self.__companyName,
