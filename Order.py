@@ -14,6 +14,7 @@ class Order():
         self.genre = Genre()
         self.pdf = PDFgen()
         self.root = root
+        self.root.protocol("WM_DELETE_WINDOW", self.__closingAction())
         self.__windowManager = windowManager
         self._database = database
 
@@ -27,9 +28,38 @@ class Order():
         self._collectDate= datetime.date.today()
 
         self.__reOrder = OrderManager()
+        self.__order = OrderManager()
 
         if rawArray: self.__reBuildOrder(rawArray)
-        else:  self.process()
+        else:        self.process()
+
+    def __closingAction(self):pass
+        #def checkNaddOrder(): # simple sub function to add warning window          
+        #    # check if empty
+        #    if not self.company.get():
+        #        messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez wprowadzenia nazwy firmy!')
+        #        return
+        #    elif not self.allProducts:
+        #        messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
+        #        return
+                
+        #    self._database.insertOrder(self.__order.getDataToDatabase())
+        #    messagebox.showinfo('Info','Zamówienie zostało poprawnie zapisane')
+
+        #if not self.__order.isEmpty():
+        #    MsgBox = messagebox.askquestion('Ostrzeżenie','Czy chcesz zapisać zamówienie przed zamknięciem?',icon = 'warning', )
+        #    if MsgBox == 'yes':
+        #        self.saveClick()
+        #else: 
+        #    self._inputUpdate() #update all products
+        #    self.__updateOrderManager()
+        #    if not self.__reOrder.isEmpty(): # in case of comming here from History Window
+        #        if not self.__order == self.__reOrder: checkNaddOrder()
+        #    else: checkNaddOrder() # in case of comming here from option 'new order'
+        #    #MsgBox = messagebox.askquestion('Ostrzeżenie','Czy chcesz zapisać zamówienie przed zamknięciem?',icon = 'warning', )
+        #    #if MsgBox == 'yes':
+        #    #    self.saveClick()
+
 
 
     
@@ -124,25 +154,26 @@ class Order():
     # Action function executed afer clicking "Zapisz" - it create matrix and send it to database class
     def saveClick(self):
         self._inputUpdate() #update all products
-        # check if empty
-        if not self.company.get():
-            messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez wprowadzenia nazwy firmy!')
-            return
-        elif not self.allProducts:
-            messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
-            return
-
         self.__updateOrderManager()
 
-        def checkNaddOrder(): # simple sub function to add warning window
-            MsgBox = messagebox.askquestion('Ostrzeżenie','Czy napewno chcesz zapisać zamówienie?',icon = 'warning', )
-            if MsgBox == 'yes': self._database.insertOrder(self.__order.getDataToDatabase())
+        def checkNaddOrder(): # simple sub function to add warning window          
+            # check if empty
+            if not self.company.get():
+                messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez wprowadzenia nazwy firmy!')
+                return
+            elif not self.allProducts:
+                messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
+                return
+                
+            self._database.insertOrder(self.__order.getDataToDatabase())
+            messagebox.showinfo('Info','Zamówienie zostało poprawnie zapisane')
             
         if not self.__reOrder.isEmpty(): # in case of comming here from History Window
             if not self.__order == self.__reOrder: checkNaddOrder()
             else: messagebox.showinfo('Info','Nic nie zostało zmienione')
         else: checkNaddOrder() # in case of comming here from option 'new order'
-    
+
+
     # Function that update order manager object which gather all data from order window
     def __updateOrderManager(self):
         self.__order = OrderManager(productArray = self.allProducts, companyName= self.company.get(),invoice = self.invoice.get(),
