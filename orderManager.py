@@ -1,9 +1,6 @@
-
-
 from basicProduct import *
 from Genre import *
 import datetime
-
 
 
 
@@ -45,6 +42,7 @@ class OrderManager():
     def isEmpty(self):
         return self.__isEmpty
 
+    # Add to object data from all Order obj window
     def addOrderData(self, array, orderInfo):
         if not self.__isEmpty: # if object is not empty 
             print('Order was already added')
@@ -69,6 +67,7 @@ class OrderManager():
 
         self.__buildMainDict()
 
+    # Add to obj all data read from database 
     def addDatabaseData(self, array):
         if not self.__isEmpty: 
             print('Order was already added')
@@ -93,11 +92,13 @@ class OrderManager():
                       self.__products.append(Stand(kind =line[1], num =line[2]))
 
             self.__buildMainDict()  
-            
+    
+    # Return main order dict         
     def getOrderDict(self):
         if self.__isEmpty: return {}
         else: return self.__order
 
+    # Method which convert saved data to array createed in special format to save in database
     def getDataToDatabase(self):
         if self.__isEmpty: raise NameError('Error: obj is empty!')
         else:
@@ -109,6 +110,7 @@ class OrderManager():
             for prod in self.__products  :   outArray.append( basic + prod.getData()) #level of searching in every products#level of list of products (dummys, stands etc.)
         return outArray
 
+    # Private method to build main object dict
     def __buildMainDict(self):
         if  self.__isEmpty or not self.__products :
             raise NameError('Error: update main dictionary is impossible- there is no data in object!')
