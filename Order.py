@@ -26,30 +26,31 @@ class Order():
         self._orderDate = datetime.date.today()
         self._collectDate = datetime.date.today()
 
-        self.__reOrder = OrderManager()
+        self.__reOrder = OrderManager() #init empty objects of order manager - which keeps and convert data
         self.__order = OrderManager()
-        self.root.protocol("WM_DELETE_WINDOW", self.__closingAction)
+        self.root.protocol("WM_DELETE_WINDOW", self.__closingAction) #add closing window interrupt
 
-        if rawArray: self.__reBuildOrder(rawArray)
+        if rawArray: self.__reBuildOrder(rawArray)  # if Order object was created to recreate order window
         else:        self.process()
-
+    
+    # Function called from closing window interrupt or changing during changing window
+    # It add protection, from losing some data if there was something changed
     def __closingAction(self, closeAct =None ):
-        if closeAct== None : closeAct = self.root.destroy
+        if closeAct== None : closeAct = self.root.destroy # default action
         prevOrder = self.__order
         self._inputUpdate() #update all products
         self.__updateOrderManager()
         closingStatus = True
-        if not self.__reOrder.isEmpty() and not self.__order == self.__reOrder: # if comming there from History window
-            MsgBox = messagebox.askquestion('','Zamówienie uległo zmianie. Czy chcesz zapisać zmiany?',icon = 'warning', )
-            if MsgBox == 'yes': closingStatus = self.__checkAndSave()
-        elif self.__reOrder.isEmpty() and not self.__order == prevOrder:
-            MsgBox = messagebox.askquestion('','Czy chcesz zapisać zmiany przed zamknięciem?',icon = 'warning', )
-            if MsgBox == 'yes': closingStatus = self.__checkAndSave()
-
+        if not self.__reOrder.isEmpty():
+            if not self.__order == self.__reOrder: # if comming there from History window
+                MsgBox = messagebox.askquestion('','Zamówienie uległo zmianie. Czy chcesz zapisać zmiany?',icon = 'warning', )
+                if MsgBox == 'yes': closingStatus = self.__checkAndSave()
+        else:
+            if not self.__order == prevOrder: # if Order was recreated using History Window
+                MsgBox = messagebox.askquestion('','Czy chcesz zapisać zmiany przed zamknięciem?',icon = 'warning', )
+                if MsgBox == 'yes': closingStatus = self.__checkAndSave()
         if closingStatus : closeAct()
-
-
-    
+  
     # Add new input frame for every Dummy/Stand/WoodenStand object
     def addInputFrame(self):
         self.inputFrame.append(LabelFrame(self.allInputsFrame, padx = 5, pady=5))
@@ -83,10 +84,8 @@ class Order():
         canvas.create_window((0,0),window= self.allInputsFrame, anchor='nw')
         self.allInputsFrame.bind("<Configure>", scrollAction)
 
-    # Actions after click of button: creating new objects depends on what user
-    # want to add.  Functions
-    # also update sequence of frames obcject in case some of them was previous
-    # delated
+    # Actions after click of button: creating new objects depends on what userwant to add.  
+    # Functions also update sequence of frames obcject in case some of them was previous delated
     def addDummyClick(self, prodList=None):
         self._inputUpdate()
         self.addInputFrame()
@@ -136,24 +135,24 @@ class Order():
 
             else: counter +=1
 
-    # Function to close adding order window TODO
+    # Action function to safely back to previous window 
     def backClick(self):
-        self.__closingAction(  self.__windowManager.backToLastWindow)
-       
-    
+        self.__closingAction(  self.__windowManager.backToLastWindow )
 
-    # Action function executed afer clicking "Zapisz" - it create matrix and
-    # send it to database class
+    # Action function executed afer clicking "Save" - it check data and if OK send it to database object
     def saveClick(self):
+        prevOrder = self.__order
         self._inputUpdate() #update all products
         self.__updateOrderManager()
 
         if not self.__reOrder.isEmpty(): # in case of comming here from History Window
             if not self.__order == self.__reOrder: self.__checkAndSave()
             else: messagebox.showinfo('Info','Nic nie zostało zmienione')
-        else: self.__checkAndSave() # in case of comming here from option 'new order'
+        elif not self.__order == prevOrder: self.__checkAndSave() # in case of comming here from option 'new order'
+        else: messagebox.showerror('Błąd!', 'PROBLEM Z ZAPISEM, DANE NIE ZOSTANĄ ZAPISANE')
 
-    def __checkAndSave(self):                   # check if empty
+    # Function to check during saving order action to check if most important data was added
+    def __checkAndSave(self):           
         if not self.company.get():
             messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez wprowadzenia nazwy firmy!')
             return False
@@ -165,12 +164,15 @@ class Order():
         messagebox.showinfo('Info','Zamówienie zostało poprawnie zapisane')
         return True
 
-
     # Function that update order manager object which gather all data from order window
     def __updateOrderManager(self):
-        self.__order = OrderManager(productArray = self.allProducts, companyName= self.company.get(),invoice = self.invoice.get(),
+        self.__order = OrderManager(productArray = self.allProducts, 
+                                    companyName= self.company.get(),
+                                    invoice = self.invoice.get(),
                                     payment = self._getPayment(),
-                                    dateOrder = self._orderDate, dateCollect =self._collectDate,)
+                                    dateOrder = self._orderDate, 
+                                    dateCollect =self._collectDate,)
+
     # Fuction that uses pdfprocess and create pdf file
     def generatePDFClick(self):
         self._inputUpdate()
@@ -275,9 +277,7 @@ class Order():
         self.addEntrySection()
         self.addMainButtons()
  
-        
-
-
+    # Function called if Order class is need to recreate order which was saved in database
     def __reBuildOrder(self, rawArray):
         self.addFrames()
         self.__addScrollbar()
