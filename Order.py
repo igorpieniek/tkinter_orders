@@ -10,11 +10,10 @@ import copy
 from orderManager import OrderManager
 
 class Order():
-    def __init__(self,*,root, windowManager,database, rawArray = None):
+    def __init__(self,*,root, windowManager,database, rawArray=None):
         self.genre = Genre()
         self.pdf = PDFgen()
         self.root = root
-        self.root.protocol("WM_DELETE_WINDOW", self.__closingAction())
         self.__windowManager = windowManager
         self._database = database
 
@@ -24,63 +23,51 @@ class Order():
         self.allProducts = []
         self._lineNumToDel = []
         self._payment = 0
-        self._orderDate= datetime.date.today()
-        self._collectDate= datetime.date.today()
+        self._orderDate = datetime.date.today()
+        self._collectDate = datetime.date.today()
 
         self.__reOrder = OrderManager()
         self.__order = OrderManager()
+        self.root.protocol("WM_DELETE_WINDOW", self.__closingAction)
 
         if rawArray: self.__reBuildOrder(rawArray)
         else:        self.process()
 
-    def __closingAction(self):pass
-        #def checkNaddOrder(): # simple sub function to add warning window          
-        #    # check if empty
-        #    if not self.company.get():
-        #        messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez wprowadzenia nazwy firmy!')
-        #        return
-        #    elif not self.allProducts:
-        #        messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
-        #        return
-                
-        #    self._database.insertOrder(self.__order.getDataToDatabase())
-        #    messagebox.showinfo('Info','Zamówienie zostało poprawnie zapisane')
+    def __closingAction(self, closeAct =None ):
+        if closeAct== None : closeAct = self.root.destroy
+        prevOrder = self.__order
+        self._inputUpdate() #update all products
+        self.__updateOrderManager()
+        closingStatus = True
+        if not self.__reOrder.isEmpty() and not self.__order == self.__reOrder: # if comming there from History window
+            MsgBox = messagebox.askquestion('','Zamówienie uległo zmianie. Czy chcesz zapisać zmiany?',icon = 'warning', )
+            if MsgBox == 'yes': closingStatus = self.__checkAndSave()
+        elif self.__reOrder.isEmpty() and not self.__order == prevOrder:
+            MsgBox = messagebox.askquestion('','Czy chcesz zapisać zmiany przed zamknięciem?',icon = 'warning', )
+            if MsgBox == 'yes': closingStatus = self.__checkAndSave()
 
-        #if not self.__order.isEmpty():
-        #    MsgBox = messagebox.askquestion('Ostrzeżenie','Czy chcesz zapisać zamówienie przed zamknięciem?',icon = 'warning', )
-        #    if MsgBox == 'yes':
-        #        self.saveClick()
-        #else: 
-        #    self._inputUpdate() #update all products
-        #    self.__updateOrderManager()
-        #    if not self.__reOrder.isEmpty(): # in case of comming here from History Window
-        #        if not self.__order == self.__reOrder: checkNaddOrder()
-        #    else: checkNaddOrder() # in case of comming here from option 'new order'
-        #    #MsgBox = messagebox.askquestion('Ostrzeżenie','Czy chcesz zapisać zamówienie przed zamknięciem?',icon = 'warning', )
-        #    #if MsgBox == 'yes':
-        #    #    self.saveClick()
-
+        if closingStatus : closeAct()
 
 
     
     # Add new input frame for every Dummy/Stand/WoodenStand object
     def addInputFrame(self):
-        self.inputFrame.append( LabelFrame(self.allInputsFrame, padx = 5, pady=5) )
-        self.inputFrame[-1].grid(row = len(self.inputFrame)-1 ,column = 0, stick = N+W)
+        self.inputFrame.append(LabelFrame(self.allInputsFrame, padx = 5, pady=5))
+        self.inputFrame[-1].grid(row = len(self.inputFrame) - 1 ,column = 0, stick = N + W)
 
-    # Add rest constans frames on order window 
+    # Add rest constans frames on order window
     def addFrames(self):
         self.addElementsFrame = LabelFrame(self.root, padx = 5, pady=5,width =300, background = "blue")
-        self.addElementsFrame.grid(row = 1,column = 1, stick = W+N+E)
+        self.addElementsFrame.grid(row = 1,column = 1, stick = W + N + E)
 
         self.allInputsFrameMain = LabelFrame(self.root, padx = 5, pady=5)
-        self.allInputsFrameMain.grid(row= 2,column = 1, stick = W+N+S)
+        self.allInputsFrameMain.grid(row= 2,column = 1, stick = W + N + S)
         
         self.controlFrame = LabelFrame(self.root, padx = 5, pady=5)
-        self.controlFrame.grid(row= 1, rowspan = 2,column = 0, stick = W+N+S)
+        self.controlFrame.grid(row= 1, rowspan = 2,column = 0, stick = W + N + S)
         
         self.nameFrame = LabelFrame(self.root, padx = 5, pady=5)
-        self.nameFrame.grid(row= 0, columnspan = 2,column = 0, stick = W+N+S)
+        self.nameFrame.grid(row= 0, columnspan = 2,column = 0, stick = W + N + S)
 
     # Add scrollbar to input frame
     def __addScrollbar(self):
@@ -96,25 +83,28 @@ class Order():
         canvas.create_window((0,0),window= self.allInputsFrame, anchor='nw')
         self.allInputsFrame.bind("<Configure>", scrollAction)
 
-    # Actions after click of button: creating new objects depends on what user want to add. Functions 
-    # also update sequence of frames obcject in case some of them was previous delated
-    def addDummyClick(self, prodList = None):
+    # Actions after click of button: creating new objects depends on what user
+    # want to add.  Functions
+    # also update sequence of frames obcject in case some of them was previous
+    # delated
+    def addDummyClick(self, prodList=None):
         self._inputUpdate()
         self.addInputFrame()
-        self.allProducts.append(DummyLine( self.inputFrame[-1] , len(self.inputFrame) - 1, prodList) )
+        self.allProducts.append(DummyLine(self.inputFrame[-1] , len(self.inputFrame) - 1, prodList))
 
-    def addStateClick(self, prodList = None):
+    def addStateClick(self, prodList=None):
         self._inputUpdate()
         self.addInputFrame()
-        self.allProducts.append(StandsLine( self.inputFrame[-1], len(self.inputFrame) - 1, prodList) )
+        self.allProducts.append(StandsLine(self.inputFrame[-1], len(self.inputFrame) - 1, prodList))
 
-    def addStateWoodClick(self, prodList = None):
+    def addStateWoodClick(self, prodList=None):
         self._inputUpdate()
         self.addInputFrame()
-        self.allProducts.append(WoodLine( self.inputFrame[-1], len(self.inputFrame) - 1, prodList) ) 
+        self.allProducts.append(WoodLine(self.inputFrame[-1], len(self.inputFrame) - 1, prodList)) 
 
-    # Main objects update function. It contains 2 smaller functions. One is updating products object and second
-    # to update frames which was connected to product object 
+    # Main objects update function.  It contains 2 smaller functions.  One is
+    # updating products object and second
+    # to update frames which was connected to product object
     def _inputUpdate(self):
         if self.allProducts and self.inputFrame: 
             self._updateProductsObj()
@@ -126,17 +116,18 @@ class Order():
         if self._lineNumToDel:
 
             for counter in self._lineNumToDel:             
-                self.inputFrame.pop(counter)   #delate chosen frames           
+                self.inputFrame.pop(counter)   #delate chosen frames
 
             for i in range(len(self.inputFrame)):
                 self.inputFrame[i].grid(row = self.allProducts[i].frameNum ,column = 0) # update frames which ramains
 
-    # Function that update parameters in object in case one of them was deleted before
+    # Function that update parameters in object in case one of them was deleted
+    # before
     def _updateProductsObj(self):
         counter = 0
         while counter < len(self.allProducts):
             if len(self.allProducts) != 0 and self.allProducts[counter].toDelate == True:
-                self._lineNumToDel.append( self.allProducts[counter].frameNum)
+                self._lineNumToDel.append(self.allProducts[counter].frameNum)
                 self.allProducts.pop(counter)
                 k = counter
                 while k < len(self.allProducts):
@@ -147,38 +138,39 @@ class Order():
 
     # Function to close adding order window TODO
     def backClick(self):
-        # TODO: create some protection - question about saving data which was input
-        self.__windowManager.backToLastWindow()
+        self.__closingAction(  self.__windowManager.backToLastWindow)
+       
     
 
-    # Action function executed afer clicking "Zapisz" - it create matrix and send it to database class
+    # Action function executed afer clicking "Zapisz" - it create matrix and
+    # send it to database class
     def saveClick(self):
         self._inputUpdate() #update all products
         self.__updateOrderManager()
 
-        def checkNaddOrder(): # simple sub function to add warning window          
-            # check if empty
-            if not self.company.get():
-                messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez wprowadzenia nazwy firmy!')
-                return
-            elif not self.allProducts:
-                messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
-                return
-                
-            self._database.insertOrder(self.__order.getDataToDatabase())
-            messagebox.showinfo('Info','Zamówienie zostało poprawnie zapisane')
-            
         if not self.__reOrder.isEmpty(): # in case of comming here from History Window
-            if not self.__order == self.__reOrder: checkNaddOrder()
+            if not self.__order == self.__reOrder: self.__checkAndSave()
             else: messagebox.showinfo('Info','Nic nie zostało zmienione')
-        else: checkNaddOrder() # in case of comming here from option 'new order'
+        else: self.__checkAndSave() # in case of comming here from option 'new order'
+
+    def __checkAndSave(self):                   # check if empty
+        if not self.company.get():
+            messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez wprowadzenia nazwy firmy!')
+            return False
+        elif not self.allProducts:
+            messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
+            return False
+                
+        self._database.insertOrder(self.__order.getDataToDatabase())
+        messagebox.showinfo('Info','Zamówienie zostało poprawnie zapisane')
+        return True
 
 
     # Function that update order manager object which gather all data from order window
     def __updateOrderManager(self):
         self.__order = OrderManager(productArray = self.allProducts, companyName= self.company.get(),invoice = self.invoice.get(),
                                     payment = self._getPayment(),
-                                    dateOrder = self._orderDate, dateCollect =self._collectDate,  )
+                                    dateOrder = self._orderDate, dateCollect =self._collectDate,)
     # Fuction that uses pdfprocess and create pdf file
     def generatePDFClick(self):
         self._inputUpdate()
@@ -188,19 +180,19 @@ class Order():
     def addMainButtons(self):
         self.buttons = []
         self.buttons.append(Button(self.addElementsFrame, text= "Dodaj\nmanekiny",padx=5, pady=7, command = lambda:self.addDummyClick()))
-        self.buttons[0].grid(row = 0,  column = 0,padx=20, pady=3, sticky=W+N)
+        self.buttons[0].grid(row = 0,  column = 0,padx=20, pady=3, sticky=W + N)
 
         self.buttons.append(Button(self.addElementsFrame, text= "Dodaj\nstatyw",padx=5, pady=7, command = lambda:self.addStateClick()))
-        self.buttons[1].grid(row = 0, column = 1,padx=20, pady=3, sticky=W+N)
+        self.buttons[1].grid(row = 0, column = 1,padx=20, pady=3, sticky=W + N)
 
         self.buttons.append(Button(self.addElementsFrame, text= "Dodaj statyw\ndrewniany",padx=5, pady=7, command = lambda:self.addStateWoodClick()))
-        self.buttons[2].grid(row = 0, column = 2,padx=20, pady=3, sticky=W+N)
+        self.buttons[2].grid(row = 0, column = 2,padx=20, pady=3, sticky=W + N)
 
         self.buttons.append(Button(self.controlFrame, text= "Cofnij",padx=10, pady=3,width=10, state = ACTIVE, command = lambda:self.backClick()))
         self.buttons[3].grid(row =0, column = 0, sticky=N)
 
         self.buttons.append(Button(self.controlFrame, text= "Zapisz",padx=10, pady=3,width=10, command = lambda:self.saveClick()))
-        self.buttons[4].grid( row =1, column = 0, sticky=N)
+        self.buttons[4].grid(row =1, column = 0, sticky=N)
 
         self.buttons.append(Button(self.controlFrame, text= "Generuj PDF\n zamówienie",padx=10, pady=3, width=10, command = lambda:self.generatePDFClick()))
         self.buttons[5].grid(row =2, column = 0, sticky=N)
@@ -216,39 +208,39 @@ class Order():
     
     # Add oppurtunity to add company name, invoice number, payment and initialize choosing date
     def addEntrySection(self,*,companyName = None, invoiceNum = None, payValue = None, dateOrder=None, dateCollect=None ):
-        self.companyLabel = Label(self.nameFrame, text= "Nazwa firmy",padx=10, pady=0 )
+        self.companyLabel = Label(self.nameFrame, text= "Nazwa firmy",padx=10, pady=0)
         self.companyLabel.grid(row=0, column=0)
         comp = StringVar()
         if companyName : comp.set(companyName)
-        self.company = ( Entry(self.nameFrame, width=15 ,textvariable = comp) )
-        self.company.grid( row= 1 , column=0,padx = 10, pady=3, sticky = N+W+E)
+        self.company = (Entry(self.nameFrame, width=15 ,textvariable = comp))
+        self.company.grid(row= 1 , column=0,padx = 10, pady=3, sticky = N + W + E)
 
-        self.invoiceLabel = Label(self.nameFrame, text= "Faktura nr",padx=10, pady=0 )
+        self.invoiceLabel = Label(self.nameFrame, text= "Faktura nr",padx=10, pady=0)
         self.invoiceLabel.grid(row=0, column=1)
         inv = StringVar()
         if invoiceNum: inv.set(invoiceNum)
-        self.invoice = ( Entry(self.nameFrame, width=15 ,textvariable = inv) )
-        self.invoice.grid( row= 1 , column=1,padx = 10, pady=3, sticky = N+W+E)
+        self.invoice = (Entry(self.nameFrame, width=15 ,textvariable = inv))
+        self.invoice.grid(row= 1 , column=1,padx = 10, pady=3, sticky = N + W + E)
 
-        self.paymentLabel = Label(self.nameFrame, text= "Płatność",padx=10, pady=0 )
+        self.paymentLabel = Label(self.nameFrame, text= "Płatność",padx=10, pady=0)
         self.paymentLabel.grid(row=0, column=2)
         payment = IntVar()
-        if payValue: payment.set( payValue)
-        self.paymentEntry = ( Entry(self.nameFrame, width=5 ,textvariable = payment) )
-        self.paymentEntry.grid( row= 1 , column=2,padx = 10, pady=3, sticky = N+W+E)
+        if payValue: payment.set(payValue)
+        self.paymentEntry = (Entry(self.nameFrame, width=5 ,textvariable = payment))
+        self.paymentEntry.grid(row= 1 , column=2,padx = 10, pady=3, sticky = N + W + E)
 
         if dateOrder:
            self._orderDate = dateOrder
-           dateOrder = str(dateOrder.day)+'-'+str(dateOrder.month)+'-'+str(dateOrder.year)
-        else : dateOrder = str(datetime.date.today().day)+'-'+str(datetime.date.today().month)+'-'+str(datetime.date.today().year)
-        self.DateOrderLabel = Label(self.nameFrame, text = dateOrder,padx=10, pady=3 )
+           dateOrder = str(dateOrder.day) + '-' + str(dateOrder.month) + '-' + str(dateOrder.year)
+        else : dateOrder = str(datetime.date.today().day) + '-' + str(datetime.date.today().month) + '-' + str(datetime.date.today().year)
+        self.DateOrderLabel = Label(self.nameFrame, text = dateOrder,padx=10, pady=3)
         self.DateOrderLabel.grid(row=1, column=3)
 
         if dateCollect:
             self._collectDate = dateCollect
-            dateCollect = str(dateCollect.day)+'-'+str(dateCollect.month)+'-'+str(dateCollect.year)
+            dateCollect = str(dateCollect.day) + '-' + str(dateCollect.month) + '-' + str(dateCollect.year)
         else : dateCollect = ''
-        self.DateCollectLabel = Label(self.nameFrame, text = dateCollect,padx=10, pady=3 )
+        self.DateCollectLabel = Label(self.nameFrame, text = dateCollect,padx=10, pady=3)
         self.DateCollectLabel.grid(row=1, column=4)
 
     # Add calendar
@@ -256,10 +248,10 @@ class Order():
         def print_sel():
             if ver == 0: 
                 self._orderDate = cal.selection_get()
-                self.DateOrderLabel.config(text = str(self._orderDate.day) +'-'+str(self._orderDate.month) +'-'+str(self._orderDate.year) )
-            elif ver==1 :
+                self.DateOrderLabel.config(text = str(self._orderDate.day) + '-' + str(self._orderDate.month) + '-' + str(self._orderDate.year))
+            elif ver == 1 :
                self._collectDate = cal.selection_get()
-               self.DateCollectLabel.config(text = str(self._collectDate.day) +'-'+str(self._collectDate.month) +'-'+str(self._collectDate.year) )
+               self.DateCollectLabel.config(text = str(self._collectDate.day) + '-' + str(self._collectDate.month) + '-' + str(self._collectDate.year))
             top.destroy()
 
         top = Toplevel(self.root)    
@@ -282,7 +274,7 @@ class Order():
         self.__addScrollbar()
         self.addEntrySection()
         self.addMainButtons()
-        #self.addDummyClick()
+ 
         
 
 
@@ -308,7 +300,7 @@ class Order():
 
 ####################################################################################################################
 class ProductLine():
-    def __init__(self,* ,root ,frameNum, models, kinds,prodObj, rebuildList = None):
+    def __init__(self,* ,root ,frameNum, models, kinds,prodObj, rebuildList=None):
         self.__root = root
         self.frameNum = frameNum # number of frame in order array
         self._modelsList = models # list to model menu
@@ -326,46 +318,46 @@ class ProductLine():
 
         self.addButtons() # add buttons 'delete' and 'add genre'
 
-        if rebuildList : self.__rebuildFrame( rebuildList )
+        if rebuildList : self.__rebuildFrame(rebuildList)
         else:  self._addInputLine()
 
     def addButtons(self):
-        self._genreButton =  Button(self.__root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) 
-        self._genreButton.grid( row =1, column = 0)
+        self._genreButton = Button(self.__root, text= "dodaj rodzaj",padx=10, pady=0, command = lambda:self._addInputLine()) 
+        self._genreButton.grid(row =1, column = 0)
 
         self._deleteButton = Button(self.__root, text= "usuń",padx=10, pady=0, command = lambda:self._delThisInputFrame()) 
-        self._deleteButton.grid( row = 0, column = 3)
+        self._deleteButton.grid(row = 0, column = 3)
 
     # Function which add model menu or model label
-    def _addModel(self, value = None):
+    def _addModel(self, value=None):
         if isinstance(self._modelsList, str):    self.__addModelAsLabel()
         elif isinstance(self._modelsList, list): self.__addModelAsOptionMenu(value)
 
     def __addModelAsLabel(self):
-        self._model = Label(self.__root, text = self._modelsList, padx=10, pady=0 )
+        self._model = Label(self.__root, text = self._modelsList, padx=10, pady=0)
         self._model.grid(row=0, column=0)
 
     def __addModelAsOptionMenu(self, value):
-        [self._model, self._modelOpt ] = self.__addOptionMenu(optList = self._modelsList, 
+        [self._model, self._modelOpt] = self.__addOptionMenu(optList = self._modelsList, 
                                               row = 0,
                                               column = 0,
                                               width = 5,
                                               initValue = value)
     
-    # Function which add kind menu (eg. colors)
-    def _addKind(self, value = None):
-        [kind, menu ] = self.__addOptionMenu(optList = self._kindsList, 
+    # Function which add kind menu (eg.  colors)
+    def _addKind(self, value=None):
+        [kind, menu] = self.__addOptionMenu(optList = self._kindsList, 
                                               row = self.__lineNum,
                                               column = 1,
                                               width = 10,
                                               initValue = value)
-        self._kind.append( kind )
-        self._kindOpt.append( menu )
+        self._kind.append(kind)
+        self._kindOpt.append(menu)
 
     # Main function of adding and configure option menu
-    def __addOptionMenu(self,*, optList, row, column, width, initValue = None):
+    def __addOptionMenu(self,*, optList, row, column, width, initValue=None):
         outOption = StringVar()
-        if initValue:  outOption.set( initValue )
+        if initValue:  outOption.set(initValue)
         else : outOption.set(optList[self.__lineNum])
         optionMenu = OptionMenu(self.__root,  outOption, *optList) 
         optionMenu.configure(width = width)
@@ -373,18 +365,18 @@ class ProductLine():
         return [outOption, optionMenu]
 
     # Function that add Entry place -> to write quantity of specified product
-    def _addNumberEntry(self, value = None):
+    def _addNumberEntry(self, value=None):
         var = IntVar()
         if value : var.set(value) 
-        self._number.append( Entry(self.__root, width=4, textvariable = var) )
-        self._number[-1].grid( row = self.__lineNum , column=2)
+        self._number.append(Entry(self.__root, width=4, textvariable = var))
+        self._number[-1].grid(row = self.__lineNum , column=2)
     
     # Function that add new line inside this Frame object
-    def _addInputLine(self, kind = None, value = None, model = None):
+    def _addInputLine(self, kind=None, value=None, model=None):
         if   self.__lineNum < len(self._kindsList) :        
             if kind and value:
                 if not self._model: self._addModel(model)
-                self._addKind( kind )
+                self._addKind(kind)
                 self._addNumberEntry(value)
             else:
                 if not self._model: self._addModel(model)
@@ -395,7 +387,7 @@ class ProductLine():
     # To calculate sum of all products in this frame
     def sumCalculate(self):
         sum = 0
-        for i in range(len( self._number)):
+        for i in range(len(self._number)):
             sum +=int(self._number[i].get())
         return sum
 
@@ -403,10 +395,10 @@ class ProductLine():
         allData = []
 
         for index in range(self.__lineNum):
-            if self._prodObj == Dummy:  temp = self._prodObj(model = self._model.get(), kind = self._kind[index].get(), num = int(self._number[index].get()) )
-            else: temp = self._prodObj(kind = self._kind[index].get(), num = int(self._number[index].get()) )
+            if self._prodObj == Dummy:  temp = self._prodObj(model = self._model.get(), kind = self._kind[index].get(), num = int(self._number[index].get()))
+            else: temp = self._prodObj(kind = self._kind[index].get(), num = int(self._number[index].get()))
             if not temp.isEmpty(): 
-                allData.append( temp )
+                allData.append(temp)
         return allData
 
     def getModel(self):
@@ -414,7 +406,7 @@ class ProductLine():
         if temp :  return temp[0].getData()[0]
         else: return temp
 
-    def getKind(self, index = None):
+    def getKind(self, index=None):
         data = self.getData()
         if not data: return []
         if index == None :
@@ -424,7 +416,7 @@ class ProductLine():
             return temp
         else : return data[index].getData()[1]
 
-    def getNumber(self, index = None):
+    def getNumber(self, index=None):
         data = self.getData()
         if not data: return []
         if index == None  :
@@ -436,7 +428,7 @@ class ProductLine():
 
     # Function whitch delete Frame and everything inside frame
     def _delThisInputFrame(self):
-        if self.__lineNum  > 1:
+        if self.__lineNum > 1:
             self._kind.pop(-1)
             self._kindOpt[-1].destroy()
             self._kindOpt.pop(-1)
@@ -454,42 +446,42 @@ class ProductLine():
     # Function to rebuild frame from histry window
     def __rebuildFrame(self, list):
         self._addModel(list[0].getData()[0])
-        for el in list: self._addInputLine( el.getData()[1], el.getData()[2] )
+        for el in list: self._addInputLine(el.getData()[1], el.getData()[2])
 ####################################################################################################################
 from basicProduct import *
 
 class DummyLine(ProductLine):
-    def __init__(self,root ,frameNum, dummysList = None):
+    def __init__(self,root ,frameNum, dummysList=None):
         self.__genre = Genre()
         super().__init__(root = root, 
                          frameNum = frameNum,
                          models = self.__genre.dummys , 
                          kinds = self.__genre.color,
                          prodObj = Dummy,
-                         rebuildList = dummysList  )
+                         rebuildList = dummysList)
         
 
 
 #############################################################################################
 class WoodLine(ProductLine):
-    def __init__(self,root ,frameNum, woodLineList = None):
+    def __init__(self,root ,frameNum, woodLineList=None):
         self.__genre = Genre()
         super().__init__(root = root, 
                          frameNum = frameNum,
                          models = 'Statyw drewniany' , 
                          kinds = self.__genre.woodStands,
                          prodObj = WoodenStand,
-                         rebuildList = woodLineList  )
+                         rebuildList = woodLineList)
         
 #############################################################################################
 class StandsLine(ProductLine):
-    def __init__(self,root ,frameNum, standsLineList = None):
+    def __init__(self,root ,frameNum, standsLineList=None):
         self.__genre = Genre()
         super().__init__(root = root, 
                          frameNum = frameNum,
                          models = 'Statyw metalowy' , 
                          kinds = self.__genre.stands,
                          prodObj = Stand,
-                         rebuildList = standsLineList  )
+                         rebuildList = standsLineList)
 
             

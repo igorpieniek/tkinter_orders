@@ -13,6 +13,7 @@ class OrderManager():
     def __init__(self, *,productArray=None,**kwargs ):
         self.__isEmpty = True
         self.__genre = Genre()
+        self.__order = {}
 
         if not productArray: #in case no argument was added
             print('Empty order manager added!')
