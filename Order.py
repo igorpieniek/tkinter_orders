@@ -282,7 +282,7 @@ class Order():
         self.__addScrollbar()
         self.addEntrySection()
         self.addMainButtons()
-        self.addDummyClick()
+        #self.addDummyClick()
         
 
 
