@@ -24,14 +24,14 @@ class PDFgen():
         self.__order = order.getOrderDict()
         
     def _addDefaultCells(self):
-        self.er['A2'] = 'Model'
-        self.er['B2'] = 'Suma'
-        self.er['C2'] = 'Ilość'
-        self.er['D2'] = 'Rodzaj'
-        self.er['E2'] = 'Uwagi'
+        self.er['A4'] = 'Model'
+        self.er['B4'] = 'Suma'
+        self.er['C4'] = 'Ilość'
+        self.er['D4'] = 'Rodzaj'
+        self.er['E4'] = 'Uwagi'
 
         headerFont = Font(size=16, bold= True )
-        for row in self.er['A2':'E2']:
+        for row in self.er['A4':'E4']:
             for cell in row:
                 cell.font = headerFont
 
@@ -46,7 +46,9 @@ class PDFgen():
         self._restFont = Font(size=14 )
         self._companyFont = Font(size = 18, bold =True)
 
-        self.__addCompanyName() # add company name to 
+        self.__addCompanyName() # add company name to
+        self.__addOrderDate()
+        self.__addCollectDate()
 
 
     def __addCompanyName(self):
@@ -57,9 +59,30 @@ class PDFgen():
         cell.font = self._companyFont
 
     def __addOrderDate(self):
-        pass
+        self.er['A2'] =  'Data zamówienia:'
+        self.er['A2'].alignment = Alignment(horizontal='left', vertical='center')
+        cell = self.er['A2']
+        cell.font =  Font(size=12 )
+
+        self.er.merge_cells('B2:C2')
+        self.er['B2'] =   str(self.__order['dateOrder'].day)+'.'+str(self.__order['dateOrder'].month)+'.'+str(self.__order['dateOrder'].year)
+        self.er['B2'].alignment = Alignment(horizontal='left', vertical='center')
+        cell = self.er['B2']
+        cell.font =  Font(size=12 )
+
+
     def __addCollectDate(self):
-        pass
+        self.er['A3'] =  'Data odbioru:'
+        self.er['A3'].alignment = Alignment(horizontal='left', vertical='center')
+        cell = self.er['A3']
+        cell.font =  Font(size=12 )
+
+        self.er.merge_cells('B3:C3')
+        self.er['B3'] = str(self.__order['dateCollect'].day)+'.'+str(self.__order['dateCollect'].month)+'.'+str(self.__order['dateCollect'].year)
+        self.er['B3'].alignment = Alignment(horizontal='left', vertical='center')
+        cell = self.er['B3']
+        cell.font =  Font(size=12 )
+
     def __addPayment(self):
         pass
     def __addInvoice(self):
@@ -68,7 +91,7 @@ class PDFgen():
 
 
     def _addToExcel(self):
-        lastRow = 3
+        lastRow = 5
         # write all dummies
 
         for model,products in self.__order['products'].items():
@@ -89,10 +112,10 @@ class PDFgen():
         
 
       
-        for row in self.er['A2':'E'+str(lastRow-1)]:
+        for row in self.er['A4':'E'+str(lastRow-1)]:
             for cell in row:
                 cell.border = self.border
-        for row in self.er['A3':'E'+str(lastRow-1)]:
+        for row in self.er['A5':'E'+str(lastRow-1)]:
             for cell in row:
                 cell.font = self._restFont    
         
