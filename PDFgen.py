@@ -6,6 +6,15 @@ class PDFgen():
          self.ex = Workbook()  
          self.er = self.ex.active
 
+         self.__startArrayLine = 4
+         self.er.column_dimensions['A'].width = 20
+         self.er.row_dimensions[1].height=30
+         self.er.column_dimensions['D'].width = 12
+         self.er.column_dimensions['E'].width = 34
+
+         self._restFont = Font(size=14 )
+         self._companyFont = Font(size = 18, bold =True)
+
     def process(self, order):
         self._clearExcelSheet()
         self.__copyProducts(order)
@@ -24,27 +33,19 @@ class PDFgen():
         self.__order = order.getOrderDict()
         
     def _addDefaultCells(self):
-        self.er['A4'] = 'Model'
-        self.er['B4'] = 'Suma'
-        self.er['C4'] = 'Ilość'
-        self.er['D4'] = 'Rodzaj'
-        self.er['E4'] = 'Uwagi'
+        self.er['A' + str(self.__startArrayLine)] = 'Model'
+        self.er['B' + str(self.__startArrayLine)] = 'Suma'
+        self.er['C' + str(self.__startArrayLine)] = 'Ilość'
+        self.er['D' + str(self.__startArrayLine)] = 'Rodzaj'
+        self.er['E' + str(self.__startArrayLine)] = 'Uwagi'
 
         headerFont = Font(size=16, bold= True )
-        for row in self.er['A4':'E4']:
+        for row in self.er['A'+ str(self.__startArrayLine):'E'+ str(self.__startArrayLine)]:
             for cell in row:
                 cell.font = headerFont
 
         bd = Side(style='thin', color="000000")
         self.border = Border(left=bd, top=bd, right=bd, bottom=bd)
-
-        self.er.column_dimensions['A'].width = 20
-        self.er.row_dimensions[1].height=30
-        self.er.column_dimensions['D'].width = 12
-        self.er.column_dimensions['E'].width = 34
-
-        self._restFont = Font(size=14 )
-        self._companyFont = Font(size = 18, bold =True)
 
         self.__addCompanyName() # add company name to
         self.__addOrderDate()
@@ -65,7 +66,8 @@ class PDFgen():
         cell.font =  Font(size=12 )
 
         self.er.merge_cells('B2:C2')
-        self.er['B2'] =   str(self.__order['dateOrder'].day)+'.'+str(self.__order['dateOrder'].month)+'.'+str(self.__order['dateOrder'].year)
+        if self.__order['dateOrder']  == '': self.er['B2'] = '-------'
+        else: self.er['B2'] =   str(self.__order['dateOrder'].day)+'.'+str(self.__order['dateOrder'].month)+'.'+str(self.__order['dateOrder'].year)
         self.er['B2'].alignment = Alignment(horizontal='left', vertical='center')
         cell = self.er['B2']
         cell.font =  Font(size=12 )
@@ -78,7 +80,8 @@ class PDFgen():
         cell.font =  Font(size=12 )
 
         self.er.merge_cells('B3:C3')
-        self.er['B3'] = str(self.__order['dateCollect'].day)+'.'+str(self.__order['dateCollect'].month)+'.'+str(self.__order['dateCollect'].year)
+        if self.__order['dateCollect']  == '': self.er['B3'] = '-------'
+        else: self.er['B3'] = str(self.__order['dateCollect'].day)+'.'+str(self.__order['dateCollect'].month)+'.'+str(self.__order['dateCollect'].year)
         self.er['B3'].alignment = Alignment(horizontal='left', vertical='center')
         cell = self.er['B3']
         cell.font =  Font(size=12 )
@@ -91,7 +94,7 @@ class PDFgen():
 
 
     def _addToExcel(self):
-        lastRow = 5
+        lastRow = self.__startArrayLine + 1
         # write all dummies
 
         for model,products in self.__order['products'].items():
@@ -112,10 +115,10 @@ class PDFgen():
         
 
       
-        for row in self.er['A4':'E'+str(lastRow-1)]:
+        for row in self.er['A'+ str(self.__startArrayLine):'E'+str(lastRow-1)]:
             for cell in row:
                 cell.border = self.border
-        for row in self.er['A5':'E'+str(lastRow-1)]:
+        for row in self.er['A'+ str(self.__startArrayLine + 1) :'E'+str(lastRow-1)]:
             for cell in row:
                 cell.font = self._restFont    
         
