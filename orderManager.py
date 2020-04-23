@@ -56,7 +56,9 @@ class OrderManager():
             self.__dateCollect =   orderInfo['dateCollect'] #datatime format
 
             self.__products= []
+            self.__sum = {}
             for frame in array: #sorting data
+                self.__sum.update({frame.getModel() : frame.sumCalculate}) # to save sum of every model
                 for i in range( len( frame.getData() ) ):
                     if frame.getModel() in self.__genre.dummys:
                          self.__products.append(Dummy(model = frame.getModel(), kind = frame.getKind(i), num = frame.getNumber(i)))
@@ -110,17 +112,18 @@ class OrderManager():
             for prod in self.__products  :   outArray.append( basic + prod.getData()) #level of searching in every products#level of list of products (dummys, stands etc.)
         return outArray
 
+    def __sumCalculate(self): pass
     # Private method to build main object dict
     def __buildMainDict(self):
         if  self.__isEmpty or not self.__products :
             raise NameError('Error: update main dictionary is impossible- there is no data in object!')
         else:
-            dummyDict = {line.getData()[0]: [] for line in self.__products if line.getData()[0] in self.__genre.dummys}
+            dummyDict = {line.getModel(): [] for line in self.__products if line.getModel() in self.__genre.dummys}
             woodenstands = []
             stands = []
 
             for pro in self.__products:
-                if pro.getData()[0] in self.__genre.dummys: dummyDict[pro.getData()[0]].append(pro)
+                if pro.getData()[0] in self.__genre.dummys: dummyDict[pro.getModel()].append(pro)
                 elif isinstance(pro,WoodenStand ): woodenstands.append(pro)
                 elif isinstance(pro,Stand ): stands.append(pro)
 
