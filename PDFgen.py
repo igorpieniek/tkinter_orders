@@ -72,8 +72,8 @@ class PDFgen():
         # write all dummies
 
         for model,products in self.__order['products'].items():
-                self.er['A'+ str(lastRow)] = model
-                #self.er['B'+ str(lastRow)] = str(product[i].sumCalculate())
+                self.er['A'+ str(lastRow)] = products[0].getModel()
+                self.er['B'+ str(lastRow)] = self.__order['sum'][model]
                 self.er['A'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center',wrap_text = True)
                 self.er['B'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center')
                 k =0

@@ -58,7 +58,6 @@ class OrderManager():
             self.__products= []
             self.__sum = {}
             for frame in array: #sorting data
-                self.__sum.update({frame.getModel() : frame.sumCalculate}) # to save sum of every model
                 for i in range( len( frame.getData() ) ):
                     if frame.getModel() in self.__genre.dummys:
                          self.__products.append(Dummy(model = frame.getModel(), kind = frame.getKind(i), num = frame.getNumber(i)))
@@ -112,7 +111,14 @@ class OrderManager():
             for prod in self.__products  :   outArray.append( basic + prod.getData()) #level of searching in every products#level of list of products (dummys, stands etc.)
         return outArray
 
-    def __sumCalculate(self): pass
+    def __sumCalculate(self): 
+        sum = {model: 0 for model, line in self.__order['products'].items()}
+        for model, frame in self.__order['products'].items():
+            for line in frame:
+                sum[model]+= line.getNumber()
+        self.__sum = sum   
+
+
     # Private method to build main object dict
     def __buildMainDict(self):
         if  self.__isEmpty or not self.__products :
@@ -139,6 +145,9 @@ class OrderManager():
                              'invoice': self.__invoiceNum,
                              'payment': self.__payment, 
                              'products': productsInDict}
+
+            self.__sumCalculate()
+            self.__order.update({'sum': self.__sum})
       
    ## TO DELETE :::::::::::::::::::         
     #     dummyDict = {line[0]: [] for line in productsRaw if line[0] in self.genre.dummys} #get all names of dummys in order
