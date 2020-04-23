@@ -176,7 +176,8 @@ class Order():
     # Fuction that uses pdfprocess and create pdf file
     def generatePDFClick(self):
         self._inputUpdate()
-        self.pdf.process(self.allProducts,self.company)
+        self.__updateOrderManager()
+        if not self.__order.isEmpty(): self.pdf.process(self.__order)
 
     # Function contains adding all buttons
     def addMainButtons(self):

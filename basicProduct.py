@@ -39,6 +39,21 @@ class BasicProduct():
         if not self.__model  : return None
         output = [self.__model, self.__kind, self.__number]
         return output
+
+    def __getSmth(self, pos):
+        temp = self.getData()
+        if  temp: return temp[pos]
+        else: return temp
+    
+    def getModel(self):
+        return self.__getSmth(0)
+
+    def getKind(self):
+        return self.__getSmth(1)
+
+    def getNumber(self):
+         return self.__getSmth(2)
+
   
     def isEmpty(self):
         return not self.__isLocked   

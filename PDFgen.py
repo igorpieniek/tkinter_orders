@@ -3,17 +3,13 @@ from openpyxl.styles import NamedStyle, Border, Side, Alignment, Font
 
 class PDFgen():
     def __init__(self):
-         self.ex = Workbook()
-    
+         self.ex = Workbook()  
          self.er = self.ex.active
 
-
-    def process(self, prodList, companyName):
+    def process(self, order):
         self._clearExcelSheet()
+        self.__copyProducts(order)
         self._addDefaultCells()
-        self._copyProducts(prodList)
-        self._copyCompanyName(companyName)
-        self._sortProducts()
         #self._delEmptyLines()
         self._addToExcel()
         self._generatePDF()
@@ -23,6 +19,9 @@ class PDFgen():
             for cell in row:
                 cell.value = None
 
+    def __copyProducts(self, order):
+        self.__orderOBJ = order
+        self.__order = order.getOrderDict()
         
     def _addDefaultCells(self):
         self.er['A2'] = 'Model'
@@ -47,59 +46,24 @@ class PDFgen():
         self._restFont = Font(size=14 )
         self._companyFont = Font(size = 18, bold =True)
 
-    def _copyProducts(self,prodList):
-        self._productsList = []
-        self._productsList = prodList
+        self.__addCompanyName() # add company name to 
 
-    def _copyCompanyName(self,companyName):
+
+    def __addCompanyName(self):
         self.er.merge_cells('A1:B1')
-        self.er['A1'] = str(companyName.get())
+        self.er['A1'] =  self.__order['companyName']
         self.er['A1'].alignment = Alignment(horizontal='left', vertical='center')
         cell = self.er['A1']
         cell.font = self._companyFont
 
-    def _sortProducts(self):
-        self._dummys = []
-        self._stands = []
-        self._woodStands = []
-
-        from Order import DummyLine, StandsLine, WoodLine
-        for i in range(len(self._productsList)):   
-             if isinstance(self._productsList[i],DummyLine ):
-                 self._dummys.append(self._productsList[i])
-             elif isinstance(self._productsList[i],StandsLine ):
-                 self._stands.append(self._productsList[i])
-             elif isinstance(self._productsList[i],WoodLine ):
-                 self._woodStands.append(self._productsList[i])
-
-    #def _delEmptyLines(self):
-    #    self._dummys = self._delEmptyLine(self._dummys)
-    #    self._stands = self._delEmptyLine(self._stands)
-    #    self._woodStands = self. _delEmptyLine(self._woodStands)
-
-    #def _delEmptyLine(self, prodList):
-    #    ObjtoDel = []
-    #    for i in range(len(prodList)):
-    #        LineToDel = []
-    #        for k in range(len(prodList[i].color)):
-    #            if not int(prodList[i].number[k].get()):
-    #                LineToDel.append(k)    
-    #        if len( LineToDel) > 0 and len(LineToDel) < len(prodList[i].color)  :
-    #            counter = 0
-    #            while counter < len(LineToDel):
-    #                prodList[i].color.pop(LineToDel[counter]-counter)
-    #                prodList[i].number.pop(LineToDel[counter]-counter)
-    #                counter +=1
-    #        elif len( LineToDel) == len(prodList[i].color):
-    #            ObjtoDel.append(i)
-
-        ## Update dummy obj in case all is empty
-        #if ObjtoDel:
-        #    counter = 0
-        #    while counter < len(ObjtoDel):
-        #        prodList.pop(ObjtoDel[counter]-counter)
-        #        counter +=1
-        #return prodList
+    def __addOrderDate(self):
+        pass
+    def __addCollectDate(self):
+        pass
+    def __addPayment(self):
+        pass
+    def __addInvoice(self):
+        pass
 
 
 
@@ -107,22 +71,21 @@ class PDFgen():
         lastRow = 3
         # write all dummies
 
-        for product in [self._dummys, self._woodStands, self._stands]:
-            for i in range(len(product)):
-                self.er['A'+ str(lastRow)] = product[i].getModel()
-                self.er['B'+ str(lastRow)] = str(product[i].sumCalculate())
+        for model,products in self.__order['products'].items():
+                self.er['A'+ str(lastRow)] = model
+                #self.er['B'+ str(lastRow)] = str(product[i].sumCalculate())
                 self.er['A'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center',wrap_text = True)
                 self.er['B'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center')
                 k =0
-                while k < len(product[i].getColor()):
-                    self.er['D'+ str(k+lastRow)] = product[i].getColor(k)
-                    self.er['C'+ str(k+lastRow)] = product[i].getNumber(k)
+                while k < len(products):
+                    self.er['D'+ str(k+lastRow)] = products[k].getKind()
+                    self.er['C'+ str(k+lastRow)] = products[k].getNumber()
                     self.er['C'+ str(k+lastRow)].alignment = Alignment(horizontal='right', vertical='center')
                     self.er['D'+ str(k+lastRow)].alignment = Alignment(horizontal='center', vertical='center')
                     k+=1
-                self.er.merge_cells('B'+ str(lastRow) +':'+ 'B'+str(lastRow -1+ len(product[i].getColor() )))
-                self.er.merge_cells('A'+ str(lastRow) +':'+ 'A'+str(lastRow -1+ len(product[i].getColor() )))
-                lastRow += len(product[i].getColor())
+                self.er.merge_cells('B'+ str(lastRow) +':'+ 'B'+str(lastRow -1+ len(products )))
+                self.er.merge_cells('A'+ str(lastRow) +':'+ 'A'+str(lastRow -1+ len(products )))
+                lastRow += len(products)
         
 
       
