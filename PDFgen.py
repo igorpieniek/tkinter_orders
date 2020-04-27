@@ -15,13 +15,19 @@ class PDFgen():
          self._restFont = Font(size=14 )
          self._companyFont = Font(size = 18, bold =True)
 
-    def process(self, order):
+    def process(self, order, mode = 'NORMAL'):
+        self.__setMode(mode)
         self._clearExcelSheet()
-        self.__copyProducts(order)
+        self.__copyProducts(order)   
         self._addDefaultCells()
         #self._delEmptyLines()
         self._addToExcel()
         self._generatePDF()
+
+    def __setMode(self, mode):
+        self.__mode = mode
+        if self.__mode == 'PRODUCTION' or self.__mode == 'SLEEVES':
+            self.__startArrayLine = 3
 
     def _clearExcelSheet(self):
         for row in self.er['A1':'G37']:
@@ -49,9 +55,10 @@ class PDFgen():
 
         self.__addCompanyName() # add company name to
         self.__addOrderDate()
-        self.__addCollectDate()
-        self.__addPayment()
-        self.__addInvoice()
+        if not self.__mode == 'NORMAL':
+            self.__addCollectDate()
+            self.__addPayment()
+            self.__addInvoice()
 
 
     def __addCompanyName(self):
