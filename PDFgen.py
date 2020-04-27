@@ -50,6 +50,8 @@ class PDFgen():
         self.__addCompanyName() # add company name to
         self.__addOrderDate()
         self.__addCollectDate()
+        self.__addPayment()
+        self.__addInvoice()
 
 
     def __addCompanyName(self):
@@ -74,22 +76,52 @@ class PDFgen():
 
 
     def __addCollectDate(self):
-        self.er['A3'] =  'Data odbioru:'
-        self.er['A3'].alignment = Alignment(horizontal='left', vertical='center')
-        cell = self.er['A3']
-        cell.font =  Font(size=12 )
+        infoCell = 'A3'
+        valueCell = 'B3'
+        mergeCell = 'C3'
+        fontSize = 12
+        self.er[infoCell] =  'Data odbioru:'
+        self.er[infoCell].alignment = Alignment(horizontal='left', vertical='center')
+        cell = self.er[infoCell]
+        cell.font =  Font(size=fontSize )
 
-        self.er.merge_cells('B3:C3')
-        if self.__order['dateCollect']  == '': self.er['B3'] = '-------'
-        else: self.er['B3'] = str(self.__order['dateCollect'].day)+'.'+str(self.__order['dateCollect'].month)+'.'+str(self.__order['dateCollect'].year)
-        self.er['B3'].alignment = Alignment(horizontal='left', vertical='center')
-        cell = self.er['B3']
-        cell.font =  Font(size=12 )
+        self.er.merge_cells(valueCell + ':' + mergeCell)
+        date = self.__order['dateCollect']
+        if date == '': self.er[ valueCell] = '-------'
+        else: self.er[ valueCell ] = str(date.day)+'.'+str(date.month)+'.'+str(date.year)
+        self.er[ valueCell ].alignment = Alignment(horizontal='left', vertical='center')
+        cell = self.er[  valueCell ]
+        cell.font =  Font(size=fontSize )
 
     def __addPayment(self):
-        pass
+        infoCell = 'D3'
+        valueCell = 'E3'
+        fontSize = 12
+        self.er[infoCell] =  'Płatność:'
+        self.er[infoCell].alignment = Alignment(horizontal='left', vertical='center')
+        cell = self.er[infoCell]
+        cell.font =  Font(size= fontSize )
+
+        self.er[valueCell] =  self.__order['payment']
+        self.er[valueCell].alignment = Alignment(horizontal='left', vertical='center')
+        cell = self.er[valueCell]
+        cell.font =  Font(size= fontSize )
+
+
+
     def __addInvoice(self):
-        pass
+        infoCell = 'D2'
+        valueCell = 'E2'
+        fontSize = 12
+        self.er[infoCell] =  'Nr faktury:'
+        self.er[infoCell].alignment = Alignment(horizontal='left', vertical='center')
+        cell = self.er[infoCell]
+        cell.font =  Font(size= fontSize )
+
+        self.er[valueCell] =  self.__order['invoice']
+        self.er[valueCell].alignment = Alignment(horizontal='left', vertical='center')
+        cell = self.er[valueCell]
+        cell.font =  Font(size= fontSize )
 
 
 
@@ -98,6 +130,7 @@ class PDFgen():
         # write all dummies
 
         for model,products in self.__order['products'].items():
+                if not products: continue
                 self.er['A'+ str(lastRow)] = products[0].getModel()
                 self.er['B'+ str(lastRow)] = self.__order['sum'][model]
                 self.er['A'+ str(lastRow)].alignment = Alignment(horizontal='center', vertical='center',wrap_text = True)
