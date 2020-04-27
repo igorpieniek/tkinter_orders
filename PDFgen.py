@@ -62,31 +62,21 @@ class PDFgen():
         cell.font = self._companyFont
 
     def __addOrderDate(self):
-        self.er['A2'] =  'Data zamówienia:'
-        self.er['A2'].alignment = Alignment(horizontal='left', vertical='center')
-        cell = self.er['A2']
-        cell.font =  Font(size=12 )
-
-        self.er.merge_cells('B2:C2')
-        if self.__order['dateOrder']  == '': self.er['B2'] = '-------'
-        else: self.er['B2'] =   str(self.__order['dateOrder'].day)+'.'+str(self.__order['dateOrder'].month)+'.'+str(self.__order['dateOrder'].year)
-        self.er['B2'].alignment = Alignment(horizontal='left', vertical='center')
-        cell = self.er['B2']
-        cell.font =  Font(size=12 )
-
+        self.__addDates(infoCell = 'A2', valueCell = 'B2',mergeCell = 'C2', 
+                           infoMsg = 'Data zamówienia:', date = self.__order['dateOrder'] )
 
     def __addCollectDate(self):
-        infoCell = 'A3'
-        valueCell = 'B3'
-        mergeCell = 'C3'
-        fontSize = 12
-        self.er[infoCell] =  'Data odbioru:'
+        self.__addDates(infoCell = 'A3', valueCell = 'B3',mergeCell = 'C3', 
+                           infoMsg = 'Data odbioru:', date = self.__order['dateCollect'] )
+
+
+    def __addDates(self,*,infoCell, valueCell,mergeCell, infoMsg, date,fontSize=12):
+        self.er[infoCell] =  infoMsg
         self.er[infoCell].alignment = Alignment(horizontal='left', vertical='center')
         cell = self.er[infoCell]
         cell.font =  Font(size=fontSize )
 
         self.er.merge_cells(valueCell + ':' + mergeCell)
-        date = self.__order['dateCollect']
         if date == '': self.er[ valueCell] = '-------'
         else: self.er[ valueCell ] = str(date.day)+'.'+str(date.month)+'.'+str(date.year)
         self.er[ valueCell ].alignment = Alignment(horizontal='left', vertical='center')
@@ -94,40 +84,27 @@ class PDFgen():
         cell.font =  Font(size=fontSize )
 
     def __addPayment(self):
-        infoCell = 'D3'
-        valueCell = 'E3'
-        fontSize = 12
-        self.er[infoCell] =  'Płatność:'
-        self.er[infoCell].alignment = Alignment(horizontal='left', vertical='center')
-        cell = self.er[infoCell]
-        cell.font =  Font(size= fontSize )
-
-        self.er[valueCell] =  self.__order['payment']
-        self.er[valueCell].alignment = Alignment(horizontal='left', vertical='center')
-        cell = self.er[valueCell]
-        cell.font =  Font(size= fontSize )
-
-
+        self.__addInvoiceAndPayment(infoCell = 'D3', valueCell = 'E3', 
+                                     infoMsg = 'Płatność: ',valueMsg = self.__order['payment'] )
 
     def __addInvoice(self):
-        infoCell = 'D2'
-        valueCell = 'E2'
-        fontSize = 12
-        self.er[infoCell] =  'Nr faktury:'
+        self.__addInvoiceAndPayment(infoCell = 'D2', valueCell = 'E2', 
+                                     infoMsg = 'Nr faktury: ',valueMsg = self.__order['invoice'] )
+
+
+    def __addInvoiceAndPayment(self,*,infoCell, valueCell, infoMsg, valueMsg, fontSize=12):
+        self.er[infoCell] =  infoMsg
         self.er[infoCell].alignment = Alignment(horizontal='left', vertical='center')
         cell = self.er[infoCell]
         cell.font =  Font(size= fontSize )
 
-        self.er[valueCell] =  self.__order['invoice']
+        self.er[valueCell] =  valueMsg
         self.er[valueCell].alignment = Alignment(horizontal='left', vertical='center')
         cell = self.er[valueCell]
         cell.font =  Font(size= fontSize )
-
-
 
     def _addToExcel(self):
         lastRow = self.__startArrayLine + 1
-        # write all dummies
 
         for model,products in self.__order['products'].items():
                 if not products: continue
