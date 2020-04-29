@@ -305,8 +305,9 @@ class Order():
 
         for key, products in order['products'].items():
             if key in self.genre.dummys : self.addDummyClick(products)
-            elif key == 'woodenStands':  self.addStateWoodClick(products)
-            elif key == 'stands': self.addStateClick(products)
+            elif isinstance(products[0], WoodenStand):  self.addStateWoodClick(products)
+            elif isinstance(products[0], Stand): self.addStateClick(products)
+            elif isinstance(products[0], Accessory): self.addAccessoriesClick(products)
 
 
 

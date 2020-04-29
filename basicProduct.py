@@ -16,8 +16,7 @@ class BasicProduct():
         else: return 'Empty object'
 
     def __eq__(self, obj):
-        if not isinstance(obj, BasicProduct): raise NameError('Error: you cant compare ', type(obj), ' with object using BasicProduct class!')
-        elif not type(obj) == type(self): return False
+        if not type(obj) == type(self): return False
         else:
             if obj.isEmpty() and self.isEmpty(): return True
             elif self.getData() == obj.getData(): return True

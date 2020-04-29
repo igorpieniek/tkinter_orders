@@ -126,19 +126,19 @@ class OrderManager():
             raise NameError('Error: update main dictionary is impossible- there is no data in object!')
         else:
             dummyDict = {line.getModel(): [] for line in self.__products if line.getModel() in self.__genre.dummys}
-            woodenstands = []
-            stands = []
-            accessories = []
+
+            listOfobj = (list( dict.fromkeys( [i.__class__ for i in self.__products] ))) #create list of basic product class from product list (without duplicate)
+            listOfobj.remove(Dummy) #delate dummy - because of different way of saving
+            restProdDict = {obj.__name__ : [] for obj in listOfobj} # create dict, with keys named as classes from listOfObj
 
             for pro in self.__products:
-                if pro.getData()[0] in self.__genre.dummys: dummyDict[pro.getModel()].append(pro)
-                elif isinstance(pro,WoodenStand ): woodenstands.append(pro)
-                elif isinstance(pro,Stand ): stands.append(pro)
-                elif isinstance(pro,Accessory ): accessories.append(pro)
+                if   isinstance(pro, Dummy):  dummyDict[pro.getModel()].append(pro) #special treating of dummy products
+                elif pro.__class__ in listOfobj: restProdDict[pro.__class__.__name__].append(pro)
+
 
             productsInDict = {}
             productsInDict.update(dummyDict)
-            productsInDict.update(  {'woodenStands': woodenstands, 'stands': stands, 'accessories': accessories})
+            productsInDict.update(restProdDict)
              
 
             self.__order = {
