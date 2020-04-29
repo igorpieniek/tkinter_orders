@@ -15,10 +15,9 @@ class OrderManager():
         if not productArray: #in case no argument was added
             print('Empty order manager added!')
         else:
-            from Order import DummyLine
-            from Order import WoodLine
-            from Order import StandsLine
-            if isinstance(productArray[0], DummyLine) or isinstance(productArray[0], StandsLine) or isinstance(productArray[0], WoodLine):
+            from Order import ProductLine
+
+            if isinstance(productArray[0], ProductLine) :
                 # there we have event from order window
                 # TODO: CONVERTING DATA TO BASIC ARRAY
                 orderInfo = {
@@ -55,16 +54,21 @@ class OrderManager():
             self.__dateOrder = orderInfo['dateOrder'] #datatime format
             self.__dateCollect =   orderInfo['dateCollect'] #datatime format
 
+            from Order import DummyLine
+            from Order import WoodLine
+            from Order import StandsLine
+            from Order import AccessoriesLine
             self.__products= []
-            self.__sum = {}
             for frame in array: #sorting data
                 for i in range( len( frame.getData() ) ):
-                    if frame.getModel() in self.__genre.dummys:
+                    if isinstance(frame, DummyLine):
                          self.__products.append(Dummy(model = frame.getModel(), kind = frame.getKind(i), num = frame.getNumber(i)))
-                    elif frame.getModel() == 'Statyw drewniany':
+                    elif isinstance(frame, WoodLine):
                          self.__products.append(WoodenStand(kind =frame.getKind(i), num =frame.getNumber(i) ))
-                    elif frame.getModel() == 'Statyw metalowy':
+                    elif isinstance(frame, StandsLine):
                          self.__products.append(Stand(kind = frame.getKind(i), num =frame.getNumber(i) ))
+                    elif isinstance(frame, AccessoriesLine):
+                         self.__products.append(Accessory(kind = frame.getKind(i), num =frame.getNumber(i) ))
 
         self.__buildMainDict()
 
@@ -91,6 +95,8 @@ class OrderManager():
                       self.__products.append(WoodenStand(kind =line[1], num =line[2]))
                 elif line[0] == 'Statyw metalowy':
                       self.__products.append(Stand(kind =line[1], num =line[2]))
+                elif line[0] == 'Akcesoria':
+                      self.__products.append(Accessory(kind =line[1], num =line[2]))
 
             self.__buildMainDict()  
     
@@ -127,15 +133,17 @@ class OrderManager():
             dummyDict = {line.getModel(): [] for line in self.__products if line.getModel() in self.__genre.dummys}
             woodenstands = []
             stands = []
+            accessories = []
 
             for pro in self.__products:
                 if pro.getData()[0] in self.__genre.dummys: dummyDict[pro.getModel()].append(pro)
                 elif isinstance(pro,WoodenStand ): woodenstands.append(pro)
                 elif isinstance(pro,Stand ): stands.append(pro)
+                elif isinstance(pro,Accessory ): accessories.append(pro)
 
             productsInDict = {}
             productsInDict.update(dummyDict)
-            productsInDict.update(  {'woodenStands': woodenstands, 'stands': stands})
+            productsInDict.update(  {'woodenStands': woodenstands, 'stands': stands, 'accessories': accessories})
              
 
             self.__order = {

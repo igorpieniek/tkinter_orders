@@ -506,7 +506,7 @@ class AccessoriesLine(ProductLine):
                          frameNum = frameNum,
                          models = 'Akcesoria' , 
                          kinds = self.__genre.accessories,
-                         prodObj = Accessories,
+                         prodObj = Accessory,
                          rebuildList = accesoriesList)
 
             
