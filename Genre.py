@@ -3,6 +3,7 @@ class Genre():
     stands = ['90', '45','Ślimak']
     woodStands = ['biały', 'czarny', 'naturalny']
     color = ['styropian', 'czarny', 'bialy', 'ecru', 'czerwony']
+    accessories = ['zaślepka', 'trzpień', 'grzybek', 'korek']
     gen = ['manekin', 'stojak']
 
     def __init__(self):
