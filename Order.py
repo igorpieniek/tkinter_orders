@@ -201,8 +201,8 @@ class Order():
         self.__addButtons[3].grid(row = 0, column = 3,padx=20, pady=3, sticky=W + N)
 
         # Buttons to main functions of order : saving and to return to previous window 
-        self.__backButton = Button(self.controlFrame, text= "Cofnij",padx=10, pady=3,width=10, state = ACTIVE, command = lambda:self.backClick())
-        self.__backButton.grid(row =0, column = 0, sticky=N)
+        self.__returnButton = Button(self.controlFrame, text= "Cofnij",padx=10, pady=3,width=10, state = ACTIVE, command = lambda:self.backClick())
+        self.__returnButton.grid(row =0, column = 0, sticky=N)
 
         self.__saveButton = Button(self.controlFrame, text= "Zapisz",padx=10, pady=3,width=10, command = lambda:self.saveClick())
         self.__saveButton.grid(row =1, column = 0, sticky=N)
@@ -296,7 +296,7 @@ class Order():
         self.addFrames()
         self.__addScrollbar()
         self.addMainButtons()
-        self.__saveButton.configure(state= DISABLED) # 'cofnij' button
+        self.__returnButton.configure(state= DISABLED) # 'cofnij' button
 
         self.__reOrder = OrderManager(productArray = rawArray)
         order = self.__reOrder.getOrderDict()
