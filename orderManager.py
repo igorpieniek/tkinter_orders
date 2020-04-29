@@ -61,14 +61,9 @@ class OrderManager():
             self.__products= []
             for frame in array: #sorting data
                 for i in range( len( frame.getData() ) ):
-                    if isinstance(frame, DummyLine):
-                         self.__products.append(Dummy(model = frame.getModel(), kind = frame.getKind(i), num = frame.getNumber(i)))
-                    elif isinstance(frame, WoodLine):
-                         self.__products.append(WoodenStand(kind =frame.getKind(i), num =frame.getNumber(i) ))
-                    elif isinstance(frame, StandsLine):
-                         self.__products.append(Stand(kind = frame.getKind(i), num =frame.getNumber(i) ))
-                    elif isinstance(frame, AccessoriesLine):
-                         self.__products.append(Accessory(kind = frame.getKind(i), num =frame.getNumber(i) ))
+                    objType = frame.getBasicProductType()
+                    if objType == Dummy : self.__products.append(objType(model = frame.getModel(), kind = frame.getKind(i), num = frame.getNumber(i)))
+                    else : self.__products.append(objType(kind =frame.getKind(i), num =frame.getNumber(i) ))
 
         self.__buildMainDict()
 

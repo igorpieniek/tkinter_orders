@@ -405,6 +405,9 @@ class ProductLine():
             sum +=int(self._number[i].get())
         return sum
 
+    def getBasicProductType(self):
+        return self._prodObj
+
     def getData(self):
         allData = []
 
