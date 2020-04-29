@@ -485,4 +485,15 @@ class StandsLine(ProductLine):
                          prodObj = Stand,
                          rebuildList = standsLineList)
 
+#############################################################################################
+class AccessoriesLine(ProductLine):
+    def __init__(self,root ,frameNum, accesoriesList=None):
+        self.__genre = Genre()
+        super().__init__(root = root, 
+                         frameNum = frameNum,
+                         models = 'Akcesoria' , 
+                         kinds = self.__genre.accessories,
+                         prodObj = Accessories,
+                         rebuildList = accesoriesList)
+
             
