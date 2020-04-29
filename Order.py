@@ -101,6 +101,11 @@ class Order():
         self.addInputFrame()
         self.allProducts.append(WoodLine(self.inputFrame[-1], len(self.inputFrame) - 1, prodList)) 
 
+    def addAccessoriesClick(self, prodList=None):
+        self._inputUpdate()
+        self.addInputFrame()
+        self.allProducts.append(AccessoriesLine(self.inputFrame[-1], len(self.inputFrame) - 1, prodList)) 
+
     # Main objects update function.  It contains 2 smaller functions.  One is
     # updating products object and second
     # to update frames which was connected to product object
@@ -191,23 +196,26 @@ class Order():
         self.buttons.append(Button(self.addElementsFrame, text= "Dodaj statyw\ndrewniany",padx=5, pady=7, command = lambda:self.addStateWoodClick()))
         self.buttons[2].grid(row = 0, column = 2,padx=20, pady=3, sticky=W + N)
 
+        self.buttons.append(Button(self.addElementsFrame, text= "Dodaj\nakcesoria",padx=5, pady=7, command = lambda:self.addAccessoriesClick()))
+        self.buttons[3].grid(row = 0, column = 3,padx=20, pady=3, sticky=W + N)
+
         self.buttons.append(Button(self.controlFrame, text= "Cofnij",padx=10, pady=3,width=10, state = ACTIVE, command = lambda:self.backClick()))
-        self.buttons[3].grid(row =0, column = 0, sticky=N)
+        self.buttons[4].grid(row =0, column = 0, sticky=N)
 
         self.buttons.append(Button(self.controlFrame, text= "Zapisz",padx=10, pady=3,width=10, command = lambda:self.saveClick()))
-        self.buttons[4].grid(row =1, column = 0, sticky=N)
+        self.buttons[5].grid(row =1, column = 0, sticky=N)
 
         self.buttons.append(Button(self.controlFrame, text= "Generuj PDF\n zamówienie",padx=10, pady=3, width=10, command = lambda:self.generatePDFClick()))
-        self.buttons[5].grid(row =2, column = 0, sticky=N)
+        self.buttons[6].grid(row =2, column = 0, sticky=N)
 
         self.buttons.append(Button(self.controlFrame, text= "Generuj PDF\n koszulki",padx=10, pady=3,width=10, command = lambda:self.generatePDFClick()))
-        self.buttons[6].grid(row =3, column = 0, sticky=N)
+        self.buttons[7].grid(row =3, column = 0, sticky=N)
 
         self.buttons.append(Button(self.nameFrame, text='Data zamówienia', command=lambda:self._orderDateFun(0)))
-        self.buttons[7].grid(row = 0, column = 3, padx=5, pady=3)
+        self.buttons[8].grid(row = 0, column = 3, padx=5, pady=3)
 
         self.buttons.append(Button(self.nameFrame, text='Data odbioru', command=lambda: self._orderDateFun(1)))
-        self.buttons[8].grid(row = 0, column = 4, padx=5, pady=3)
+        self.buttons[9].grid(row = 0, column = 4, padx=5, pady=3)
     
     # Add oppurtunity to add company name, invoice number, payment and initialize choosing date
     def addEntrySection(self,*,companyName = None, invoiceNum = None, payValue = None, dateOrder=None, dateCollect=None ):
@@ -283,7 +291,7 @@ class Order():
         self.addFrames()
         self.__addScrollbar()
         self.addMainButtons()
-        self.buttons[3].configure(state= DISABLED) # 'cofnij' button
+        self.buttons[4].configure(state= DISABLED) # 'cofnij' button
 
         self.__reOrder = OrderManager(productArray = rawArray)
         order = self.__reOrder.getOrderDict()
