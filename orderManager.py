@@ -52,7 +52,11 @@ class OrderManager():
             self.__invoiceNum =  orderInfo['invoice']
             self.__payment = orderInfo['payment']
             self.__dateOrder = orderInfo['dateOrder'] #datatime format
-            self.__dateCollect =   orderInfo['dateCollect'] #datatime format
+
+            if orderInfo['dateCollect'] or not orderInfo['dateCollect'] == None :
+                self.__dateCollect =   orderInfo['dateCollect'] #datatime format
+            else: self.__dateCollect = datetime.date.fromordinal(1) #(0001-01-01)
+           
 
             from Order import DummyLine
             from Order import WoodLine

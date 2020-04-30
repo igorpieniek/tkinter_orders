@@ -24,7 +24,7 @@ class Order():
         self._lineNumToDel = []
         self._payment = 0
         self._orderDate = datetime.date.today()
-        self._collectDate = datetime.date.today()
+        self._collectDate = None
 
         self.__reOrder = OrderManager() #init empty objects of order manager - which keeps and convert data
         self.__order = OrderManager()
@@ -252,7 +252,7 @@ class Order():
         self.DateOrderLabel = Label(self.nameFrame, text = dateOrder,padx=10, pady=3)
         self.DateOrderLabel.grid(row=1, column=3)
 
-        if dateCollect:
+        if not dateCollect == None and not dateCollect == datetime.date.fromordinal(1) :
             self._collectDate = dateCollect
             dateCollect = str(dateCollect.day) + '-' + str(dateCollect.month) + '-' + str(dateCollect.year)
         else : dateCollect = ''
