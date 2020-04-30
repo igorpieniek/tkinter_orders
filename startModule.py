@@ -8,22 +8,28 @@ class StartModule():
         if openMenu:
             self.process()
 
-    def _newOrder(self):
+    def __newOrder(self):
         self.__windowManager.changeWindow('order')
 
-    def _history(self):
+    def __history(self):
         self.__windowManager.changeWindow('history')
+    
+    def __settings(self):
+        pass
+
+    def __end(self):
+        self._root.destroy()
 
     def addButtons(self):
         self.buttons = []
-        self.buttons.append(Button(self._root, text= "Nowe zamówienie",padx=10, pady=7, command = lambda:self._newOrder()))
-        self.buttons.append(Button(self._root, text= "Historia zamówień",  padx=10, pady=7, command = lambda: self._history()))
-        self.buttons.append(Button(self._root, text= "Zamknij", padx=10, pady=7, command = lambda: self._end()))
+        self.buttons.append(Button(self._root, text= "Nowe zamówienie",padx=10, pady=7, command = lambda:self.__newOrder()))
+        self.buttons.append(Button(self._root, text= "Historia zamówień",  padx=10, pady=7, command = lambda: self.__history()))
+        self.buttons.append(Button(self._root, text= "Ustawienia", padx=10, pady=7, command = lambda: self.__settings()))
+        self.buttons.append(Button(self._root, text= "Zamknij", padx=10, pady=7, command = lambda: self.__end()))
 
         for i in range(len(self.buttons)):
             self.buttons[i].pack()
-    def _end(self):
-        self._root.destroy()
+
 
 
     def process(self):
