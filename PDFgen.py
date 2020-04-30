@@ -145,12 +145,14 @@ class PDFgen():
     def _generatePDF(self):
         import win32com.client
 
+        pdfName = str(self.__order['dateOrder'].day) + '-' + str(self.__order['dateOrder'].month) + '-' + str(self.__order['dateOrder'].year)+ self.__order['companyName']
+
         o = win32com.client.Dispatch("excel.application")
         o.Visible = False
         wb_path = r'c:\users\igor\source\repos\tkinterproject1\tkinterproject1\tkinter_test.xlsx'
         wb = o.Workbooks.Open(wb_path)
         ws_index_list = [1] 
-        path_to_pdf = r'c:\users\igor\desktop\test.pdf'
+        path_to_pdf = r'c:\users\igor\desktop\{:s}.pdf'.format(pdfName)
         wb.WorkSheets(ws_index_list).Select()
         wb.ActiveSheet.ExportAsFixedFormat(0, path_to_pdf)
         wb.Close(True, wb_path)
