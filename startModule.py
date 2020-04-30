@@ -15,7 +15,7 @@ class StartModule():
         self.__windowManager.changeWindow('history')
     
     def __settings(self):
-        pass
+       self.__windowManager.changeWindow('settings')
 
     def __end(self):
         self._root.destroy()

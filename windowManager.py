@@ -1,6 +1,7 @@
 from History import History
 from Database import Database
 from startModule import StartModule
+from SettingsWindow import SettingsWindow
 from Order import Order
 from tkinter import *
 
@@ -16,6 +17,7 @@ class windowManager():
         if name == 'start': return StartModule(root = root, windowManager = self)
         elif name == 'order':  return Order(root = root, windowManager = self,  database =  self.__database, rawArray = reArray )
         elif name == 'history':  return  History(root = root,  database =  self.__database ,windowManager = self )
+        elif name == 'settings':  return  SettingsWindow(root = root, windowManager = self)
         else: print('No such window name')
 
     def backToLastWindow(self):
