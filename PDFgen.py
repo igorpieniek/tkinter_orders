@@ -55,7 +55,7 @@ class PDFgen():
 
         self.__addCompanyName() # add company name to
         self.__addOrderDate()
-        if not self.__mode == 'NORMAL':
+        if  self.__mode == 'NORMAL':
             self.__addCollectDate()
             self.__addPayment()
             self.__addInvoice()

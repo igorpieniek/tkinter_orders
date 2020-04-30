@@ -15,10 +15,9 @@ class OrderManager():
         if not productArray: #in case no argument was added
             print('Empty order manager added!')
         else:
-            from Order import DummyLine
-            from Order import WoodLine
-            from Order import StandsLine
-            if isinstance(productArray[0], DummyLine) or isinstance(productArray[0], StandsLine) or isinstance(productArray[0], WoodLine):
+            from Order import ProductLine
+
+            if isinstance(productArray[0], ProductLine) :
                 # there we have event from order window
                 # TODO: CONVERTING DATA TO BASIC ARRAY
                 orderInfo = {
@@ -53,18 +52,22 @@ class OrderManager():
             self.__invoiceNum =  orderInfo['invoice']
             self.__payment = orderInfo['payment']
             self.__dateOrder = orderInfo['dateOrder'] #datatime format
-            self.__dateCollect =   orderInfo['dateCollect'] #datatime format
 
+            if orderInfo['dateCollect'] or not orderInfo['dateCollect'] == None :
+                self.__dateCollect =   orderInfo['dateCollect'] #datatime format
+            else: self.__dateCollect = datetime.date.fromordinal(1) #(0001-01-01)
+           
+
+            from Order import DummyLine
+            from Order import WoodLine
+            from Order import StandsLine
+            from Order import AccessoriesLine
             self.__products= []
-            self.__sum = {}
             for frame in array: #sorting data
                 for i in range( len( frame.getData() ) ):
-                    if frame.getModel() in self.__genre.dummys:
-                         self.__products.append(Dummy(model = frame.getModel(), kind = frame.getKind(i), num = frame.getNumber(i)))
-                    elif frame.getModel() == 'Statyw drewniany':
-                         self.__products.append(WoodenStand(kind =frame.getKind(i), num =frame.getNumber(i) ))
-                    elif frame.getModel() == 'Statyw metalowy':
-                         self.__products.append(Stand(kind = frame.getKind(i), num =frame.getNumber(i) ))
+                    objType = frame.getBasicProductType()
+                    if objType == Dummy : self.__products.append(objType(model = frame.getModel(), kind = frame.getKind(i), num = frame.getNumber(i)))
+                    else : self.__products.append(objType(kind =frame.getKind(i), num =frame.getNumber(i) ))
 
         self.__buildMainDict()
 
@@ -91,6 +94,8 @@ class OrderManager():
                       self.__products.append(WoodenStand(kind =line[1], num =line[2]))
                 elif line[0] == 'Statyw metalowy':
                       self.__products.append(Stand(kind =line[1], num =line[2]))
+                elif line[0] == 'Akcesoria':
+                      self.__products.append(Accessory(kind =line[1], num =line[2]))
 
             self.__buildMainDict()  
     
@@ -125,17 +130,19 @@ class OrderManager():
             raise NameError('Error: update main dictionary is impossible- there is no data in object!')
         else:
             dummyDict = {line.getModel(): [] for line in self.__products if line.getModel() in self.__genre.dummys}
-            woodenstands = []
-            stands = []
+
+            listOfobj = (list( dict.fromkeys( [i.__class__ for i in self.__products] ))) #create list of basic product class from product list (without duplicate)
+            if Dummy in listOfobj: listOfobj.remove(Dummy) #delate dummy - because of different way of saving
+            restProdDict = {obj.__name__ : [] for obj in listOfobj} # create dict, with keys named as classes from listOfObj
 
             for pro in self.__products:
-                if pro.getData()[0] in self.__genre.dummys: dummyDict[pro.getModel()].append(pro)
-                elif isinstance(pro,WoodenStand ): woodenstands.append(pro)
-                elif isinstance(pro,Stand ): stands.append(pro)
+                if   isinstance(pro, Dummy):  dummyDict[pro.getModel()].append(pro) #special treating of dummy products
+                elif pro.__class__ in listOfobj: restProdDict[pro.__class__.__name__].append(pro)
+
 
             productsInDict = {}
             productsInDict.update(dummyDict)
-            productsInDict.update(  {'woodenStands': woodenstands, 'stands': stands})
+            productsInDict.update(restProdDict)
              
 
             self.__order = {
@@ -149,38 +156,3 @@ class OrderManager():
             self.__sumCalculate()
             self.__order.update({'sum': self.__sum})
       
-   ## TO DELETE :::::::::::::::::::         
-    #     dummyDict = {line[0]: [] for line in productsRaw if line[0] in self.genre.dummys} #get all names of dummys in order
-    #        woodenstands = []
-    #        stands = []
-    #        for line in productsRaw: #sorting data
-    #            if line[0] in self.genre.dummys:
-    #                dummyDict[line[0]].append(Dummy(model = line[0], kind = line[1], num = line[2]))
-    #            elif line[0] == 'Statyw drewniany':
-    #                woodenstands.append(WoodenStand(kind =line[1], num =line[2]))
-    #            elif line[0] == 'Statyw metalowy':
-    #                stands.append(Stand(kind =line[1], num =line[2]))
-
-    #        self.__products = {'dummys': dummyDict, 'woodenStands': woodenstands, 'stands': stands}
-    #        self.__buildMainDict()
- 
-              
-    #def getDataToDatabase(self):
-    #    if self.__isEmpty: raise NameError('Error: obj is empty!')
-    #    else:
-    #        outArray = []
-    #        basic = [self.order['dateOrder'].day, self.order['dateOrder'].month, self.order['dateOrder'].year,
-    #                 self.order['dateCollect'].day,  self.order['dateCollect'].month, self.order['dateCollect'].year,
-    #                 self.order['invoice'], self.order['companyName'], self.order['payment'] ]
-
-    #        for header,prod in self.order['products'].items()  : #level of list of products (dummys, stands etc.)
-    #            if isinstance(prod, dict): # prod in format {'model': list of Dummy()}
-    #                for dummyModel, basicprod in prod.items(): # basicprod in format: list of Dummy() obj
-    #                   for line in basicprod: outArray.append( basic + line.getData() ) # level of every Dummy() obj
-    #            else:
-    #                for line in  prod:  outArray.append( basic + line.getData()) #level of searching in every products         
-
-
-
-
-

@@ -16,8 +16,7 @@ class BasicProduct():
         else: return 'Empty object'
 
     def __eq__(self, obj):
-        if not isinstance(obj, BasicProduct): raise NameError('Error: you cant compare ', type(obj), ' with object using BasicProduct class!')
-        elif not type(obj) == type(self): return False
+        if not type(obj) == type(self): return False
         else:
             if obj.isEmpty() and self.isEmpty(): return True
             elif self.getData() == obj.getData(): return True
@@ -78,4 +77,11 @@ class WoodenStand(BasicProduct):
         self.__genre = Genre()
         self.__model = 'Statyw drewniany'
         if kind and not kind in self.__genre.woodStands: raise NameError(' No such kind of wooden stand on genre list!')
+        super().__init__( model=self.__model, kind=kind, num=num)
+
+class Accessory(BasicProduct):
+    def __init__(self, *, kind = None, num = None):
+        self.__genre = Genre()
+        self.__model = 'Akcesoria'
+        if kind and not kind in self.__genre.accessories: NameError(' No such kind of accesories on genre list!')
         super().__init__( model=self.__model, kind=kind, num=num)
