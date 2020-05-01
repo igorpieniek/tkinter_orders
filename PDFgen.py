@@ -154,7 +154,8 @@ class PDFgen():
         wb_path = r'c:\users\igor\source\repos\tkinterproject1\tkinterproject1\tkinter_test.xlsx'
         wb = o.Workbooks.Open(wb_path)
         ws_index_list = [1] 
-        path_to_pdf = r'c:\users\igor\desktop\{:s}.pdf'.format(pdfName)
+        #path_to_pdf = r'c:\users\igor\desktop\{:s}.pdf'.format(pdfName)
+        path_to_pdf = r''.join(self.__folderPath,pdfName,'.pdf')
         wb.WorkSheets(ws_index_list).Select()
         wb.ActiveSheet.ExportAsFixedFormat(0, path_to_pdf)
         wb.Close(True, wb_path)

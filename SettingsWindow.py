@@ -20,6 +20,10 @@ class SettingsWindow():
 
     def browseToPath(self):
          filename = filedialog.askdirectory()
+         filename = r''.join(filename) # join 'r' to name
+         filename = filename.lower()   # lower all letters
+         filename = filename.replace('/', '\\') # change / to \
+         filename = filename + '\\'  # add to end \ - folder sign
          print(filename)
          path = StringVar()
          path.set(filename)
