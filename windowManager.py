@@ -21,11 +21,9 @@ class windowManager():
         else: print('No such window name')
 
     def backToLastWindow(self):
-        if isinstance(self.__currentWindow, Order) or isinstance(self.__currentWindow, History):
-            self.__clearWindow()
-            del self.__currentWindow
-            self.__currentWindow = self.__windowInit('start')
-        else: print('There is no option to get back!')
+        self.__clearWindow()
+        del self.__currentWindow
+        self.__currentWindow = self.__windowInit('start')
 
     def changeWindow(self, name):
         if  isinstance(self.__currentWindow, StartModule): 

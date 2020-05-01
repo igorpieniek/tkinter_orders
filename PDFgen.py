@@ -1,5 +1,6 @@
 from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, Border, Side, Alignment, Font
+from tkinter import messagebox
 
 class PDFgen():
     def __init__(self):
@@ -16,13 +17,14 @@ class PDFgen():
          self._companyFont = Font(size = 18, bold =True)
 
     def process(self, order, mode = 'NORMAL'):
-        self.__setMode(mode)
-        self._clearExcelSheet()
-        self.__copyProducts(order)   
-        self._addDefaultCells()
-        #self._delEmptyLines()
-        self._addToExcel()
-        self._generatePDF()
+        if self.__readPath():
+            self.__setMode(mode)
+            self._clearExcelSheet()
+            self.__copyProducts(order)   
+            self._addDefaultCells()
+            #self._delEmptyLines()
+            self._addToExcel()
+            self._generatePDF()
 
     def __setMode(self, mode):
         self.__mode = mode
@@ -156,3 +158,14 @@ class PDFgen():
         wb.WorkSheets(ws_index_list).Select()
         wb.ActiveSheet.ExportAsFixedFormat(0, path_to_pdf)
         wb.Close(True, wb_path)
+
+    def __readPath(self):
+        try: 
+            file = open('config.txt')
+            self.__folderPath = file.read()
+            file.close()
+        except: 
+            print('So such file!')
+            messagebox.showerror('Błąd!', 'Nie można wygenerować pliku PDF!\n Najpierw wybierz folder korzystając z ustawień')
+            return False
+        else: return True
