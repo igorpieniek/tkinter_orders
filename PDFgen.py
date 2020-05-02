@@ -146,6 +146,9 @@ class PDFgen():
 
     def _generatePDF(self):
         import win32com.client
+        from pathlib import Path
+        monthNames = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 
+                             'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'] # temp month names to create folders
 
         pdfName = str(self.__order['dateOrder'].day) + '-' + str(self.__order['dateOrder'].month) + '-' + str(self.__order['dateOrder'].year)+ self.__order['companyName']
 
@@ -154,8 +157,11 @@ class PDFgen():
         wb_path = r'c:\users\igor\source\repos\tkinterproject1\tkinterproject1\tkinter_test.xlsx'
         wb = o.Workbooks.Open(wb_path)
         ws_index_list = [1] 
-        #path_to_pdf = r'c:\users\igor\desktop\{:s}.pdf'.format(pdfName)
-        path_to_pdf = self.__folderPath + pdfName +'pdf'
+        tempFolderPath =  self.__folderPath + str(self.__order['dateOrder'].year)
+        Path( tempFolderPath ).mkdir(parents=True, exist_ok=True)
+        tempFolderPath += '\\' +   str(monthNames[self.__order['dateOrder'].month - 1])
+        Path( tempFolderPath ).mkdir(parents=True, exist_ok=True)
+        path_to_pdf = tempFolderPath + '\\'+ pdfName +'.pdf'
         path_to_pdf = r''.join(path_to_pdf)
         wb.WorkSheets(ws_index_list).Select()
         wb.ActiveSheet.ExportAsFixedFormat(0, path_to_pdf)
