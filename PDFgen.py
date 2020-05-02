@@ -1,6 +1,7 @@
 from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, Border, Side, Alignment, Font
 from tkinter import messagebox
+import datetime
 
 class PDFgen():
     def __init__(self):
@@ -86,7 +87,7 @@ class PDFgen():
         cell.font =  Font(size=fontSize )
 
         self.er.merge_cells(valueCell + ':' + mergeCell)
-        if date == '': self.er[ valueCell] = '-------'
+        if date == datetime.date.fromordinal(1) : self.er[ valueCell] = '-------'
         else: self.er[ valueCell ] = str(date.day)+'.'+str(date.month)+'.'+str(date.year)
         self.er[ valueCell ].alignment = Alignment(horizontal='left', vertical='center')
         cell = self.er[  valueCell ]
@@ -107,7 +108,8 @@ class PDFgen():
         cell = self.er[infoCell]
         cell.font =  Font(size= fontSize )
 
-        self.er[valueCell] =  valueMsg
+        if  valueMsg == '' or valueMsg==0: self.er[valueCell] = '-------'
+        else: self.er[valueCell] =  valueMsg
         self.er[valueCell].alignment = Alignment(horizontal='left', vertical='center')
         cell = self.er[valueCell]
         cell.font =  Font(size= fontSize )
