@@ -165,7 +165,7 @@ class Order():
             messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
             return False
                 
-        self._database.insertOrder(self.__order.getDataToDatabase())
+        self._database.insertOrder(self.__order.getOrderDict())
         self.generatePDFClick()
         self.__reOrder = self.__order
         messagebox.showinfo('Info','Zamówienie zostało poprawnie zapisane')

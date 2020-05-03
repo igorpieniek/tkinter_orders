@@ -31,24 +31,25 @@ class Database(object):
 
     def insertOrder(self,order):
         ind = self.__getNextIndex()
-        for oneLine in order:
-            with self._conn:
-                self._c.execute("""INSERT INTO orders VALUES (:id, :day_order, :month_order, :year_order, :day_collect,
-                                :month_collect, :year_collect, :fv_num, :company, :payment,:object, :color, :quantity)""", 
-                                {'id': ind,
-                                 'day_order': oneLine[0], 
-                                 'month_order': oneLine[1], 
-                                 'year_order': oneLine[2],
-                                 'day_collect': oneLine[3], 
-                                 'month_collect': oneLine[4], 
-                                 'year_collect': oneLine[5],
-                                 'fv_num': oneLine[6],
-                                 'company': oneLine[7], 
-                                 'payment': oneLine[8],
-                                 'object' : oneLine[9],
-                                 'color' : oneLine[10],
-                                 'quantity' : oneLine[11]
-                                })
+        for prod in order['products'].values():
+            for element in prod:
+                with self._conn:
+                    self._c.execute("""INSERT INTO orders VALUES (:id, :day_order, :month_order, :year_order, :day_collect,
+                                    :month_collect, :year_collect, :fv_num, :company, :payment,:object, :color, :quantity)""", 
+                                    {'id': ind,
+                                     'day_order': order['dateOrder'].day, 
+                                     'month_order': order['dateOrder'].month, 
+                                     'year_order': order['dateOrder'].year,
+                                     'day_collect': order['dateCollect'].day, 
+                                     'month_collect': order['dateCollect'].month, 
+                                     'year_collect': order['dateCollect'].year,
+                                     'fv_num': order['invoice'],
+                                     'company': order['companyName'], 
+                                     'payment': order['payment'],
+                                     'object' : element.getModel(),
+                                     'color' : element.getKind(),
+                                     'quantity' : element.getNumber()
+                                    })
 
 
     def getOrderby_companyName(self,name):
@@ -68,14 +69,7 @@ class Database(object):
                      last = line[1:10]  
                      
         return  sorted(output, key=lambda a_entry: a_entry[0]) # sort all output orders by day order
-                                                               # SO says its slower than NumPy - maybe to change future
-
-    def update_Payment(self, order, pay):
-        with self._conn:
-            self._c.execute("""UPDATE order SET pay = :pay
-                        WHERE first = :first AND last = :last""",
-                      {'first': emp.first, 'last': emp.last, 'pay': pay})
-
+                                                               # SO says its slower than NumPy - maybe to change in the future
 
     def remove_order(self, order):
         self._c.execute("""DELETE from orders WHERE day_order = :day_order 
@@ -126,3 +120,14 @@ class Database(object):
             return []
         else: return list(set(rawList))
 
+
+    def updateOrder(self, newOrd, prevOrd): #orderManager objects
+        from orderManager import OrderManager
+        if isinstance(newOrd, dict) and isinstance(prevOrd, dict) :
+            self.remove_order(prevOrd)
+            self.insertOrder(newOrd)
+        elif isinstance(newOrd, OrderManager) and isinstance(prevOrd, OrderManager):
+            self.remove_order(prevOrd.getOrderDict())
+            self.insertOrder(newOrd.getOrderDict())
+        else : return False
+        return True
