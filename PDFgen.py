@@ -16,6 +16,8 @@ class PDFgen():
 
          self._restFont = Font(size=14 )
          self._companyFont = Font(size = 18, bold =True)
+        
+         self.__mainExcelName = 'mainExcelFile.xlsx'
 
     def process(self, order, mode = 'NORMAL'):
         if self.__readPath():
@@ -143,18 +145,20 @@ class PDFgen():
             for cell in row:
                 cell.font = self._restFont    
         
-        self.ex.save('tkinter_test.xlsx')
+        self.ex.save(self.__mainExcelName )
 
 
     def _generatePDF(self):
         import win32com.client
         from pathlib import Path
+        import os
+        projectPath = os.path.abspath(os.curdir).lower() # getting project path
 
         pdfName = str(self.__order['dateOrder'].day) + '-' + str(self.__order['dateOrder'].month) + '-' + str(self.__order['dateOrder'].year)+ self.__order['companyName']
 
         o = win32com.client.Dispatch("excel.application")
         o.Visible = False
-        wb_path = r'c:\users\igor\source\repos\tkinterproject1\tkinterproject1\tkinter_test.xlsx'
+        wb_path = projectPath +'\\'+self.__mainExcelName
         wb = o.Workbooks.Open(wb_path)
         ws_index_list = [1] 
         tempFolderPath =  self.__folderPath + str(self.__order['dateOrder'].year)+ '-'+ str(self.__order['dateOrder'].month) 
