@@ -76,10 +76,10 @@ class Database(object):
                         AND month_order = :month_order
                         AND year_order = :year_order
                         AND company = :company""",
-                      {'day_order': order['day_order'],
-                      'month_order': order['month_order'],
-                      'year_order': order['year_order'],
-                       'company': order['company'] }) 
+                      {'day_order': order['dateOrder'].day,
+                      'month_order': order['dateOrder'].month,
+                      'year_order': order['dateOrder'].year,
+                       'company': order['companyName'] }) 
         self._conn.commit()
 
     def getOrderList_month_year(self, month, year):
