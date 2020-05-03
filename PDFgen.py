@@ -1,5 +1,7 @@
 from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, Border, Side, Alignment, Font
+from tkinter import messagebox
+import datetime
 
 class PDFgen():
     def __init__(self):
@@ -16,13 +18,14 @@ class PDFgen():
          self._companyFont = Font(size = 18, bold =True)
 
     def process(self, order, mode = 'NORMAL'):
-        self.__setMode(mode)
-        self._clearExcelSheet()
-        self.__copyProducts(order)   
-        self._addDefaultCells()
-        #self._delEmptyLines()
-        self._addToExcel()
-        self._generatePDF()
+        if self.__readPath():
+            self.__setMode(mode)
+            self._clearExcelSheet()
+            self.__copyProducts(order)   
+            self._addDefaultCells()
+            #self._delEmptyLines()
+            self._addToExcel()
+            self._generatePDF()
 
     def __setMode(self, mode):
         self.__mode = mode
@@ -84,7 +87,7 @@ class PDFgen():
         cell.font =  Font(size=fontSize )
 
         self.er.merge_cells(valueCell + ':' + mergeCell)
-        if date == '': self.er[ valueCell] = '-------'
+        if date == datetime.date.fromordinal(1) : self.er[ valueCell] = '-------'
         else: self.er[ valueCell ] = str(date.day)+'.'+str(date.month)+'.'+str(date.year)
         self.er[ valueCell ].alignment = Alignment(horizontal='left', vertical='center')
         cell = self.er[  valueCell ]
@@ -105,7 +108,8 @@ class PDFgen():
         cell = self.er[infoCell]
         cell.font =  Font(size= fontSize )
 
-        self.er[valueCell] =  valueMsg
+        if  valueMsg == '' or valueMsg==0: self.er[valueCell] = '-------'
+        else: self.er[valueCell] =  valueMsg
         self.er[valueCell].alignment = Alignment(horizontal='left', vertical='center')
         cell = self.er[valueCell]
         cell.font =  Font(size= fontSize )
@@ -144,13 +148,30 @@ class PDFgen():
 
     def _generatePDF(self):
         import win32com.client
+        from pathlib import Path
+
+        pdfName = str(self.__order['dateOrder'].day) + '-' + str(self.__order['dateOrder'].month) + '-' + str(self.__order['dateOrder'].year)+ self.__order['companyName']
 
         o = win32com.client.Dispatch("excel.application")
         o.Visible = False
         wb_path = r'c:\users\igor\source\repos\tkinterproject1\tkinterproject1\tkinter_test.xlsx'
         wb = o.Workbooks.Open(wb_path)
         ws_index_list = [1] 
-        path_to_pdf = r'c:\users\igor\desktop\test.pdf'
+        tempFolderPath =  self.__folderPath + str(self.__order['dateOrder'].year)+ '-'+ str(self.__order['dateOrder'].month) 
+        Path( tempFolderPath ).mkdir(parents=True, exist_ok=True)
+        path_to_pdf = tempFolderPath + '\\'+ pdfName +'.pdf'
+        path_to_pdf = r''.join(path_to_pdf)
         wb.WorkSheets(ws_index_list).Select()
         wb.ActiveSheet.ExportAsFixedFormat(0, path_to_pdf)
         wb.Close(True, wb_path)
+
+    def __readPath(self):
+        try: 
+            file = open('config.txt')
+            self.__folderPath = file.read()
+            file.close()
+        except: 
+            print('So such file!')
+            messagebox.showerror('Błąd!', 'Nie można wygenerować pliku PDF!\n Najpierw wybierz folder korzystając z ustawień')
+            return False
+        else: return True

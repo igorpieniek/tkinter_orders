@@ -12,10 +12,10 @@ class Database(object):
             self._c.execute("""CREATE TABLE IF NOT EXISTS orders (
                         id int,
                         day_order int,
-                        mouth_order int,
+                        month_order int,
                         year_order int,
                         day_collect int,
-                        mouth_collect int,
+                        month_collect int,
                         year_collect int,
                         fv_num text,
                         company text,
@@ -31,24 +31,25 @@ class Database(object):
 
     def insertOrder(self,order):
         ind = self.__getNextIndex()
-        for oneLine in order:
-            with self._conn:
-                self._c.execute("""INSERT INTO orders VALUES (:id, :day_order, :mouth_order, :year_order, :day_collect,
-                                :mouth_collect, :year_collect, :fv_num, :company, :payment,:object, :color, :quantity)""", 
-                                {'id': ind,
-                                 'day_order': oneLine[0], 
-                                 'mouth_order': oneLine[1], 
-                                 'year_order': oneLine[2],
-                                 'day_collect': oneLine[3], 
-                                 'mouth_collect': oneLine[4], 
-                                 'year_collect': oneLine[5],
-                                 'fv_num': oneLine[6],
-                                 'company': oneLine[7], 
-                                 'payment': oneLine[8],
-                                 'object' : oneLine[9],
-                                 'color' : oneLine[10],
-                                 'quantity' : oneLine[11]
-                                })
+        for prod in order['products'].values():
+            for element in prod:
+                with self._conn:
+                    self._c.execute("""INSERT INTO orders VALUES (:id, :day_order, :month_order, :year_order, :day_collect,
+                                    :month_collect, :year_collect, :fv_num, :company, :payment,:object, :color, :quantity)""", 
+                                    {'id': ind,
+                                     'day_order': order['dateOrder'].day, 
+                                     'month_order': order['dateOrder'].month, 
+                                     'year_order': order['dateOrder'].year,
+                                     'day_collect': order['dateCollect'].day, 
+                                     'month_collect': order['dateCollect'].month, 
+                                     'year_collect': order['dateCollect'].year,
+                                     'fv_num': order['invoice'],
+                                     'company': order['companyName'], 
+                                     'payment': order['payment'],
+                                     'object' : element.getModel(),
+                                     'color' : element.getKind(),
+                                     'quantity' : element.getNumber()
+                                    })
 
 
     def getOrderby_companyName(self,name):
@@ -56,7 +57,7 @@ class Database(object):
         return self._c.fetchall()
 
     def getOrderby_orderMonthandYear(self,month,year):
-        self._c.execute("SELECT * FROM orders WHERE mouth_order=:month AND year_order=:year", {'month': month, 'year': year})
+        self._c.execute("SELECT * FROM orders WHERE month_order=:month AND year_order=:year", {'month': month, 'year': year})
         rawArray = self._c.fetchall()
         output = []
         if rawArray: 
@@ -68,24 +69,17 @@ class Database(object):
                      last = line[1:10]  
                      
         return  sorted(output, key=lambda a_entry: a_entry[0]) # sort all output orders by day order
-                                                               # SO says its slower than NumPy - maybe to change future
-
-    def update_Payment(self, order, pay):
-        with self._conn:
-            self._c.execute("""UPDATE employees SET pay = :pay
-                        WHERE first = :first AND last = :last""",
-                      {'first': emp.first, 'last': emp.last, 'pay': pay})
-
+                                                               # SO says its slower than NumPy - maybe to change in the future
 
     def remove_order(self, order):
         self._c.execute("""DELETE from orders WHERE day_order = :day_order 
-                        AND mouth_order = :mouth_order
+                        AND month_order = :month_order
                         AND year_order = :year_order
                         AND company = :company""",
-                      {'day_order': order['day_order'],
-                      'mouth_order': order['month_order'],
-                      'year_order': order['year_order'],
-                       'company': order['company'] }) 
+                      {'day_order': order['dateOrder'].day,
+                      'month_order': order['dateOrder'].month,
+                      'year_order': order['dateOrder'].year,
+                       'company': order['companyName'] }) 
         self._conn.commit()
 
     def getOrderList_month_year(self, month, year):
@@ -96,7 +90,7 @@ class Database(object):
     def getOneOrder(self, *,companyName, day_order, month_order, year_order):
         self._c.execute("""SELECT * FROM orders WHERE company=:companyName AND 
                          day_order= :day_order AND
-                        mouth_order = :month_order AND 
+                        month_order = :month_order AND 
                         year_order = :year_order """, 
                         {'companyName': companyName, 
                          'day_order' :  day_order, 
@@ -126,3 +120,14 @@ class Database(object):
             return []
         else: return list(set(rawList))
 
+
+    def updateOrder(self, newOrd, prevOrd): #orderManager objects
+        from orderManager import OrderManager
+        if isinstance(newOrd, dict) and isinstance(prevOrd, dict) :
+            self.remove_order(prevOrd)
+            self.insertOrder(newOrd)
+        elif isinstance(newOrd, OrderManager) and isinstance(prevOrd, OrderManager):
+            self.remove_order(prevOrd.getOrderDict())
+            self.insertOrder(newOrd.getOrderDict())
+        else : return False
+        return True

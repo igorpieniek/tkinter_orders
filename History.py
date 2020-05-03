@@ -110,10 +110,9 @@ class History(object):
             item  = self._tree.item( self._tree.focus() )['values']
             dateSep = item[2].split('-')
             dateSep = [int(i) for i in dateSep]
-            self.__todeleteOrder = {  'day_order' :dateSep[0],
-                                      'month_order': dateSep[1],
-                                      'year_order' : dateSep[2],
-                                        'company': item[1]}
+            orderDate = datetime.date(day = dateSep[0], month = dateSep[1], year=  dateSep[2])
+            self.__todeleteOrder = {  'dateOrder' : orderDate,
+                                      'companyName': item[1]}
 
     def __OnDoubleClick(self,event):
         if self._tree.selection():

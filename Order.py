@@ -151,21 +151,26 @@ class Order():
         self.__updateOrderManager()
 
         if not self.__reOrder.isEmpty(): # in case of comming here from History Window
-            if not self.__order == self.__reOrder: self.__checkAndSave()
+            if not self.__order == self.__reOrder: self.__checkAndSave(update = True)
             else: messagebox.showinfo('Info','Nic nie zostało zmienione')
         elif not self.__order == prevOrder: self.__checkAndSave() # in case of comming here from option 'new order'
         else: messagebox.showerror('Błąd!', 'PROBLEM Z ZAPISEM, DANE NIE ZOSTANĄ ZAPISANE')
 
     # Function to check during saving order action to check if most important data was added
-    def __checkAndSave(self):           
+    def __checkAndSave(self, update = False):           
         if not self.company.get():
             messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez wprowadzenia nazwy firmy!')
             return False
         elif not self.allProducts:
             messagebox.showerror('Błąd!', 'Nie można zapisać zamowienia bez zadnego wprowadzonego produktu!')
             return False
-                
-        self._database.insertOrder(self.__order.getDataToDatabase())
+
+        if update:
+            self._database.updateOrder(self.__order, self.__reOrder)
+        else:
+            self._database.insertOrder(self.__order.getOrderDict())
+            self.generatePDFClick()
+        self.__reOrder = self.__order
         messagebox.showinfo('Info','Zamówienie zostało poprawnie zapisane')
         return True
 

@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="SettingsWindow.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="orderManager.py">
       <SubType>Code</SubType>
     </Compile>
