@@ -12,10 +12,10 @@ class Database(object):
             self._c.execute("""CREATE TABLE IF NOT EXISTS orders (
                         id int,
                         day_order int,
-                        mouth_order int,
+                        month_order int,
                         year_order int,
                         day_collect int,
-                        mouth_collect int,
+                        month_collect int,
                         year_collect int,
                         fv_num text,
                         company text,
@@ -33,14 +33,14 @@ class Database(object):
         ind = self.__getNextIndex()
         for oneLine in order:
             with self._conn:
-                self._c.execute("""INSERT INTO orders VALUES (:id, :day_order, :mouth_order, :year_order, :day_collect,
-                                :mouth_collect, :year_collect, :fv_num, :company, :payment,:object, :color, :quantity)""", 
+                self._c.execute("""INSERT INTO orders VALUES (:id, :day_order, :month_order, :year_order, :day_collect,
+                                :month_collect, :year_collect, :fv_num, :company, :payment,:object, :color, :quantity)""", 
                                 {'id': ind,
                                  'day_order': oneLine[0], 
-                                 'mouth_order': oneLine[1], 
+                                 'month_order': oneLine[1], 
                                  'year_order': oneLine[2],
                                  'day_collect': oneLine[3], 
-                                 'mouth_collect': oneLine[4], 
+                                 'month_collect': oneLine[4], 
                                  'year_collect': oneLine[5],
                                  'fv_num': oneLine[6],
                                  'company': oneLine[7], 
@@ -56,7 +56,7 @@ class Database(object):
         return self._c.fetchall()
 
     def getOrderby_orderMonthandYear(self,month,year):
-        self._c.execute("SELECT * FROM orders WHERE mouth_order=:month AND year_order=:year", {'month': month, 'year': year})
+        self._c.execute("SELECT * FROM orders WHERE month_order=:month AND year_order=:year", {'month': month, 'year': year})
         rawArray = self._c.fetchall()
         output = []
         if rawArray: 
@@ -72,18 +72,18 @@ class Database(object):
 
     def update_Payment(self, order, pay):
         with self._conn:
-            self._c.execute("""UPDATE employees SET pay = :pay
+            self._c.execute("""UPDATE order SET pay = :pay
                         WHERE first = :first AND last = :last""",
                       {'first': emp.first, 'last': emp.last, 'pay': pay})
 
 
     def remove_order(self, order):
         self._c.execute("""DELETE from orders WHERE day_order = :day_order 
-                        AND mouth_order = :mouth_order
+                        AND month_order = :month_order
                         AND year_order = :year_order
                         AND company = :company""",
                       {'day_order': order['day_order'],
-                      'mouth_order': order['month_order'],
+                      'month_order': order['month_order'],
                       'year_order': order['year_order'],
                        'company': order['company'] }) 
         self._conn.commit()
@@ -96,7 +96,7 @@ class Database(object):
     def getOneOrder(self, *,companyName, day_order, month_order, year_order):
         self._c.execute("""SELECT * FROM orders WHERE company=:companyName AND 
                          day_order= :day_order AND
-                        mouth_order = :month_order AND 
+                        month_order = :month_order AND 
                         year_order = :year_order """, 
                         {'companyName': companyName, 
                          'day_order' :  day_order, 
