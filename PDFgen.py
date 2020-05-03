@@ -154,14 +154,14 @@ class PDFgen():
         import os
         projectPath = os.path.abspath(os.curdir).lower() # getting project path
 
-        pdfName = str(self.__order['dateOrder'].day) + '-' + str(self.__order['dateOrder'].month) + '-' + str(self.__order['dateOrder'].year)+ self.__order['companyName']
+        pdfName = str(self.__order['dateOrder'].day) + '-' + str(self.__order['dateOrder'].month) + '-' + str(self.__order['dateOrder'].year)+'-'+ self.__order['companyName']
 
         o = win32com.client.Dispatch("excel.application")
         o.Visible = False
         wb_path = projectPath +'\\'+self.__mainExcelName
         wb = o.Workbooks.Open(wb_path)
         ws_index_list = [1] 
-        tempFolderPath =  self.__folderPath + str(self.__order['dateOrder'].year)+ '-'+ str(self.__order['dateOrder'].month) 
+        tempFolderPath =  self.__mainFolderPath + str(self.__order['dateOrder'].year)+ '-'+ str(self.__order['dateOrder'].month) 
         Path( tempFolderPath ).mkdir(parents=True, exist_ok=True)
         path_to_pdf = tempFolderPath + '\\'+ pdfName +'.pdf'
         path_to_pdf = r''.join(path_to_pdf)
@@ -172,10 +172,26 @@ class PDFgen():
     def __readPath(self):
         try: 
             file = open('config.txt')
-            self.__folderPath = file.read()
+            self.__mainFolderPath = file.read()
             file.close()
         except: 
             print('So such file!')
             messagebox.showerror('Błąd!', 'Nie można wygenerować pliku PDF!\n Najpierw wybierz folder korzystając z ustawień')
             return False
         else: return True
+
+    def deletePDFfile(self, order):
+        import os
+        self.__readPath() # update main folder path
+        pdfName = str(order['dateOrder'].day) + '-' + str(order['dateOrder'].month) + '-' + str(order['dateOrder'].year)+ '-' + order['companyName']+ '.pdf'
+        folderPath = self.__mainFolderPath +  str(self.__order['dateOrder'].year)+ '-'+ str(self.__order['dateOrder'].month) 
+        if os.path.exists(folderPath+ '\\'+pdfName):
+          os.remove(folderPath + '\\'+ pdfName)
+          print('The file:',pdfName, ' removed!' )
+        else:
+          print("The file does not exist")
+
+        if len(os.listdir(folderPath)) == 0: # Check is empty..
+            os.rmdir(folderPath)
+            print('Folder was empty, it was deleted')
+        else: print('Folder isnt empty')

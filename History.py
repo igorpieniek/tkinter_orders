@@ -130,7 +130,9 @@ class History(object):
     def __deleteOrder(self):
         MsgBox = messagebox.askquestion ('Usunięcie zamówienia','Czy napewno chcesz usunąć wybrane zamówienie?',icon = 'warning', )
         if MsgBox == 'yes':
-            if self.__todeleteOrder: self._database.remove_order(self.__todeleteOrder)
+            if self.__todeleteOrder:         
+               self._database.remove_order(self.__todeleteOrder)
+               
             print('Order deleted')
             self.__updateTree()
 
