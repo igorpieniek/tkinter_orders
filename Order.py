@@ -167,6 +167,7 @@ class Order():
                 
         self._database.insertOrder(self.__order.getDataToDatabase())
         self.generatePDFClick()
+        self.__reOrder = self.__order
         messagebox.showinfo('Info','Zamówienie zostało poprawnie zapisane')
         return True
 
